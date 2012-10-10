@@ -98,7 +98,7 @@ namespace MSEKinectTests
         public void ProcessPersonsOnFrameStandardTest()
         {
             
-            PersonManager_Accessor target = new PersonManager_Accessor();
+            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
 
             //Empty list of devices
             List<Device> currentDevices = new List<Device>();
@@ -129,7 +129,7 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessPersonsOnFrameTestEmptyToOne()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor();
+            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
 
             //Empty list of devices
             List<Device> currentDevices = new List<Device>();
@@ -157,7 +157,7 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessPersonsOnFrameTestEmptyToEmpty()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor();
+            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
 
             //Empty list of devices
             List<Device> currentDevices = new List<Device>();
@@ -186,7 +186,7 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsStandardTest()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor();
+            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
 
             //Missing Persons = { Person (Id = 1, Holds-Device = 2) }
             List<Person> missingPersons = new List<Person>() 
@@ -218,7 +218,7 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsTestDeviceDoesntExist()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor();
+            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
 
             //Missing person has a reference to a device that doesn't exist
 
@@ -249,7 +249,7 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsTestNoMissingPersons()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor();
+            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
 
             //Missing Persons  = empty 
             List<Person> missingPersons = new List<Person>();
@@ -275,7 +275,7 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsTest()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor();
+            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
 
             //Missing Persons  = empty 
             List<Person> missingPersons = new List<Person>();

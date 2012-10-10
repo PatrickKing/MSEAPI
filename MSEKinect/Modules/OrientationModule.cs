@@ -9,7 +9,7 @@ namespace MSEKinect.Modules
 {
     public class OrientationModule: NancyModule
     {
-        public OrientationModule(IAIntAirAct intAirAct)
+        public OrientationModule(Room room)
         {
             //TODO Refactor this to work on a RESTful 
             Action<IADevice, Orientation> action = delegate(IADevice device, Orientation orientation)
@@ -23,6 +23,23 @@ namespace MSEKinect.Modules
             };
 
             Put["action/orientationUpdate"] = _ => Response.Execute(action);
+
+            Get["device/{id}"] = parameters =>
+            {
+                Console.WriteLine("" + parameters.id);
+                String name = Uri.UnescapeDataString(parameters.id);
+                Console.WriteLine(name);
+
+                //Find the associated device in the Current Devices 
+                Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
+
+                return Response.RespondWith(device, "devices");
+            };
+
+            Put["device/{id}"] = parameters =>
+            {
+                return "Hello " + parameters.id;
+            };
              
             
         }

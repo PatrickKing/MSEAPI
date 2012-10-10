@@ -16,10 +16,12 @@ namespace MSEKinect
     {
         KinectSensor ks;
         GestureController gestureController;
+        Room room;
 
-        public PersonManager(GestureController gc = null)
+        public PersonManager(Room room, GestureController gc)
         {
-            this.gestureController = gc; 
+            this.gestureController = gc;
+            this.room = room;
         }
 
 
@@ -135,13 +137,11 @@ namespace MSEKinect
             //Process the skeleton frame
             else
             {
-                Room ri = TinyIoC.TinyIoCContainer.Current.Resolve<Room>();
-
                 //Capture the updates persons from the skeleton object
                 List<Person> updatedPersons = GetPersons(GetSkeletons(e));
 
                 //Process and handle the update to Persons
-                ri.CurrentPersons = ProcessPersonsOnFrame(updatedPersons, ri.CurrentPersons, ri.CurrentDevices);
+                room.CurrentPersons = ProcessPersonsOnFrame(updatedPersons, room.CurrentPersons, room.CurrentDevices);
 
                 gestureController.UpdateAllGestures(GetSkeletons(e));
             }

@@ -16,16 +16,18 @@ namespace MSEKinect
         public void Start()
         {
             //Instantiate Components 
-            gc = new GestureController();
-            km = new PersonManager(gc);
-            dm = new DeviceManager(); 
             ri = new Room();
+            
+
+            gc = new GestureController();
+            km = new PersonManager(ri, gc);
+            dm = new DeviceManager(ri); 
 
             km.StartPersonManager();
             dm.StartDeviceManager();
 
-            gc.GestureRecognized += ri.PersonPairGestureRecognized; 
-            
+            gc.GestureRecognized += ri.PersonPairGestureRecognized;
+
             TinyIoC.TinyIoCContainer.Current.Register<Room>(ri);
         }
 

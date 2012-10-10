@@ -10,6 +10,11 @@ namespace MSEKinect
     public class DeviceManager
     {
         IAIntAirAct ia;
+        Room room;
+
+        public DeviceManager(Room room) {
+            this.room = room;
+        }
 
         public void StartDeviceManager()
         {
@@ -32,13 +37,12 @@ namespace MSEKinect
 
         internal void DeviceListUpdated(object sender, EventArgs e)
         {
-            Console.WriteLine("Device List Updated"); 
-            Room ri = TinyIoC.TinyIoCContainer.Current.Resolve<Room>(); 
+            Console.WriteLine("Device List Updated");
 
             //Capture the updated devices from IntAirAct
             List<Device> updatedDevices = GetDevices(ia.devices);
 
-            ri.CurrentDevices = ProcessDevicesOnUpdated(updatedDevices, ri.CurrentDevices, ri.CurrentPersons);
+            room.CurrentDevices = ProcessDevicesOnUpdated(updatedDevices, room.CurrentDevices, room.CurrentPersons);
  
         }
 
