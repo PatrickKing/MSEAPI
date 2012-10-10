@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEGestureRecognizer", "MSE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntAirAct", "IntAirActCS\IntAirAct\IntAirAct.csproj", "{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEKinectBootstrapper", "MSEKinectBootstrapper\MSEKinectBootstrapper.csproj", "{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = MSEAPI.vsmdi
@@ -81,6 +83,16 @@ Global
 		{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}.Release|x86.ActiveCfg = Release|Any CPU
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Debug|x86.ActiveCfg = Debug|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Debug|x86.Build.0 = Debug|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Release|Any CPU.ActiveCfg = Release|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Release|Mixed Platforms.Build.0 = Release|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Release|x86.ActiveCfg = Release|x86
+		{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
