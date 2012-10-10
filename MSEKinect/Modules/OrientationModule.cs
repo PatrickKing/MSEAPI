@@ -26,9 +26,7 @@ namespace MSEKinect.Modules
 
             Get["device/{id}"] = parameters =>
             {
-                Console.WriteLine("" + parameters.id);
                 String name = Uri.UnescapeDataString(parameters.id);
-                Console.WriteLine(name);
 
                 //Find the associated device in the Current Devices 
                 Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
