@@ -65,5 +65,10 @@ namespace MSEKinect
             return (d.Identifier == this.Identifier);
         }
 
+        public override string ToString()
+        {
+            return String.Format("Device[Orientation: {0}, PairingState: {1}, HeldByPersonIdentifier: {2}]", Orientation, PairingState, HeldByPersonIdentifier);
+        }
+
     }
 }
