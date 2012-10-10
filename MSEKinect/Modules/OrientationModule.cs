@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Nancy; 
 using IntAirAct;
+using Nancy.ModelBinding;
 
 namespace MSEKinect.Modules
 {
@@ -36,6 +37,10 @@ namespace MSEKinect.Modules
 
             Put["device/{id}"] = parameters =>
             {
+                Device d = this.Bind();
+
+                Console.WriteLine(d.ToString());
+
                 return "Hello " + parameters.id;
             };
              
