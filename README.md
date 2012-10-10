@@ -9,3 +9,6 @@ An API for creating Multi-Surface Environments
 5. Open `*/IntAirActCS/IntAirAct.sln`, build, and close the solution
 6. Open `MSEAPI.sln` in Visual Studio and ensure it builds correctly `F6`
 
+# Jenkins
+This repository is set up with Jenkins, so whenever something is pushed to GitHub, then Jenkins runs the build script
+
