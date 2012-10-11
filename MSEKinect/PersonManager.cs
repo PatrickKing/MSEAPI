@@ -14,6 +14,8 @@ namespace MSEKinect
     //TODO Refactor into seperate classes for device-detection and person-detection
     public class PersonManager
     {
+        private static TraceSource _source = new TraceSource("MSEKinect");
+
         KinectSensor ks;
         GestureController gestureController;
         Room room;
@@ -31,7 +33,7 @@ namespace MSEKinect
             // Checks to see how many Kinects are connected to the system. If None then exit.
             if (KinectSensor.KinectSensors.Count == 0)
             {
-                Console.Out.WriteLine("There are no Kinects Connected");
+                _source.TraceEvent(TraceEventType.Error, 0, "There are no Kinects connected");
                 return;
             }
 
@@ -73,15 +75,25 @@ namespace MSEKinect
                           select cp;
 
             List<Person> missingPersons = missing.ToList<Person>();
-            ProcessMissingPersons(missingPersons, currentConnectedDevices); 
+
+            //TODO Reconsider this too 
+            if (missingPersons.Count > 0)
+            {
+                ProcessMissingPersons(missingPersons, currentConnectedDevices);
+            }
 
             //Determine Persons newly Added to the System
             var added = from up in updatedPersons
                         where !currentPersons.Contains(up)
                         select up;
 
-            List<Person> addedPersons = added.ToList<Person>(); 
-            ProcessAddedPersons(addedPersons); 
+            List<Person> addedPersons = added.ToList<Person>();
+
+            //TODO Reconsider How This Event Is Called
+            if (addedPersons.Count > 0)
+            {
+                ProcessAddedPersons(addedPersons);
+            }
 
             //Update the List of Current Persons
             List<Person> processedPersons = new List<Person>();
@@ -100,7 +112,8 @@ namespace MSEKinect
         /// <param name="currentConnectedDevices"> List of devices currently connected to the system </param>
         internal void ProcessMissingPersons(List<Person> missingPersons, List<Device> currentConnectedDevices)
         {
-            
+            _source.TraceEvent(TraceEventType.Verbose, 0, "Processing Missing Persons");
+
            //For each Person in the list, remove it's held-device referece and the circular reference held by the device
             foreach (Person p in missingPersons)
             {
@@ -124,7 +137,7 @@ namespace MSEKinect
         /// <param name="addedPersons"></param>
         private void ProcessAddedPersons(List<Person> addedPersons)
         {
-
+            _source.TraceEvent(TraceEventType.Verbose, 0, "Processing Added Persons"); 
         }
 
         //TODO Add documentation explaining how this works

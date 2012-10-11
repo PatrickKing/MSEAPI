@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Kinect;
+using System.Diagnostics;
 
 namespace MSEGestureRecognizer
 {
     public class WaveLeftSegment1 : IRelativeGestureSegment
     {
+        private static TraceSource _source = new TraceSource("MSEGestureRecognizer");
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -22,6 +25,7 @@ namespace MSEGestureRecognizer
                 // hand right of elbow
                 if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
+                    _source.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 1");
                     return GesturePartResult.Suceed;
                 }
 
@@ -36,6 +40,8 @@ namespace MSEGestureRecognizer
 
     public class WaveLeftSegment2 : IRelativeGestureSegment
     {
+        private static TraceSource _source = new TraceSource("MSEGestureRecognizer");
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>
@@ -49,6 +55,7 @@ namespace MSEGestureRecognizer
                 // hand right of elbow
                 if (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
+                    _source.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 2");
                     return GesturePartResult.Suceed;
                 }
 
