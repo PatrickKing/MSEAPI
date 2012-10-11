@@ -22,13 +22,15 @@ namespace MSEGestureRecognizer
         {
             // Define the gestures
 
-            IRelativeGestureSegment[] waveRightSegments = new IRelativeGestureSegment[4];
+            //TODO This should actually be 4 segments, but it's behaving inconsistently
+            // Try getting it to work once we've fixed issue #5
+            IRelativeGestureSegment[] waveRightSegments = new IRelativeGestureSegment[2];
             WaveRightSegment1 waveRightSegment1 = new WaveRightSegment1();
             WaveRightSegment2 waveRightSegment2 = new WaveRightSegment2();
             waveRightSegments[0] = waveRightSegment1;
             waveRightSegments[1] = waveRightSegment2;
-            waveRightSegments[2] = waveRightSegment1;
-            waveRightSegments[3] = waveRightSegment2;
+            //waveRightSegments[2] = waveRightSegment1;
+            //waveRightSegments[3] = waveRightSegment2;
             AddGesture(GestureType.WaveRight, waveRightSegments);
 
             IRelativeGestureSegment[] waveLeftSegments = new IRelativeGestureSegment[4];
