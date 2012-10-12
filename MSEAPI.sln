@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEKinectBootstrapper", "MSEKinectBootstrapper\MSEKinectBootstrapper.csproj", "{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEKinect", "MSEKinect\MSEKinect.csproj", "{880AD678-2C20-423E-B5B8-55AB3933B192}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEKinectTests", "MSEKinectTests\MSEKinectTests.csproj", "{F9442BC1-AFFC-4699-9DAA-745D5D68A2B3}"
@@ -17,8 +19,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEGestureRecognizer", "MSEGestureRecognizer\MSEGestureRecognizer.csproj", "{A243FD29-4572-4351-8CC8-498488EF67C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntAirAct", "IntAirActCS\IntAirAct\IntAirAct.csproj", "{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEKinectBootstrapper", "MSEKinectBootstrapper\MSEKinectBootstrapper.csproj", "{D9B8A8C1-02E7-4053-90A2-B78022E13B9D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{419FE00E-F3A0-4D81-85B0-E940C970F89A}"
 	ProjectSection(SolutionItems) = preProject
