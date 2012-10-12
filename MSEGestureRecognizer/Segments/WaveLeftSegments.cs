@@ -9,7 +9,7 @@ namespace MSEGestureRecognizer
 {
     public class WaveLeftSegment1 : IRelativeGestureSegment
     {
-        private static TraceSource _source = new TraceSource("MSEGestureRecognizer");
+        private static TraceSource logger = new TraceSource("MSEGestureRecognizer");
 
         /// <summary>
         /// Checks the gesture.
@@ -18,14 +18,15 @@ namespace MSEGestureRecognizer
         /// <returns>GesturePartResult based on if the gesture part has been completed</returns>
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
-            //Console.Out.WriteLine(skeleton.Joints[JointType.HandLeft].Position.Y);
+            //logger.TraceEvent(TraceEventType.Verbose, 0, skeleton.Joints[JointType.HandLeft].Position.Y);
+
             // hand above elbow
             if (skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.ElbowLeft].Position.Y)
             {
                 // hand right of elbow
                 if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
-                    _source.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 1");
+                    logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 1");
                     return GesturePartResult.Suceed;
                 }
 
@@ -40,7 +41,7 @@ namespace MSEGestureRecognizer
 
     public class WaveLeftSegment2 : IRelativeGestureSegment
     {
-        private static TraceSource _source = new TraceSource("MSEGestureRecognizer");
+        private static TraceSource logger = new TraceSource("MSEGestureRecognizer");
 
         /// <summary>
         /// Checks the gesture.
@@ -55,7 +56,7 @@ namespace MSEGestureRecognizer
                 // hand right of elbow
                 if (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
-                    _source.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 2");
+                    logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 2");
                     return GesturePartResult.Suceed;
                 }
 
