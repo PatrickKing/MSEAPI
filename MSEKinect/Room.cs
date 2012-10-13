@@ -108,8 +108,9 @@ namespace MSEKinect
             IADevice device = devices.Find(d => d.name == pairingDevice.Identifier);
             if (device != null)
             {
-                RestClient client = new RestClient(String.Format("http://{0}", device.host));
+                RestClient client = new RestClient(String.Format("http://{0}:{1}", device.host, device.port));
                 RestRequest request = new RestRequest("action/pairingSucceeded", Method.PUT);
+                request.AddBody("{'actions':{'action':'pairingSucceeded','parameters':[]}}");
                 client.Execute(request);
             }
 
