@@ -12,9 +12,9 @@ namespace MSEKinect.Modules
     {
         public OrientationModule(Room room)
         {
-            Get["device/{id}"] = parameters =>
+            Get["device/{identifier}"] = parameters =>
             {
-                String name = Uri.UnescapeDataString(parameters.id);
+                String name = Uri.UnescapeDataString(parameters.identifier);
 
                 //Find the associated device in the Current Devices 
                 Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
@@ -22,13 +22,13 @@ namespace MSEKinect.Modules
                 return Response.RespondWith(device, "devices");
             };
 
-            Put["device/{id}"] = parameters =>
+            Put["device/{identifier}"] = parameters =>
             {
                 Device d = this.Bind();
 
                 Console.WriteLine(d.ToString());
 
-                return "Hello " + parameters.id;
+                return "Hello " + parameters.identifier;
             };
         }
     }
