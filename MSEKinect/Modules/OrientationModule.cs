@@ -29,7 +29,7 @@ namespace MSEKinect.Modules
             Put["device/{identifier}"] = parameters =>
             {
                 string json = Request.BodyAsString();
-                logger.TraceEvent(TraceEventType.Verbose, 0, "PUT /device/{identifier}: ", json);
+                logger.TraceEvent(TraceEventType.Verbose, 0, "PUT /device/:identifier ", json);
                 object obj = intAirAct.DeserializeObject(JObject.Parse(json));
                 Type type1 = obj.GetType();
                 if (obj.GetType().Equals(typeof(Device)))
@@ -37,7 +37,7 @@ namespace MSEKinect.Modules
                     String name = Uri.UnescapeDataString(parameters.identifier);
                     Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
 
-                    if (device == null)
+                    if (device != null)
                     {
                         device.Orientation = ((Device)obj).Orientation;
                         logger.TraceEvent(TraceEventType.Verbose, 0, "Updated orientation of {0}", device);
