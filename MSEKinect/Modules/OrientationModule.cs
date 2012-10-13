@@ -29,21 +29,29 @@ namespace MSEKinect.Modules
             Put["device/{identifier}"] = parameters =>
             {
                 string json = Request.BodyAsString();
-                logger.TraceEvent(TraceEventType.Verbose, 0, json);
-                JObject msedeviceJson = JObject.Parse(json);
-                object obj = intAirAct.DeserializeObject(msedeviceJson);
+                logger.TraceEvent(TraceEventType.Verbose, 0, "PUT /device/{identifier}: ", json);
+                object obj = intAirAct.DeserializeObject(JObject.Parse(json));
                 Type type1 = obj.GetType();
                 if (obj.GetType().Equals(typeof(Device)))
                 {
                     String name = Uri.UnescapeDataString(parameters.identifier);
                     Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
 
-                    device.Orientation = ((Device)obj).Orientation;
-                    logger.TraceEvent(TraceEventType.Verbose, 0, "Successfully updated orientation");
-                    return "OK";
+                    if (device == null)
+                    {
+                        device.Orientation = ((Device)obj).Orientation;
+                        logger.TraceEvent(TraceEventType.Verbose, 0, "Updated orientation of {0}", device);
+                        return HttpStatusCode.OK;
+                    }
+                    else
+                    {
+                        logger.TraceEvent(TraceEventType.Error, 0, "Could not find device with identifier: {0}", name);
+                        return HttpStatusCode.NotFound;
+                    }
                 }
                 else
                 {
+                    logger.TraceEvent(TraceEventType.Error, 0, "Did not receive a Device object");
                     return HttpStatusCode.BadRequest;
                 }
             };
