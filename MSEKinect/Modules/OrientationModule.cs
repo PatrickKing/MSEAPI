@@ -6,6 +6,7 @@ using Nancy;
 using IntAirAct;
 using Nancy.ModelBinding;
 using System.Diagnostics;
+using Newtonsoft.Json.Linq;
 
 namespace MSEKinect.Modules
 {
@@ -13,7 +14,7 @@ namespace MSEKinect.Modules
     {
         private static TraceSource logger = new TraceSource("MSEKinect");
 
-        public OrientationModule(Room room)
+        public OrientationModule(IAIntAirAct intAirAct, Room room)
         {
             Get["device/{identifier}"] = parameters =>
             {
@@ -27,11 +28,24 @@ namespace MSEKinect.Modules
 
             Put["device/{identifier}"] = parameters =>
             {
-                Device d = this.Bind();
+                string json = Request.BodyAsString();
+                logger.TraceEvent(TraceEventType.Verbose, 0, json);
+                JObject msedeviceJson = JObject.Parse(json);
+                object obj = intAirAct.DeserializeObject(msedeviceJson);
+                Type type1 = obj.GetType();
+                if (obj.GetType().Equals(typeof(Device)))
+                {
+                    String name = Uri.UnescapeDataString(parameters.identifier);
+                    Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
 
-                logger.TraceEvent(TraceEventType.Information, 0, d.ToString());
-
-                return "Hello " + parameters.identifier;
+                    device.Orientation = ((Device)obj).Orientation;
+                    logger.TraceEvent(TraceEventType.Verbose, 0, "Successfully updated orientation");
+                    return "OK";
+                }
+                else
+                {
+                    return HttpStatusCode.BadRequest;
+                }
             };
         }
     }

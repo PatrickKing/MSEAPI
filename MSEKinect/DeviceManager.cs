@@ -27,6 +27,7 @@ namespace MSEKinect
             ia.capabilities.Add(new IACapability("PUT action/pairWith"));
             ia.capabilities.Add(new IACapability("PUT action/orientationUpdate"));
             ia.capabilities.Add(new IACapability("PUT /device/:identifier"));
+            ia.AddMappingForClass(typeof(Device), "mse-device");
 
             ia.AddMappingForClass(typeof(Orientation), "orientations"); 
 
