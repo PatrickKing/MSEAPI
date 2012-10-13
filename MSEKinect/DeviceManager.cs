@@ -16,27 +16,19 @@ namespace MSEKinect
         private static TraceSource logger = new TraceSource("MSEKinect");
 
 
-        public DeviceManager(Room room) {
+        public DeviceManager(Room room, IAIntAirAct intAirAct) {
             this.room = room;
+            this.ia = intAirAct;
         }
 
         public void StartDeviceManager()
         {
-            ia = new IAIntAirAct();
-            ia.client = false;
-            ia.capabilities.Add(new IACapability("PUT action/pairWith"));
-            ia.capabilities.Add(new IACapability("PUT action/orientationUpdate"));
-            ia.capabilities.Add(new IACapability("PUT /device/:identifier"));
-            ia.AddMappingForClass(typeof(Device), "mse-device");
-
-            ia.deviceUpdateEventHandler += new ServiceUpdateEventHandler(DeviceListUpdated); 
-
-            ia.Start();
+            ia.deviceUpdateEventHandler += new ServiceUpdateEventHandler(DeviceListUpdated);
         }
 
         public void StopDeviceManager()
         {
-            ia.Stop();
+            // TODO remove eventHandler
         }
 
         internal void DeviceListUpdated(object sender, EventArgs e)

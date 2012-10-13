@@ -97,7 +97,7 @@ namespace MSEKinectTests
         [TestMethod()]
         public void AttemptPairingTest()
         {
-            Room target = new Room(); 
+            Room target = new Room(null); 
 
             List<Device> devices = new List<Device>(); 
             devices.Add(CreateTestDevice(1, null, PairingState.PairingAttempt)); 
@@ -121,7 +121,7 @@ namespace MSEKinectTests
         [TestMethod()]
         public void AttemptPairingTestSingleState()
         {
-            Room target = new Room();
+            Room target = new Room(null);
 
             List<Device> devices = new List<Device>();
             devices.Add(CreateTestDevice(1, null, PairingState.PairingAttempt));
@@ -145,7 +145,7 @@ namespace MSEKinectTests
         [TestMethod()]
         public void AttemptPairingWithPairedTest()
         {
-            Room target = new Room();
+            Room target = new Room(null);
 
             List<Device> devices = new List<Device>();
             devices.Add(CreateTestDevice(1, null, PairingState.PairingAttempt));

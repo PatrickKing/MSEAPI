@@ -3,19 +3,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MSEGestureRecognizer;
-using System.Diagnostics; 
+using System.Diagnostics;
+using IntAirAct;
+using RestSharp; 
 
 namespace MSEKinect
 {
     public class Room
     {
 
-        private static TraceSource logger = new TraceSource("Room");
+        private static TraceSource logger = new TraceSource("MSEKinect");
 
-        public Room()
+        private IAIntAirAct intAirAct;
+
+        public Room(IAIntAirAct intAirAct)
         {
             CurrentPersons = new List<Person>();
-            CurrentDevices = new List<Device>();  
+            CurrentDevices = new List<Device>();
+
+            this.intAirAct = intAirAct;
         }
 
         private List<Person> _currentPersons;
@@ -67,7 +73,6 @@ namespace MSEKinect
             if (pairingPerson == null)
             {
                 logger.TraceEvent(TraceEventType.Error, 0, "Cannot Pair Because No Person Is Marked For Pairing");
-
             }
 
 
@@ -98,6 +103,15 @@ namespace MSEKinect
             //Create a Holds-Device and Held-By-Person Relationship
             pairingPerson.HeldDeviceIdentifier = pairingDevice.Identifier;
             pairingDevice.HeldByPersonIdentifier = pairingPerson.Identifier;
+
+            List<IADevice> devices = intAirAct.devices;
+            IADevice device = devices.Find(d => d.name == pairingDevice.Identifier);
+            if (device != null)
+            {
+                RestClient client = new RestClient(String.Format("http://{0}", device.host));
+                RestRequest request = new RestRequest("action/pairingSucceeded", Method.PUT);
+                client.Execute(request);
+            }
 
             logger.TraceEvent(TraceEventType.Information, 0, "Pairing Succeeded with Device {0} and Person {1}", pairingDevice.Identifier, pairingPerson.Identifier); 
 
