@@ -5,11 +5,14 @@ using System.Text;
 using Nancy; 
 using IntAirAct;
 using Nancy.ModelBinding;
+using System.Diagnostics;
 
 namespace MSEKinect.Modules
 {
     public class OrientationModule: NancyModule
     {
+        private static TraceSource logger = new TraceSource("MSEKinect");
+
         public OrientationModule(Room room)
         {
             Get["device/{identifier}"] = parameters =>
@@ -26,7 +29,7 @@ namespace MSEKinect.Modules
             {
                 Device d = this.Bind();
 
-                Console.WriteLine(d.ToString());
+                logger.TraceEvent(TraceEventType.Information, 0, d.ToString());
 
                 return "Hello " + parameters.identifier;
             };

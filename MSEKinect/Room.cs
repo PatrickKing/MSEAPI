@@ -10,7 +10,7 @@ namespace MSEKinect
     public class Room
     {
 
-        private static TraceSource _source = new TraceSource("Room");
+        private static TraceSource logger = new TraceSource("Room");
 
         public Room()
         {
@@ -34,7 +34,7 @@ namespace MSEKinect
 
         public void AttemptPairing()
         {
-            _source.TraceEvent(TraceEventType.Verbose, 0, "Attempting To Pair");
+            logger.TraceEvent(TraceEventType.Verbose, 0, "Attempting To Pair");
             AttemptPairing(CurrentDevices, CurrentPersons); 
 
         }
@@ -60,13 +60,13 @@ namespace MSEKinect
             //Check Device & Person 
             if (pairingDevice == null)
             {
-                Console.WriteLine("Cannot Pair Because No Device Is Marked For Pairing");  
+                logger.TraceEvent(TraceEventType.Error, 0, "Cannot Pair Because No Device Is Marked For Pairing");
 
             }
 
             if (pairingPerson == null)
             {
-                Console.WriteLine("Cannot Pair Because No Person Is Marked For Pairing"); 
+                logger.TraceEvent(TraceEventType.Error, 0, "Cannot Pair Because No Person Is Marked For Pairing");
 
             }
 
@@ -76,7 +76,7 @@ namespace MSEKinect
             String personExists = (pairingPerson != null) ? "Pairing Person" : "Null";
 
             
-            _source.TraceEvent(TraceEventType.Verbose, 0, "Device: {0} and Person: {1}", deviceExists, personExists); 
+            logger.TraceEvent(TraceEventType.Verbose, 0, "Device: {0} and Person: {1}", deviceExists, personExists); 
 
             if (pairingDevice != null && pairingPerson != null)
             {
@@ -99,7 +99,7 @@ namespace MSEKinect
             pairingPerson.HeldDeviceIdentifier = pairingDevice.Identifier;
             pairingDevice.HeldByPersonIdentifier = pairingPerson.Identifier;
 
-            _source.TraceEvent(TraceEventType.Information, 0, "Pairing Succeeded with Device {0} and Person {1}", pairingDevice.Identifier, pairingPerson.Identifier); 
+            logger.TraceEvent(TraceEventType.Information, 0, "Pairing Succeeded with Device {0} and Person {1}", pairingDevice.Identifier, pairingPerson.Identifier); 
 
         }
 
@@ -112,7 +112,7 @@ namespace MSEKinect
         /// <param name="e"> The Gesture Event Arguments, which includes the tracking id</param>
         public void PersonPairGestureRecognized(object sender, GestureEventArgs e)
         {
-            _source.TraceEvent(TraceEventType.Information, 0, "Person Wave Gesture Recognized"); 
+            logger.TraceEvent(TraceEventType.Information, 0, "Person Wave Gesture Recognized"); 
 
             PersonPairGestureRecognized(e.TrackingId.ToString(), CurrentPersons); 
         }
@@ -129,7 +129,7 @@ namespace MSEKinect
             }
             AttemptPairing();
 
-            Console.Out.WriteLine("Kinect Wave Gesture Recognized"); 
+            logger.TraceEvent(TraceEventType.Information, 0, "Kinect Wave Gesture Recognized");
         }
 
 
@@ -141,7 +141,7 @@ namespace MSEKinect
         {
             Device d = Devices.Find(device => device.Identifier.Equals(DeviceId));
 
-            Console.WriteLine("Device Wave Gesture Recognized");  
+            logger.TraceEvent(TraceEventType.Information, 0, "Device Wave Gesture Recognized");
             if (d != null && d.PairingState != PairingState.Paired)
             {
                 d.PairingState = PairingState.PairingAttempt;

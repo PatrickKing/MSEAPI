@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using IntAirAct;
-using ZeroConf; 
+using ZeroConf;
+using System.Diagnostics;
 
 namespace MSEKinect
 {
@@ -11,6 +12,9 @@ namespace MSEKinect
     {
         IAIntAirAct ia;
         Room room;
+
+        private static TraceSource logger = new TraceSource("MSEKinect");
+
 
         public DeviceManager(Room room) {
             this.room = room;
@@ -38,7 +42,7 @@ namespace MSEKinect
 
         internal void DeviceListUpdated(object sender, EventArgs e)
         {
-            Console.WriteLine("Device List Updated");
+            logger.TraceEvent(TraceEventType.Information, 0, "Device List Updated");
 
             //Capture the updated devices from IntAirAct
             List<Device> updatedDevices = GetDevices(ia.devices);

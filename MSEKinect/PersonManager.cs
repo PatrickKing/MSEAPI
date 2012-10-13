@@ -14,7 +14,7 @@ namespace MSEKinect
     //TODO Refactor into seperate classes for device-detection and person-detection
     public class PersonManager
     {
-        private static TraceSource _source = new TraceSource("MSEKinect");
+        private static TraceSource logger = new TraceSource("MSEKinect");
 
         KinectSensor ks;
         GestureController gestureController;
@@ -33,7 +33,7 @@ namespace MSEKinect
             // Checks to see how many Kinects are connected to the system. If None then exit.
             if (KinectSensor.KinectSensors.Count == 0)
             {
-                _source.TraceEvent(TraceEventType.Error, 0, "There are no Kinects connected");
+                logger.TraceEvent(TraceEventType.Error, 0, "There are no Kinects connected");
                 return;
             }
 
@@ -112,7 +112,7 @@ namespace MSEKinect
         /// <param name="currentConnectedDevices"> List of devices currently connected to the system </param>
         internal void ProcessMissingPersons(List<Person> missingPersons, List<Device> currentConnectedDevices)
         {
-            _source.TraceEvent(TraceEventType.Verbose, 0, "Processing Missing Persons");
+            logger.TraceEvent(TraceEventType.Verbose, 0, "Processing Missing Persons");
 
            //For each Person in the list, remove it's held-device referece and the circular reference held by the device
             foreach (Person p in missingPersons)
@@ -137,7 +137,7 @@ namespace MSEKinect
         /// <param name="addedPersons"></param>
         private void ProcessAddedPersons(List<Person> addedPersons)
         {
-            _source.TraceEvent(TraceEventType.Verbose, 0, "Processing Added Persons"); 
+            logger.TraceEvent(TraceEventType.Verbose, 0, "Processing Added Persons"); 
         }
 
         //TODO Add documentation explaining how this works
