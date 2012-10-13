@@ -22,6 +22,7 @@ namespace MSEKinect
             ia.client = false;
             ia.capabilities.Add(new IACapability("PUT action/pairWith"));
             ia.capabilities.Add(new IACapability("PUT action/orientationUpdate"));
+            ia.capabilities.Add(new IACapability("PUT /device/:identifier"));
 
             ia.AddMappingForClass(typeof(Orientation), "orientations"); 
 
