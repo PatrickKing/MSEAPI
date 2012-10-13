@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MSEKinect
+namespace MSELocator
 { 
     public class Device
     {
@@ -12,13 +12,6 @@ namespace MSEKinect
         {
             get { return _Orientation; }
             set { _Orientation = value; }
-        }
-        
-        private PairingState _pairingState;
-        public PairingState PairingState
-        {
-            get { return _pairingState; }
-            set { _pairingState = value; }
         }
 
         private String _HeldByPersonIdentifier;
@@ -67,7 +60,7 @@ namespace MSEKinect
 
         public override string ToString()
         {
-            return String.Format("Device[Orientation: {0}, PairingState: {1}, HeldByPersonIdentifier: {2}]", Orientation, PairingState, HeldByPersonIdentifier);
+            return String.Format("Device[Orientation: {0}, HeldByPersonIdentifier: {2}]", Orientation, HeldByPersonIdentifier);
         }
 
     }

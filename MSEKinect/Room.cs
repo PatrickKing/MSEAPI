@@ -5,7 +5,8 @@ using System.Text;
 using MSEGestureRecognizer;
 using System.Diagnostics;
 using IntAirAct;
-using RestSharp; 
+using RestSharp;
+using MSELocator; 
 
 namespace MSEKinect
 {
@@ -15,34 +16,18 @@ namespace MSEKinect
         private static TraceSource logger = new TraceSource("MSEKinect");
 
         private IAIntAirAct intAirAct;
+        private MSELocatorInterface locator;
 
-        public Room(IAIntAirAct intAirAct)
+        public Room(MSELocatorInterface locator, IAIntAirAct intAirAct)
         {
-            CurrentPersons = new List<Person>();
-            CurrentDevices = new List<Device>();
-
+            this.locator = locator;
             this.intAirAct = intAirAct;
-        }
-
-        private List<Person> _currentPersons;
-        public List<Person> CurrentPersons
-        {
-            get { return _currentPersons; }
-            set { _currentPersons = value; }
-        }
-
-        private List<Device> _currentDevices;
-        public List<Device> CurrentDevices
-        {
-            get { return _currentDevices; }
-            set { _currentDevices = value; }
         }
 
         public void AttemptPairing()
         {
             logger.TraceEvent(TraceEventType.Verbose, 0, "Attempting To Pair");
-            AttemptPairing(CurrentDevices, CurrentPersons); 
-
+            AttemptPairing(locator.Devices, locator.Persons);
         }
 
         //TODO Deal with the cause where more then two Devices (or persons) are Attempting to Pair
@@ -128,7 +113,7 @@ namespace MSEKinect
         {
             logger.TraceEvent(TraceEventType.Information, 0, "Person Wave Gesture Recognized"); 
 
-            PersonPairGestureRecognized(e.TrackingId.ToString(), CurrentPersons); 
+            PersonPairGestureRecognized(e.TrackingId.ToString(), locator.Persons); 
         }
 
         internal void PersonPairGestureRecognized(String SkeletonId, List<Person> Persons)
@@ -149,7 +134,7 @@ namespace MSEKinect
 
         public void DevicePairGestureRecognized(String DeviceId)
         {
-            DevicePairGestureRecognized(DeviceId, CurrentDevices); 
+            DevicePairGestureRecognized(DeviceId, locator.Devices); 
         }
         internal void DevicePairGestureRecognized(String DeviceId, List<Device> Devices)
         {

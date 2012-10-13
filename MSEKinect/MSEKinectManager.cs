@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using MSEGestureRecognizer;
-using IntAirAct; 
+using IntAirAct;
+using MSELocator; 
 
 namespace MSEKinect
 {
@@ -24,8 +25,10 @@ namespace MSEKinect
             ia.capabilities.Add(new IACapability("PUT /device/:identifier"));
             ia.AddMappingForClass(typeof(Device), "mse-device");
 
+            MSELocatorInterface locator = new Locator();
+
             //Instantiate Components 
-            ri = new Room(ia);
+            ri = new Room(ia, locator);
 
             gc = new GestureController();
             km = new PersonManager(ri, gc);

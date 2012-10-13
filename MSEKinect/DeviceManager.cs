@@ -5,6 +5,7 @@ using System.Text;
 using IntAirAct;
 using ZeroConf;
 using System.Diagnostics;
+using MSELocator;
 
 namespace MSEKinect
 {

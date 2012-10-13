@@ -7,6 +7,7 @@ using System.Diagnostics;
 using IntAirAct;
 using ZeroConf;
 using MSEGestureRecognizer;
+using MSELocator;
 
 
 namespace MSEKinect

@@ -3,17 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace MSEKinect
+namespace MSELocator
 {
     public class Person
     {
-        private PairingState _pairingState;
-        public PairingState PairingState
-        {
-            get { return _pairingState; }
-            set { _pairingState = value; }
-        }
-
         private String _HeldDeviceIdentifier;
         public String HeldDeviceIdentifier
         {
