@@ -29,8 +29,6 @@ namespace MSEKinect
             ia.capabilities.Add(new IACapability("PUT /device/:identifier"));
             ia.AddMappingForClass(typeof(Device), "mse-device");
 
-            ia.AddMappingForClass(typeof(Orientation), "orientations"); 
-
             ia.deviceUpdateEventHandler += new ServiceUpdateEventHandler(DeviceListUpdated); 
 
             ia.Start();

@@ -28,8 +28,8 @@ namespace MSEKinect
             set { _Location = value; }
         }
 
-        private Orientation _Orientation;
-        public Orientation Orientation
+        private double? _Orientation;
+        public double? Orientation
         {
             get { return _Orientation; }
             set { _Orientation = value; }

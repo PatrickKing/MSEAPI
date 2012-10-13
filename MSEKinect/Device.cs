@@ -7,8 +7,8 @@ namespace MSEKinect
 { 
     public class Device
     {
-        private double _Orientation;
-        public double Orientation
+        private double? _Orientation;
+        public double? Orientation
         {
             get { return _Orientation; }
             set { _Orientation = value; }
