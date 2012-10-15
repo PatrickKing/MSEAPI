@@ -13,7 +13,7 @@ namespace MSEKinect
         PersonManager km;
         DeviceManager dm;
         GestureController gc; 
-        Room ri;
+        PairingRecognizer ri;
         IAIntAirAct ia;
 
         public void Start()
@@ -25,23 +25,24 @@ namespace MSEKinect
             ia.capabilities.Add(new IACapability("PUT /device/:identifier"));
             ia.AddMappingForClass(typeof(Device), "mse-device");
 
-            MSELocatorInterface locator = new Locator();
+            LocatorInterface locator = new Locator();
 
             //Instantiate Components 
-            ri = new Room(ia, locator);
+            ri = new PairingRecognizer(locator, ia);
 
             gc = new GestureController();
-            km = new PersonManager(ri, gc);
-            dm = new DeviceManager(ri, ia);
+            km = new PersonManager(locator, gc);
+            dm = new DeviceManager(locator, ia);
 
             ia.Start();
 
             km.StartPersonManager();
             dm.StartDeviceManager();
 
-            gc.GestureRecognized += ri.PersonPairGestureRecognized;
+            gc.GestureRecognized += ri.PersonPairAttempt;
 
-            TinyIoC.TinyIoCContainer.Current.Register<Room>(ri);
+            TinyIoC.TinyIoCContainer.Current.Register<LocatorInterface>(locator);
+            
         }
 
         public void Stop()

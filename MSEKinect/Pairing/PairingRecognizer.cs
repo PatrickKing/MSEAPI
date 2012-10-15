@@ -10,24 +10,27 @@ using MSELocator;
 
 namespace MSEKinect
 {
-    public class Room
+    public class PairingRecognizer
     {
-
         private static TraceSource logger = new TraceSource("MSEKinect");
 
         private IAIntAirAct intAirAct;
-        private MSELocatorInterface locator;
+        private LocatorInterface locator;
 
-        public Room(MSELocatorInterface locator, IAIntAirAct intAirAct)
+        public PairingRecognizer(LocatorInterface locator, IAIntAirAct intAirAct)
         {
             this.locator = locator;
             this.intAirAct = intAirAct;
         }
 
-        public void AttemptPairing()
+        private void AttemptPairing()
         {
             logger.TraceEvent(TraceEventType.Verbose, 0, "Attempting To Pair");
-            AttemptPairing(locator.Devices, locator.Persons);
+            
+            List<PairableDevice> pDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
+            List<PairablePerson> pPersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+
+            AttemptPairing(pDevices, pPersons); 
         }
 
         //TODO Deal with the cause where more then two Devices (or persons) are Attempting to Pair
@@ -39,20 +42,18 @@ namespace MSEKinect
         /// <param name="devices"> The list of current devices</param>
         /// <param name="persons"> The list of current persons</param>
         /// <returns></returns>
-        internal bool AttemptPairing(List<Device> devices, List<Person> persons)
+        internal bool AttemptPairing(List<PairableDevice> devices, List<PairablePerson> persons)
         {
-
             //Find a device set to PairingAttempt
-            Device pairingDevice = devices.Find(device => device.PairingState == PairingState.PairingAttempt);
+            PairableDevice pairingDevice = devices.Find(device => device.PairingState == PairingState.PairingAttempt);
 
             //Find a person set to PairingAttempt
-            Person pairingPerson = persons.Find(person => person.PairingState == PairingState.PairingAttempt);
+            PairablePerson pairingPerson = persons.Find(person => person.PairingState == PairingState.PairingAttempt);
 
             //Check Device & Person 
             if (pairingDevice == null)
             {
                 logger.TraceEvent(TraceEventType.Error, 0, "Cannot Pair Because No Device Is Marked For Pairing");
-
             }
 
             if (pairingPerson == null)
@@ -60,26 +61,25 @@ namespace MSEKinect
                 logger.TraceEvent(TraceEventType.Error, 0, "Cannot Pair Because No Person Is Marked For Pairing");
             }
 
-
             //Debug Intermittent Failure 
             String deviceExists = (pairingDevice != null) ? "Pairing Device" : "Null";
             String personExists = (pairingPerson != null) ? "Pairing Person" : "Null";
-
             
-            logger.TraceEvent(TraceEventType.Verbose, 0, "Device: {0} and Person: {1}", deviceExists, personExists); 
+            logger.TraceEvent(TraceEventType.Verbose, 0, "Device: {0} and Person: {1}", deviceExists, personExists);
 
             if (pairingDevice != null && pairingPerson != null)
             {
                 Pair(pairingDevice, pairingPerson);
                 return true;
             }
-
             else
-                return false; 
+            {
+                return false;
+            }
         }
 
 
-        internal void Pair(Device pairingDevice, Person pairingPerson)
+        internal void Pair(PairableDevice pairingDevice, PairablePerson pairingPerson)
         {
             //Change the Pairing State 
             pairingDevice.PairingState = PairingState.Paired;
@@ -109,17 +109,20 @@ namespace MSEKinect
         /// </summary>
         /// <param name="sender"> The Gesture Recognizer</param>
         /// <param name="e"> The Gesture Event Arguments, which includes the tracking id</param>
-        public void PersonPairGestureRecognized(object sender, GestureEventArgs e)
+        public void PersonPairAttempt(object sender, GestureEventArgs e)
         {
-            logger.TraceEvent(TraceEventType.Information, 0, "Person Wave Gesture Recognized"); 
+            logger.TraceEvent(TraceEventType.Information, 0, "Person Wave Gesture Recognized");
 
-            PersonPairGestureRecognized(e.TrackingId.ToString(), locator.Persons); 
+            //Cast Into List Containing PairablePersons
+            List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>(); 
+
+            PersonPairAttempt(e.TrackingId.ToString(), pairablePersons); 
         }
 
-        internal void PersonPairGestureRecognized(String SkeletonId, List<Person> Persons)
+        internal void PersonPairAttempt(String SkeletonId, List<PairablePerson> Persons)
         {
             //Set the Person involved to the AttemptingPair state 
-            Person p = Persons.Find(person => person.Identifier.Equals(SkeletonId));
+            PairablePerson p = Persons.Find(person => person.Identifier.Equals(SkeletonId));
 
             //Because the pairing can overlap, we do not want to reset a paired state 
             if (p != null && p.PairingState != PairingState.Paired)
@@ -131,14 +134,16 @@ namespace MSEKinect
             logger.TraceEvent(TraceEventType.Information, 0, "Kinect Wave Gesture Recognized");
         }
 
+        public void DevicePairAttempt(String DeviceId)
+        {
+            List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>(); 
 
-        public void DevicePairGestureRecognized(String DeviceId)
-        {
-            DevicePairGestureRecognized(DeviceId, locator.Devices); 
+            DevicePairAttempt(DeviceId, pairableDevices); 
         }
-        internal void DevicePairGestureRecognized(String DeviceId, List<Device> Devices)
+
+        internal void DevicePairAttempt(String DeviceId, List<PairableDevice> Devices)
         {
-            Device d = Devices.Find(device => device.Identifier.Equals(DeviceId));
+            PairableDevice d = Devices.Find(device => device.Identifier.Equals(DeviceId));
 
             logger.TraceEvent(TraceEventType.Information, 0, "Device Wave Gesture Recognized");
             if (d != null && d.PairingState != PairingState.Paired)
@@ -148,5 +153,4 @@ namespace MSEKinect
             AttemptPairing(); 
         }
     }
-
 }

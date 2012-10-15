@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using MSELocator;
 
 namespace MSEKinectTests
 {
@@ -12,7 +13,7 @@ namespace MSEKinectTests
     ///to contain all RoomTest Unit Tests
     ///</summary>
     [TestClass()]
-    public class RoomTest
+    public class PairingRecognizerTests
     {
 
 
@@ -64,23 +65,23 @@ namespace MSEKinectTests
         //
         #endregion
 
-        public Person CreateTestPerson(int newId, int? holdsId = null, PairingState? pairState = null)
+        internal PairablePerson CreateTestPerson(int newId, int? holdsId = null, PairingState? pairState = null)
         {
-            Person person = new Person
+            PairablePerson person = new PairablePerson
             {
                 Identifier = newId.ToString(),
                 HeldDeviceIdentifier = holdsId.ToString() ?? null,
                 Location = null,
                 Orientation = null,
-                PairingState = pairState ?? PairingState.NotPaired
+                PairingState = PairingState.NotPaired
             };
 
             return person;
         }
 
-        public Device CreateTestDevice(int newId, int? heldById = null, PairingState? pairState = null)
+        internal PairableDevice CreateTestDevice(int newId, int? heldById = null, PairingState? pairState = null)
         {
-            Device device = new Device
+            PairableDevice device = new PairableDevice
             {
                 Identifier = newId.ToString(),
                 HeldByPersonIdentifier = heldById.ToString() ?? null,
@@ -97,12 +98,12 @@ namespace MSEKinectTests
         [TestMethod()]
         public void AttemptPairingTest()
         {
-            Room target = new Room(null); 
+            PairingRecognizer target = new PairingRecognizer(null, null); 
 
-            List<Device> devices = new List<Device>(); 
+            List<PairableDevice> devices = new List<PairableDevice>(); 
             devices.Add(CreateTestDevice(1, null, PairingState.PairingAttempt)); 
 
-            List<Person> persons = new List<Person>();
+            List<PairablePerson> persons = new List<PairablePerson>();
             persons.Add(CreateTestPerson(2,null, PairingState.PairingAttempt));
 
             bool expected = true;
@@ -121,12 +122,12 @@ namespace MSEKinectTests
         [TestMethod()]
         public void AttemptPairingTestSingleState()
         {
-            Room target = new Room(null);
+            PairingRecognizer target = new PairingRecognizer(null, null); 
 
-            List<Device> devices = new List<Device>();
+            List<PairableDevice> devices = new List<PairableDevice>();
             devices.Add(CreateTestDevice(1, null, PairingState.PairingAttempt));
 
-            List<Person> persons = new List<Person>();
+            List<PairablePerson> persons = new List<PairablePerson>();
             persons.Add(CreateTestPerson(2, null, PairingState.NotPaired));
 
             bool expected = false;
@@ -145,12 +146,12 @@ namespace MSEKinectTests
         [TestMethod()]
         public void AttemptPairingWithPairedTest()
         {
-            Room target = new Room(null);
+            PairingRecognizer target = new PairingRecognizer(null, null);
 
-            List<Device> devices = new List<Device>();
+            List<PairableDevice> devices = new List<PairableDevice>();
             devices.Add(CreateTestDevice(1, null, PairingState.PairingAttempt));
 
-            List<Person> persons = new List<Person>();
+            List<PairablePerson> persons = new List<PairablePerson>();
             persons.Add(CreateTestPerson(2, null, PairingState.Paired));
 
             bool expected = false;

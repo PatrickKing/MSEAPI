@@ -19,12 +19,12 @@ namespace MSEKinect
 
         KinectSensor ks;
         GestureController gestureController;
-        Room room;
+        LocatorInterface locator;
 
-        public PersonManager(Room room, GestureController gc)
+        public PersonManager(LocatorInterface locator, GestureController gc)
         {
             this.gestureController = gc;
-            this.room = room;
+            this.locator = locator;
         }
 
 
@@ -62,7 +62,7 @@ namespace MSEKinect
 
         //TODO Add documentation for this method
         //TODO Consider writing exceptions for certain values here 
-        List<Person> ProcessPersonsOnFrame(List<Person> updatedPersons, List<Person> currentPersons, List<Device> currentConnectedDevices)
+        internal List<Person> ProcessPersonsOnFrame(List<PairablePerson> updatedPersons, List<PairablePerson> currentPersons, List<PairableDevice> currentConnectedDevices)
         {
             
 
@@ -75,7 +75,7 @@ namespace MSEKinect
                           where !updatedPersons.Contains(cp)
                           select cp;
 
-            List<Person> missingPersons = missing.ToList<Person>();
+            List<PairablePerson> missingPersons = missing.ToList<PairablePerson>();
 
             //TODO Reconsider this too 
             if (missingPersons.Count > 0)
@@ -111,7 +111,7 @@ namespace MSEKinect
         /// </summary>
         /// <param name="missingPersons"> List of Persons disconnected from the system </param>
         /// <param name="currentConnectedDevices"> List of devices currently connected to the system </param>
-        internal void ProcessMissingPersons(List<Person> missingPersons, List<Device> currentConnectedDevices)
+        internal void ProcessMissingPersons(List<PairablePerson> missingPersons, List<PairableDevice> currentConnectedDevices)
         {
             logger.TraceEvent(TraceEventType.Verbose, 0, "Processing Missing Persons");
 
@@ -119,7 +119,7 @@ namespace MSEKinect
             foreach (Person p in missingPersons)
             {
                 //Remove Held-By-Person Identifier
-                Device d = currentConnectedDevices.Find(device => device.Identifier.Equals(p.HeldDeviceIdentifier));
+                PairableDevice d = currentConnectedDevices.Find(device => device.Identifier.Equals(p.HeldDeviceIdentifier));
 
                 if (d != null)
                 {
@@ -152,10 +152,16 @@ namespace MSEKinect
             else
             {
                 //Capture the updates persons from the skeleton object
-                List<Person> updatedPersons = GetPersons(GetSkeletons(e));
+                List<PairablePerson> updatedPersons = GetPersons(GetSkeletons(e));
+
+                //Convert Locator List Types into PairablePerson & PairableDevice
+                List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>(); 
+                List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>(); 
+
+
 
                 //Process and handle the update to Persons
-                room.CurrentPersons = ProcessPersonsOnFrame(updatedPersons, room.CurrentPersons, room.CurrentDevices);
+                locator.Persons = ProcessPersonsOnFrame(updatedPersons, pairablePersons, pairableDevices);
 
                 gestureController.UpdateAllGestures(GetSkeletons(e));
             }
@@ -201,9 +207,9 @@ namespace MSEKinect
         /// </summary>
         /// <param name="updateSkeletons">A list of updated skeletons tracked by the kinect</param>
         /// <returns>List of Person objects, who are tracked by the Kinect</returns>
-        List<Person> GetPersons(List<Skeleton> updateSkeletons)
+        List<PairablePerson> GetPersons(List<Skeleton> updateSkeletons)
         {
-            List<Person> persons = new List<Person>();
+            List<PairablePerson> persons = new List<PairablePerson>();
 
             //Checks if the updatedSkeletons are null
             if (updateSkeletons == null)
@@ -216,11 +222,12 @@ namespace MSEKinect
                 //Iterate through each Skeleton to create a Person Object
                 foreach (Skeleton skeleton in updateSkeletons)
                 {
-                    Person person = new Person
+                    PairablePerson person = new PairablePerson
                     {
                         Location = new Location {X = skeleton.Position.X, Y = skeleton.Position.Y},
                         Orientation = null,
-                        Identifier = skeleton.TrackingId.ToString()
+                        Identifier = skeleton.TrackingId.ToString(),
+                        PairingState = PairingState.NotPaired
                     }; 
 
                     persons.Add(person);

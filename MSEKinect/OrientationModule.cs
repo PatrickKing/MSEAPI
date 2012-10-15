@@ -7,6 +7,7 @@ using IntAirAct;
 using Nancy.ModelBinding;
 using System.Diagnostics;
 using Newtonsoft.Json.Linq;
+using MSELocator;
 
 namespace MSEKinect.Modules
 {
@@ -14,14 +15,14 @@ namespace MSEKinect.Modules
     {
         private static TraceSource logger = new TraceSource("MSEKinect");
 
-        public OrientationModule(IAIntAirAct intAirAct, Room room)
+        public OrientationModule(IAIntAirAct intAirAct, LocatorInterface room)
         {
             Get["device/{identifier}"] = parameters =>
             {
                 String name = Uri.UnescapeDataString(parameters.identifier);
 
                 //Find the associated device in the Current Devices 
-                Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
+                Device device = room.Devices.Find(d => d.Identifier.Equals(name));
 
                 return Response.RespondWith(device, "devices");
             };
@@ -35,7 +36,7 @@ namespace MSEKinect.Modules
                 if (obj.GetType().Equals(typeof(Device)))
                 {
                     String name = Uri.UnescapeDataString(parameters.identifier);
-                    Device device = room.CurrentDevices.Find(d => d.Identifier.Equals(name));
+                    Device device = room.Devices.Find(d => d.Identifier.Equals(name));
 
                     if (device != null)
                     {

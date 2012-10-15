@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MSELocator;
 
 namespace MSEKinectTests
 {
@@ -13,7 +14,7 @@ namespace MSEKinectTests
     ///to contain all KinectCameraTest Unit Tests
     ///</summary>
     [TestClass()]
-    public class PersonManagerTest
+    public class PersonManagerTests
     {
         private TestContext testContextInstance;
 
@@ -65,25 +66,27 @@ namespace MSEKinectTests
 
         #region Process Persons Tests
 
-        public Person CreateTestPerson(int newId, int? holdsId = null)
+        internal PairablePerson CreateTestPerson(int newId, int? holdsId = null)
         {
-            Person person = new Person
+            PairablePerson person = new PairablePerson
             {
                 Identifier = newId.ToString(),
                 HeldDeviceIdentifier = holdsId.ToString() ?? null,
                 Location = null,
-                Orientation = null
+                Orientation = null,
+                PairingState = PairingState.NotPaired
             };
 
             return person;
         }
 
-        public Device CreateTestDevice(int newId, int? heldById = null)
+        internal PairableDevice CreateTestDevice(int newId, int? heldById = null)
         {
-            Device device = new Device
+            PairableDevice device = new PairableDevice
             {
                 Identifier = newId.ToString(),
-                HeldByPersonIdentifier = heldById.ToString() ?? null
+                HeldByPersonIdentifier = heldById.ToString() ?? null,
+                PairingState = PairingState.NotPaired 
             };
 
             return device;
@@ -98,22 +101,22 @@ namespace MSEKinectTests
         public void ProcessPersonsOnFrameStandardTest()
         {
             
-            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
+            PersonManager target = new PersonManager(null, null);
 
             //Empty list of devices
-            List<Device> currentDevices = new List<Device>();
+            List<PairableDevice> currentDevices = new List<PairableDevice>();
 
             //Current Persons = {1,2}
-            List<Person> currentPersons = new List<Person>();
+            List<PairablePerson> currentPersons = new List<PairablePerson>();
             currentPersons.Add(CreateTestPerson(1));
             currentPersons.Add(CreateTestPerson(2));
 
             //Update Persons = {2, 3}
-            List<Person> updatedPersons = new List<Person>();
+            List<PairablePerson> updatedPersons = new List<PairablePerson>();
             updatedPersons.Add(CreateTestPerson(2));
             updatedPersons.Add(CreateTestPerson(3));
 
-            List<Person> expected = updatedPersons; //The returned list should always be the same as the updated list
+            List<PairablePerson> expected = updatedPersons; //The returned list should always be the same as the updated list
 
             //(!) Run Person Processing
             List<Person> actual = target.ProcessPersonsOnFrame(updatedPersons, currentPersons, currentDevices);
@@ -129,21 +132,21 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessPersonsOnFrameTestEmptyToOne()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
+            PersonManager target = new PersonManager(null, null);
 
             //Empty list of devices
-            List<Device> currentDevices = new List<Device>();
+            List<PairableDevice> currentDevices = new List<PairableDevice>();
 
             //Current Persons Is Empty
-            List<Person> currentPersons = new List<Person>();
+            List<PairablePerson> currentPersons = new List<PairablePerson>();
 
             //Update Persons = {1}
-            List<Person> updatedPersons = new List<Person>();
+            List<PairablePerson> updatedPersons = new List<PairablePerson>();
             updatedPersons.Add(CreateTestPerson(1));
 
-            List<Person> expected = updatedPersons;
+            List<PairablePerson> expected = updatedPersons;
 
-            //(!) Run Person Processing
+            //(!) Run PairablePerson Processing
             List<Person> actual = target.ProcessPersonsOnFrame(updatedPersons, currentPersons, currentDevices);
 
             bool listIsEqual = actual.SequenceEqual(expected);
@@ -157,20 +160,20 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessPersonsOnFrameTestEmptyToEmpty()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
+            PersonManager target = new PersonManager(null, null);
 
             //Empty list of devices
-            List<Device> currentDevices = new List<Device>();
+            List<PairableDevice> currentDevices = new List<PairableDevice>();
 
             //Current Persons Is Empty
-            List<Person> currentPersons = new List<Person>();
+            List<PairablePerson> currentPersons = new List<PairablePerson>();
 
             //Update Persons Is Empty
-            List<Person> updatedPersons = new List<Person>();
+            List<PairablePerson> updatedPersons = new List<PairablePerson>();
 
-            List<Person> expected = updatedPersons;
+            List<PairablePerson> expected = updatedPersons;
 
-            //(!) Run Person Processing
+            //(!) Run PairablePerson Processing
             List<Person> actual = target.ProcessPersonsOnFrame(updatedPersons, currentPersons, currentDevices);
 
             bool listIsEqual = actual.SequenceEqual(expected);
@@ -180,34 +183,34 @@ namespace MSEKinectTests
         #endregion
 
         /// <summary>
-        ///This test tries the standard case. The missing Persons list contains one person, who has a circule reference to the one Device stored in the currentlyConnectedDevicesList.
+        ///This test tries the standard case. The missing Persons list contains one person, who has a circule reference to the one PairableDevice stored in the currentlyConnectedDevicesList.
         ///</summary>
         [TestMethod()]
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsStandardTest()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
+            PersonManager target = new PersonManager(null, null);
 
-            //Missing Persons = { Person (Id = 1, Holds-Device = 2) }
-            List<Person> missingPersons = new List<Person>() 
+            //Missing Persons = { PairablePerson (Id = 1, Holds-PairableDevice = 2) }
+            List<PairablePerson> missingPersons = new List<PairablePerson>() 
             {
                 CreateTestPerson(1,2)
             };
 
-            //Current Connect Devices = { Device (Id = 2, Held-By-Person = 1) } 
-            List<Device> currentConnectedDevices = new List<Device>() 
+            //Current Connect Devices = { PairableDevice (Id = 2, Held-By-PairablePerson = 1) } 
+            List<PairableDevice> currentConnectedDevices = new List<PairableDevice>() 
             {
                 CreateTestDevice(2, 1)
             };
 
-            //(!) Run Missign Device Processing 
+            //(!) Run Missign PairableDevice Processing 
             target.ProcessMissingPersons(missingPersons, currentConnectedDevices);
 
-            List<Device> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
-            List<Person> personsWithHoldsDeviceIdentifiers = missingPersons.FindAll(person => person.HeldDeviceIdentifier != null);
+            List<PairableDevice> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
+            List<PairablePerson> personsWithHoldsDeviceIdentifiers = missingPersons.FindAll(person => person.HeldDeviceIdentifier != null);
 
-            Assert.IsTrue(devicesWithHeldByIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Held-By-Person Identifier");
-            Assert.IsTrue(personsWithHoldsDeviceIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Holds-Device Identifer");
+            Assert.IsTrue(devicesWithHeldByIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Held-By-PairablePerson Identifier");
+            Assert.IsTrue(personsWithHoldsDeviceIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Holds-PairableDevice Identifer");
         }
 
         /// <summary>
@@ -218,27 +221,27 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsTestDeviceDoesntExist()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
+            PersonManager target = new PersonManager(null, null);
 
             //Missing person has a reference to a device that doesn't exist
 
-            //Missing Persons = { Person (Id = 1, Holds-Device = 3) }
-            List<Person> missingPersons = new List<Person>() 
+            //Missing Persons = { PairablePerson (Id = 1, Holds-PairableDevice = 3) }
+            List<PairablePerson> missingPersons = new List<PairablePerson>() 
             {
                 CreateTestPerson(1,3)
             };
 
             //Current Connect Devices = empty 
-            List<Device> currentConnectedDevices = new List<Device>();
+            List<PairableDevice> currentConnectedDevices = new List<PairableDevice>();
 
-            //(!) Run Missign Device Processing 
+            //(!) Run Missign PairableDevice Processing 
             target.ProcessMissingPersons(missingPersons, currentConnectedDevices);
 
-            List<Device> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
-            List<Person> personsWithHoldsDeviceIdentifiers = missingPersons.FindAll(person => person.HeldDeviceIdentifier != null);
+            List<PairableDevice> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
+            List<PairablePerson> personsWithHoldsDeviceIdentifiers = missingPersons.FindAll(person => person.HeldDeviceIdentifier != null);
 
             Assert.IsTrue(devicesWithHeldByIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Held-By-Person Identifier");
-            Assert.IsTrue(personsWithHoldsDeviceIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Holds-Device Identifer");
+            Assert.IsTrue(personsWithHoldsDeviceIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Holds-PairableDevice Identifer");
         }
 
         /// <summary>
@@ -249,21 +252,21 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsTestNoMissingPersons()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
+            PersonManager target = new PersonManager(null, null);
 
             //Missing Persons  = empty 
-            List<Person> missingPersons = new List<Person>();
+            List<PairablePerson> missingPersons = new List<PairablePerson>();
 
-            //Current Connect Devices = { Device (Id = 2, Held-By-Person = 1) } 
-            List<Device> currentConnectedDevices = new List<Device>() 
+            //Current Connect Devices = { PairableDevice (Id = 2, Held-By-Person = 1) } 
+            List<PairableDevice> currentConnectedDevices = new List<PairableDevice>() 
             {
                 CreateTestDevice(2, 1)
             };
 
-            //(!) Run Missign Device Processing 
+            //(!) Run Missign PairableDevice Processing 
             target.ProcessMissingPersons(missingPersons, currentConnectedDevices);
 
-            List<Device> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
+            List<PairableDevice> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
 
             Assert.IsTrue(devicesWithHeldByIdentifiers.Count > 0, "Process Missing Persons Did Not Remove Held-By-Person Identifier");
         }
@@ -275,20 +278,20 @@ namespace MSEKinectTests
         [DeploymentItem("MSEKinect.dll")]
         public void ProcessMissingPersonsTest()
         {
-            PersonManager_Accessor target = new PersonManager_Accessor(null, null);
+            PersonManager target = new PersonManager(null, null);
 
             //Missing Persons  = empty 
-            List<Person> missingPersons = new List<Person>();
+            List<PairablePerson> missingPersons = new List<PairablePerson>();
 
             //Current Connect Devices = empty 
-            List<Device> currentConnectedDevices = new List<Device>();
+            List<PairableDevice> currentConnectedDevices = new List<PairableDevice>();
 
             target.ProcessMissingPersons(missingPersons, currentConnectedDevices);
-            List<Device> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
-            List<Person> personsWithHoldsDeviceIdentifiers = missingPersons.FindAll(person => person.HeldDeviceIdentifier != null);
+            List<PairableDevice> devicesWithHeldByIdentifiers = currentConnectedDevices.FindAll(device => device.HeldByPersonIdentifier != null);
+            List<PairablePerson> personsWithHoldsDeviceIdentifiers = missingPersons.FindAll(person => person.HeldDeviceIdentifier != null);
 
             Assert.IsTrue(devicesWithHeldByIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Held-By-Person Identifier");
-            Assert.IsTrue(personsWithHoldsDeviceIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Holds-Device Identifer");
+            Assert.IsTrue(personsWithHoldsDeviceIdentifiers.Count == 0, "Process Missing Persons Did Not Remove Holds-PairableDevice Identifer");
 
         }
     }

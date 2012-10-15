@@ -43,7 +43,7 @@
     <Compile Include="Device.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Locator.cs" />
-    <Compile Include="MSELocatorInterface.cs" />
+    <Compile Include="LocatorInterface.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MSELocator
 {
-    public interface MSELocatorInterface
+    public interface LocatorInterface
     {
         List<Person> Persons
         {

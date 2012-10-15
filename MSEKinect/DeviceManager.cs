@@ -11,25 +11,26 @@ namespace MSEKinect
 {
     public class DeviceManager
     {
+        private static TraceSource logger = new TraceSource("MSEKinect")
+
+        event ServiceUpdateEventHandler deviceUpdateEventHandler;
         IAIntAirAct ia;
-        Room room;
+        LocatorInterface locator;
 
-        private static TraceSource logger = new TraceSource("MSEKinect");
-
-
-        public DeviceManager(Room room, IAIntAirAct intAirAct) {
-            this.room = room;
+        public DeviceManager(LocatorInterface locator, IAIntAirAct intAirAct) {
+            this.locator = locator;
             this.ia = intAirAct;
         }
 
         public void StartDeviceManager()
         {
-            ia.deviceUpdateEventHandler += new ServiceUpdateEventHandler(DeviceListUpdated);
+            deviceUpdateEventHandler = new ServiceUpdateEventHandler(DeviceListUpdated);
+            ia.deviceUpdateEventHandler += deviceUpdateEventHandler;
         }
 
         public void StopDeviceManager()
         {
-            // TODO remove eventHandler
+            ia.deviceUpdateEventHandler -= deviceUpdateEventHandler;
         }
 
         internal void DeviceListUpdated(object sender, EventArgs e)
@@ -37,20 +38,25 @@ namespace MSEKinect
             logger.TraceEvent(TraceEventType.Information, 0, "Device List Updated");
 
             //Capture the updated devices from IntAirAct
-            List<Device> updatedDevices = GetDevices(ia.devices);
+            List<PairableDevice> updatedDevices = GetDevices(ia.devices);
 
-            room.CurrentDevices = ProcessDevicesOnUpdated(updatedDevices, room.CurrentDevices, room.CurrentPersons);
+
+            //Cast Into List Containing PairableDevices, PairablePersons
+            List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>(); 
+            List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>(); 
+
+            locator.Devices = ProcessDevicesOnUpdated(updatedDevices, pairableDevices, pairablePersons);
  
         }
 
-        private List<Device> ProcessDevicesOnUpdated(List<Device> updatedDevices, List<Device> currentDevices, List<Person> currentPersons)
+        private List<Device> ProcessDevicesOnUpdated(List<PairableDevice> updatedDevices, List<PairableDevice> currentDevices, List<PairablePerson> currentPersons)
         {
 
             var missing = from cd in currentDevices
                           where !updatedDevices.Contains(cd)
                           select cd;
 
-            List<Device> missingDevices = missing.ToList<Device>();
+            List<PairableDevice> missingDevices = missing.ToList<PairableDevice>();
 
             ProcessMissingDevices(missingDevices, currentPersons); 
 
@@ -71,11 +77,11 @@ namespace MSEKinect
         }
 
         //TODO Why is the self device missing?
-        internal void ProcessMissingDevices(List<Device> missingDevices, List<Person> currentPersons)
+        internal void ProcessMissingDevices(List<PairableDevice> missingDevices, List<PairablePerson> currentPersons)
         {
             foreach (Device d in missingDevices)
             {
-                Person p = currentPersons.Find(person => person.Identifier.Equals(d.HeldByPersonIdentifier));
+                PairablePerson p = currentPersons.Find(person => person.Identifier.Equals(d.HeldByPersonIdentifier));
 
                 if (p != null)
                 {
@@ -88,16 +94,18 @@ namespace MSEKinect
             }
         }
 
-        List<Device> GetDevices(List<IADevice> updatedDevices)
+        List<PairableDevice> GetDevices(List<IADevice> updatedDevices)
         {
-            List<Device> devices = new List<Device>(); 
+            List<PairableDevice> devices = new List<PairableDevice>(); 
 
             foreach (IADevice iad in updatedDevices) {
 
                 //TODO Figure out if we should attach an IADevice
                 //Create a new Device for each IADevice found
-                Device d = new Device {
-                    Identifier = iad.name 
+                PairableDevice d = new PairableDevice
+                {
+                    Identifier = iad.name, 
+                    PairingState = PairingState.NotPaired
                 };
 
                 devices.Add(d); 
