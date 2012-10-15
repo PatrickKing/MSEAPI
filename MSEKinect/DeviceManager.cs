@@ -11,7 +11,7 @@ namespace MSEKinect
 {
     public class DeviceManager
     {
-        private static TraceSource logger = new TraceSource("MSEKinect")
+        private static TraceSource logger = new TraceSource("MSEKinect");
 
         event ServiceUpdateEventHandler deviceUpdateEventHandler;
         IAIntAirAct ia;
