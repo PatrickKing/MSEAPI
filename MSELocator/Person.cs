@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using System.Windows;
+
 namespace MSELocator
 {
     public class Person
@@ -14,8 +16,8 @@ namespace MSELocator
             set { _HeldDeviceIdentifier = value; }
         } 
 
-        private Location _Location;
-        public Location Location
+        private Point? _Location;
+        public Point? Location
         {
             get { return _Location; }
             set { _Location = value; }
@@ -25,7 +27,17 @@ namespace MSELocator
         public double? Orientation
         {
             get { return _Orientation; }
-            set { _Orientation = value; }
+            set 
+            {
+                if (value.HasValue)
+                {
+                    _Orientation = Util.NormalizeAngle(value.Value);
+                }
+                else
+                {
+                    _Orientation = null;
+                }                
+            }
         }
 
         private String _Identifier;

@@ -2,16 +2,56 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 namespace MSELocator
 { 
     public class Device
     {
+
+
         private double? _Orientation;
         public double? Orientation
         {
             get { return _Orientation; }
-            set { _Orientation = value; }
+            set 
+            {
+                if (value.HasValue)
+                {
+                    _Orientation = Util.NormalizeAngle(value.Value);
+                }
+                else
+                {
+                    _Orientation = null;
+                }  
+            }
+        }
+
+        private double? _FieldOfView;
+        public double? FieldOfView
+        {
+            get { return _FieldOfView; }
+            set 
+            {
+                if (value.HasValue)
+                {
+                    _FieldOfView = Util.NormalizeAngle(value.Value);
+                }
+                else
+                {
+                    _FieldOfView = null;
+                }  
+            
+            }
+
+
+        }
+
+        private Point? _Location;
+        public Point? Location
+        {
+            get { return _Location; }
+            set { _Location = value; }
         }
 
         private String _HeldByPersonIdentifier;
@@ -61,6 +101,14 @@ namespace MSELocator
         public override string ToString()
         {
             return String.Format("Device[Orientation: {0}, HeldByPersonIdentifier: {2}]", Orientation, HeldByPersonIdentifier);
+        }
+
+
+
+
+        public Device()
+        {
+            this.FieldOfView = Util.DEFAULT_FIELD_OF_VIEW;
         }
 
     }

@@ -9,6 +9,7 @@ using ZeroConf;
 using MSEGestureRecognizer;
 using MSELocator;
 
+using System.Windows;
 
 namespace MSEKinect
 {
@@ -224,7 +225,7 @@ namespace MSEKinect
                 {
                     PairablePerson person = new PairablePerson
                     {
-                        Location = new Location {X = skeleton.Position.X, Y = skeleton.Position.Y},
+                        Location = new Point {X = skeleton.Position.X, Y = skeleton.Position.Y},
                         Orientation = null,
                         Identifier = skeleton.TrackingId.ToString(),
                         PairingState = PairingState.NotPaired
