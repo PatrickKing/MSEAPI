@@ -18,5 +18,12 @@ namespace MSELocator
             get;
             set;
         }
+
+        List<Tracker> Trackers
+        {
+            get;
+            set;
+        }
+
     }
 }

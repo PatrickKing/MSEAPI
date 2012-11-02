@@ -16,16 +16,26 @@ namespace MSEKinect
     //TODO Refactor into seperate classes for device-detection and person-detection
     public class PersonManager
     {
-        private static TraceSource logger = new TraceSource("MSEKinect");
 
+        #region Instance Variables
+
+        private static TraceSource logger = new TraceSource("MSEKinect");
         KinectSensor ks;
         GestureController gestureController;
         LocatorInterface locator;
+        Tracker tracker;
+
+        #endregion
+
+        #region Constructor, Start and Stop
 
         public PersonManager(LocatorInterface locator, GestureController gc)
         {
             this.gestureController = gc;
             this.locator = locator;
+
+            tracker = new Tracker() { Location = new Point(0, 0), Orientation = 0, Identifier = "MSEKinect" };
+            locator.Trackers.Add(tracker);
         }
 
 
@@ -59,88 +69,14 @@ namespace MSEKinect
             ks.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(ks_SkeletonFrameReady);
         }
 
-
-
-        //TODO Add documentation for this method
-        //TODO Consider writing exceptions for certain values here 
-        internal List<Person> ProcessPersonsOnFrame(List<PairablePerson> updatedPersons, List<PairablePerson> currentPersons, List<PairableDevice> currentConnectedDevices)
+        public void StopPersonManager()
         {
-            
-
-            //Assertion that both parameters are valid 
-            Debug.Assert(!(updatedPersons == null), "Invalid Parameter: Updated Persons Cannot Be Null");
-            Debug.Assert(!(currentPersons == null), "Invalid Parameter: Current Persosn Cannot Be Null");  
-
-            //Determine Persons Missing from the System
-            var missing = from cp in currentPersons
-                          where !updatedPersons.Contains(cp)
-                          select cp;
-
-            List<PairablePerson> missingPersons = missing.ToList<PairablePerson>();
-
-            //TODO Reconsider this too 
-            if (missingPersons.Count > 0)
-            {
-                ProcessMissingPersons(missingPersons, currentConnectedDevices);
-            }
-
-            //Determine Persons newly Added to the System
-            var added = from up in updatedPersons
-                        where !currentPersons.Contains(up)
-                        select up;
-
-            List<Person> addedPersons = added.ToList<Person>();
-
-            //TODO Reconsider How This Event Is Called
-            if (addedPersons.Count > 0)
-            {
-                ProcessAddedPersons(addedPersons);
-            }
-
-            //Update the List of Current Persons
-            List<Person> processedPersons = new List<Person>();
-            processedPersons.AddRange(currentPersons);
-            processedPersons.AddRange(addedPersons);
-            processedPersons.RemoveAll(person => missingPersons.Contains(person));
-
-            return processedPersons; 
+            ks.Stop();
         }
 
+        #endregion
 
-        /// <summary>
-        /// Removes the Held-Device relationship and the Held-By-Person relationship for devices which have been disconnected from the system. 
-        /// </summary>
-        /// <param name="missingPersons"> List of Persons disconnected from the system </param>
-        /// <param name="currentConnectedDevices"> List of devices currently connected to the system </param>
-        internal void ProcessMissingPersons(List<PairablePerson> missingPersons, List<PairableDevice> currentConnectedDevices)
-        {
-            logger.TraceEvent(TraceEventType.Verbose, 0, "Processing Missing Persons");
-
-           //For each Person in the list, remove it's held-device referece and the circular reference held by the device
-            foreach (Person p in missingPersons)
-            {
-                //Remove Held-By-Person Identifier
-                PairableDevice d = currentConnectedDevices.Find(device => device.Identifier.Equals(p.HeldDeviceIdentifier));
-
-                if (d != null)
-                {
-                    d.HeldByPersonIdentifier = null;
-                    d.PairingState = PairingState.NotPaired; 
-                }
-
-                //Remove Held-Device Identifier
-                p.HeldDeviceIdentifier = null;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="addedPersons"></param>
-        private void ProcessAddedPersons(List<Person> addedPersons)
-        {
-            logger.TraceEvent(TraceEventType.Verbose, 0, "Processing Added Persons"); 
-        }
+        #region Handling Skeleton Frames from Kinect
 
         //TODO Add documentation explaining how this works
         void ks_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
@@ -152,21 +88,104 @@ namespace MSEKinect
             //Process the skeleton frame
             else
             {
-                //Capture the updates persons from the skeleton object
-                List<PairablePerson> updatedPersons = GetPersons(GetSkeletons(e));
-
-                //Convert Locator List Types into PairablePerson & PairableDevice
-                List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>(); 
-                List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>(); 
-
-
-
-                //Process and handle the update to Persons
-                locator.Persons = ProcessPersonsOnFrame(updatedPersons, pairablePersons, pairableDevices);
-
-                gestureController.UpdateAllGestures(GetSkeletons(e));
+                List<Skeleton> skeletons = GetSkeletons(e);
+                UpdatePersonsAndDevices(skeletons);
+                gestureController.UpdateAllGestures(skeletons);
             }
+
+            //TODO remove this debug junk
+            foreach (Person person in locator.Persons)
+            {
+                if (person.Location.HasValue)
+                    System.Diagnostics.Debug.WriteLine(person.Identifier + " person : " + person.Location.Value.X + " " + person.Location.Value.Y);
+                else
+                    System.Diagnostics.Debug.WriteLine(person.Identifier + " person : " + "no location");
+            }
+
         }
+
+
+        /// <summary>
+        /// Single function to update location, and eventually orientation, of persons and devices in response to new Kinect frames.
+        /// TODO: It might make sense to refactor some parts of this function into sub functions.
+        /// </summary>
+        /// <param name="skeletons"></param>
+        private void UpdatePersonsAndDevices(List<Skeleton> skeletons)
+        {
+            //Convert Locator List Types into PairablePerson & PairableDevice
+            List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+            List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
+
+            // For any skeletons that have just appeared, create a new PairablePerson
+            foreach (Skeleton skeleton in skeletons)
+            {
+                if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
+                {
+                    PairablePerson person = new PairablePerson
+                    {
+                        Location = new Point(0, 0),
+                        Orientation = 0.0,
+                        Identifier = skeleton.TrackingId.ToString(),
+                        PairingState = PairingState.NotPaired
+                    };
+                    pairablePersons.Add(person);
+                }
+            }
+
+            // For any Persons that have left the scene, remove their PairablePerson from , and if it was paired, unhook their paired device
+            List<PairablePerson> vanishedPersons = new List<PairablePerson>();
+            foreach (PairablePerson person in pairablePersons)
+            {
+                if (skeletons.Find(x => x.ToString().Equals(person.Identifier)) == null)
+                {
+                    //Remove Held-By-Person Identifier
+                    PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(x.HeldByPersonIdentifier.Equals(person.HeldDeviceIdentifier)));
+
+                    if (device != null)
+                    {
+                        device.HeldByPersonIdentifier = null;
+                        device.PairingState = PairingState.NotPaired;
+                    }
+
+                    //Remove Held-Device Identifier
+                    person.HeldDeviceIdentifier = null;
+                    vanishedPersons.Add(person);
+                }
+            }
+            foreach (PairablePerson person in vanishedPersons)
+            {
+                pairablePersons.Remove(person);
+            }
+
+            // PairablePersons and Skeletons now contain only corresponding elements.
+            // Update each Person
+            foreach (Skeleton skeleton in skeletons)
+            {
+                PairablePerson person = pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString()));
+
+                // The Kinect looks down the Z axis in its coordinate space, left right movement happens on the X axis, and vertical movement on the Y axis
+                // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
+                // the skeleton's position. See Tracker for more details.
+                tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
+
+                // TODO: Also update Person's orientation.
+
+                // If the Person has a paired device, infer that the device is located where the person is, and update its location too
+                if (person.PairingState == PairingState.Paired && person.HeldDeviceIdentifier != null)
+                {
+                    Device device = pairableDevices.Find(x => x.HeldByPersonIdentifier.Equals(person.Identifier));
+                    device.Location = person.Location;
+                }
+
+            }
+
+            //Sync up the Locator's Person collection
+            locator.Persons = new List<Person>(pairablePersons);
+        }
+
+        #endregion
+
+        #region Skeleton Frame Helper
 
         //TODO: Lost person notification
         //TODO:
@@ -202,45 +221,10 @@ namespace MSEKinect
             }
         }
 
-
-        /// <summary>
-        /// Method that returns a list of people from the skeletons tracked by the Kinect
-        /// </summary>
-        /// <param name="updateSkeletons">A list of updated skeletons tracked by the kinect</param>
-        /// <returns>List of Person objects, who are tracked by the Kinect</returns>
-        List<PairablePerson> GetPersons(List<Skeleton> updateSkeletons)
-        {
-            List<PairablePerson> persons = new List<PairablePerson>();
-
-            //Checks if the updatedSkeletons are null
-            if (updateSkeletons == null)
-            {
-                return persons; 
-            }
-
-            else
-            {
-                //Iterate through each Skeleton to create a Person Object
-                foreach (Skeleton skeleton in updateSkeletons)
-                {
-                    PairablePerson person = new PairablePerson
-                    {
-                        Location = new Point {X = skeleton.Position.X, Y = skeleton.Position.Y},
-                        Orientation = null,
-                        Identifier = skeleton.TrackingId.ToString(),
-                        PairingState = PairingState.NotPaired
-                    }; 
-
-                    persons.Add(person);
-                }
-                return persons;
-            }
-        }
+        #endregion
 
 
-        public void StopPersonManager()
-        {
-            ks.Stop();
-        }
+
+
     }
 }

@@ -9,6 +9,9 @@ namespace MSELocator
 {
     public class Locator : LocatorInterface
     {
+
+        #region Properties and Constructor
+        
         private List<Person> _persons;
         public List<Person> Persons
         {
@@ -23,6 +26,7 @@ namespace MSELocator
             set { _devices = value; }
         }
 
+        // Tracker does not actually need to be a part of the locator to work, though it makes sense to keep tabs on trackers in a central place.
         private List<Tracker> _trackers;
         public List<Tracker> Trackers
         {
@@ -37,78 +41,14 @@ namespace MSELocator
             Trackers = new List<Tracker>();
         }
 
+        #endregion
 
-
-        public Device GetNearestDeviceInView(String identifier)
-        {
-            return GetNearestDeviceInView(_devices.Find(x => x.Identifier.Equals(identifier)));
-        }
-
-        public Device GetNearestDeviceInView(Device observer)
-        {
-            List<Device> devicesInView = GetDevicesInView(observer);
-            if (devicesInView.Count == 0)
-                return null;
-            else
-            {
-                Device nearest = null;
-
-                //First, find a device with a location to compare against
-                foreach (Device device in devicesInView)
-                {
-                    if (device.Location.HasValue)
-                    {
-                        nearest = device;
-                    }
-                }
-                if (nearest == null)
-                    return null;
-
-                //Find the device with the least distance to the observer
-                foreach (Device device in devicesInView)
-                {
-                    if (device.Location.HasValue && 
-                        Util.DistanceBetweenPoints(device.Location.Value, observer.Location.Value) < Util.DistanceBetweenPoints(nearest.Location.Value, observer.Location.Value))
-                    {
-                        nearest = device;
-                    }
-                }
-                return nearest;
-
-            }
-        }
-
-
-        public List<Device> GetDevicesWithinRange(String identifier, double distance)
-        {
-            return GetDevicesWithinRange(_devices.Find(x => x.Identifier.Equals(identifier)), distance);
-        }
-
-        public List<Device> GetDevicesWithinRange(Device observer, double distance)
-        {
-            List<Device> returnDevices = new List<Device>();
-
-            if (!observer.Location.HasValue)
-                return returnDevices;
-
-            foreach (Device device in _devices)
-            {
-                if (device == observer)
-                    continue;
-                else if ( device.Location.HasValue &&  Util.DistanceBetweenPoints(observer.Location.Value, device.Location.Value) < distance)
-                {
-                    returnDevices.Add(device);
-                }
-            }
-
-            return returnDevices;
-        }
+        #region GetDevicesInView
 
         public List<Device> GetDevicesInView(String identifier)
         {
             return GetDevicesInView(_devices.Find(x => x.Identifier.Equals(identifier)));
         }
-
 
         /// <summary>
         /// Computes the devices within the field of view of the observer. Returns an empty list if FieldOfView or Location are null on the observer.
@@ -123,7 +63,7 @@ namespace MSELocator
                 return returnDevices;
             if (observer.FieldOfView == 0.0)
                 return returnDevices;
-            
+
             // We imagine the field of view as two vectors, pointing away from the observing device. Targets between the vectors are in view.
             // We will use angles to represent these vectors.
             double leftFieldOfView = Util.NormalizeAngle(observer.Orientation.Value + observer.FieldOfView.Value / 2);
@@ -159,6 +99,105 @@ namespace MSELocator
 
             return returnDevices;
 
+        }
+        #endregion
+
+        #region GetNearestDeviceInView
+
+        public Device GetNearestDeviceInView(String identifier)
+        {
+            return GetNearestDeviceInView(_devices.Find(x => x.Identifier.Equals(identifier)));
+        }
+
+        public Device GetNearestDeviceInView(Device observer)
+        {
+            List<Device> devicesInView = GetDevicesInView(observer);
+            return FindNearestDevice(observer, devicesInView);
+        }
+
+
+
+        #endregion
+       
+        #region GetDevicesWithinRange
+
+        public List<Device> GetDevicesWithinRange(String identifier, double distance)
+        {
+            return GetDevicesWithinRange(_devices.Find(x => x.Identifier.Equals(identifier)), distance);
+        }
+
+        public List<Device> GetDevicesWithinRange(Device observer, double distance)
+        {
+            List<Device> returnDevices = new List<Device>();
+
+            if (!observer.Location.HasValue)
+                return returnDevices;
+
+            foreach (Device device in _devices)
+            {
+                if (device == observer)
+                    continue;
+                else if (device.Location.HasValue && Util.DistanceBetweenPoints(observer.Location.Value, device.Location.Value) < distance)
+                {
+                    returnDevices.Add(device);
+                }
+            }
+
+            return returnDevices;
+        }
+
+
+
+        #endregion
+
+        #region GetNearestDeviceWithinRange
+
+        public Device GetNearestDeviceWithinRange(String identifier, double distance)
+        {
+            return GetNearestDeviceWithinRange(_devices.Find(x => x.Identifier.Equals(identifier)), distance);
+        }
+
+        public Device GetNearestDeviceWithinRange(Device observer, double distance)
+        {
+            List<Device> devicesInView = GetDevicesWithinRange(observer, distance);
+            return FindNearestDevice(observer, devicesInView);
+        }
+
+
+        #endregion
+
+
+        private static Device FindNearestDevice(Device observer, List<Device> deviceList)
+        {
+            if (deviceList.Count == 0)
+                return null;
+            else
+            {
+                Device nearest = null;
+
+                //First, find a device with a location to compare against
+                foreach (Device device in deviceList)
+                {
+                    if (device.Location.HasValue)
+                    {
+                        nearest = device;
+                    }
+                }
+                if (nearest == null)
+                    return null;
+
+                //Find the device with the least distance to the observer
+                foreach (Device device in deviceList)
+                {
+                    if (device.Location.HasValue &&
+                        Util.DistanceBetweenPoints(device.Location.Value, observer.Location.Value) < Util.DistanceBetweenPoints(nearest.Location.Value, observer.Location.Value))
+                    {
+                        nearest = device;
+                    }
+                }
+                return nearest;
+
+            }
         }
 
     }
