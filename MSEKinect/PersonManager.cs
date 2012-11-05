@@ -136,7 +136,7 @@ namespace MSEKinect
             List<PairablePerson> vanishedPersons = new List<PairablePerson>();
             foreach (PairablePerson person in pairablePersons)
             {
-                if (skeletons.Find(x => x.ToString().Equals(person.Identifier)) == null)
+                if (skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier)) == null)
                 {
                     //Remove Held-By-Person Identifier
                     PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
