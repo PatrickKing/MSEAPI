@@ -53,7 +53,7 @@ namespace MSEKinect
             ks = KinectSensor.KinectSensors[0];
             ks.Start();
             //Sets the initial elevation angle of the connect to 0 degrees
-            ks.ElevationAngle = 0;
+            //ks.ElevationAngle = 0;
 
             // Set smoothing parameters for when Kinect is tracking a skeleton
             TransformSmoothParameters parameters = new TransformSmoothParameters()
@@ -107,6 +107,9 @@ namespace MSEKinect
             //Convert Locator List Types into PairablePerson & PairableDevice
             List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
             List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
+
+
+
 
             // For any skeletons that have just appeared, create a new PairablePerson
             foreach (Skeleton skeleton in skeletons)
@@ -171,6 +174,18 @@ namespace MSEKinect
                 }
 
             }
+
+                        //TODO Remove debug junk
+            foreach (PairableDevice d in pairableDevices)
+            {
+                System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString());
+            }
+            foreach (PairablePerson p in pairablePersons)
+            {
+                System.Diagnostics.Debug.WriteLine(p.Identifier + " " + p.PairingState.ToString());
+            }
+            System.Diagnostics.Debug.WriteLine(" === ");
+
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);
