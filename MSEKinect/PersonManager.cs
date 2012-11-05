@@ -93,14 +93,6 @@ namespace MSEKinect
                 gestureController.UpdateAllGestures(skeletons);
             }
 
-            //TODO remove this debug junk
-            foreach (Person person in locator.Persons)
-            {
-                if (person.Location.HasValue)
-                    System.Diagnostics.Debug.WriteLine(person.Identifier + " person : " + person.Location.Value.X + " " + person.Location.Value.Y);
-                else
-                    System.Diagnostics.Debug.WriteLine(person.Identifier + " person : " + "no location");
-            }
 
         }
 
