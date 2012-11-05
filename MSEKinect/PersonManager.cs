@@ -139,7 +139,7 @@ namespace MSEKinect
                 if (skeletons.Find(x => x.ToString().Equals(person.Identifier)) == null)
                 {
                     //Remove Held-By-Person Identifier
-                    PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(x.HeldByPersonIdentifier.Equals(person.HeldDeviceIdentifier)));
+                    PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
 
                     if (device != null)
                     {
@@ -173,7 +173,8 @@ namespace MSEKinect
                 // If the Person has a paired device, infer that the device is located where the person is, and update its location too
                 if (person.PairingState == PairingState.Paired && person.HeldDeviceIdentifier != null)
                 {
-                    Device device = pairableDevices.Find(x => x.HeldByPersonIdentifier.Equals(person.Identifier));
+//                    Device device = pairableDevices.Find(x => x.HeldByPersonIdentifier.Equals(person.Identifier));
+                    Device device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
                     device.Location = person.Location;
                 }
 
