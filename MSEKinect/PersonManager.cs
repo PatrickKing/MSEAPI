@@ -53,7 +53,7 @@ namespace MSEKinect
             ks = KinectSensor.KinectSensors[0];
             ks.Start();
             //Sets the initial elevation angle of the connect to 0 degrees
-            ks.ElevationAngle = 0;
+            //ks.ElevationAngle = 0;
 
             // Set smoothing parameters for when Kinect is tracking a skeleton
             TransformSmoothParameters parameters = new TransformSmoothParameters()
@@ -93,14 +93,6 @@ namespace MSEKinect
                 gestureController.UpdateAllGestures(skeletons);
             }
 
-            //TODO remove this debug junk
-            foreach (Person person in locator.Persons)
-            {
-                if (person.Location.HasValue)
-                    System.Diagnostics.Debug.WriteLine(person.Identifier + " person : " + person.Location.Value.X + " " + person.Location.Value.Y);
-                else
-                    System.Diagnostics.Debug.WriteLine(person.Identifier + " person : " + "no location");
-            }
 
         }
 
@@ -116,6 +108,9 @@ namespace MSEKinect
             //Convert Locator List Types into PairablePerson & PairableDevice
             List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
             List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
+
+
+
 
             // For any skeletons that have just appeared, create a new PairablePerson
             foreach (Skeleton skeleton in skeletons)
@@ -138,10 +133,10 @@ namespace MSEKinect
             List<PairablePerson> vanishedPersons = new List<PairablePerson>();
             foreach (PairablePerson person in pairablePersons)
             {
-                if (skeletons.Find(x => x.ToString().Equals(person.Identifier)) == null)
+                if (skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier)) == null)
                 {
                     //Remove Held-By-Person Identifier
-                    PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(x.HeldByPersonIdentifier.Equals(person.HeldDeviceIdentifier)));
+                    PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
 
                     if (device != null)
                     {
@@ -178,11 +173,35 @@ namespace MSEKinect
                 // If the Person has a paired device, infer that the device is located where the person is, and update its location too
                 if (person.PairingState == PairingState.Paired && person.HeldDeviceIdentifier != null)
                 {
-                    Device device = pairableDevices.Find(x => x.HeldByPersonIdentifier.Equals(person.Identifier));
+//                    Device device = pairableDevices.Find(x => x.HeldByPersonIdentifier.Equals(person.Identifier));
+                    Device device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
                     device.Location = person.Location;
                 }
 
             }
+
+                        //TODO Remove debug junk
+            foreach (PairableDevice d in pairableDevices)
+            {
+                if (d.PairingState == PairingState.Paired)
+                {
+                    System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString() + " ori: " + d.Orientation);
+                }
+                else
+                    System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString());
+
+
+
+
+
+
+            }
+            foreach (PairablePerson p in pairablePersons)
+            {
+                System.Diagnostics.Debug.WriteLine(p.Identifier + " " + p.PairingState.ToString());
+            }
+            System.Diagnostics.Debug.WriteLine(" === ");
+
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);

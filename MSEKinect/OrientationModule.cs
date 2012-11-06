@@ -42,7 +42,12 @@ namespace MSEKinect.Modules
                     {
                         device.Orientation = ((Device)obj).Orientation;
                         logger.TraceEvent(TraceEventType.Verbose, 0, "Updated orientation of {0}", device);
-                        return HttpStatusCode.OK;
+
+                        Response response = new Response();
+                        response.StatusCode = HttpStatusCode.Created; 
+                        response.ContentType = "application/json";
+
+                        return response; 
                     }
                     else
                     {
