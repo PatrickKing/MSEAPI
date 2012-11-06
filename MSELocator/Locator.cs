@@ -36,6 +36,7 @@ namespace MSELocator
 
         public Locator()
         {
+
             Persons = new List<Person>();
             Devices = new List<Device>();
             Trackers = new List<Tracker>();

@@ -110,6 +110,7 @@ namespace MSEKinect
         /// TODO: It might make sense to refactor some parts of this function into sub functions.
         /// </summary>
         /// <param name="skeletons"></param>
+        //(TODO) Refactor this method
         private void UpdatePersonsAndDevices(List<Skeleton> skeletons)
         {
             //Convert Locator List Types into PairablePerson & PairableDevice
@@ -119,6 +120,7 @@ namespace MSEKinect
             // For any skeletons that have just appeared, create a new PairablePerson
             foreach (Skeleton skeleton in skeletons)
             {
+                //New Skeleton Found
                 if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
                 {
                     PairablePerson person = new PairablePerson
@@ -145,10 +147,13 @@ namespace MSEKinect
                     {
                         device.HeldByPersonIdentifier = null;
                         device.PairingState = PairingState.NotPaired;
+
+                        //TODO, Dispatch a message to the device
                     }
 
                     //Remove Held-Device Identifier
                     person.HeldDeviceIdentifier = null;
+
                     vanishedPersons.Add(person);
                 }
             }
