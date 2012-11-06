@@ -178,7 +178,18 @@ namespace MSEKinect
                         //TODO Remove debug junk
             foreach (PairableDevice d in pairableDevices)
             {
-                System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString());
+                if (d.PairingState == PairingState.Paired)
+                {
+                    System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString() + " ori: " + d.Orientation);
+                }
+                else
+                    System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString());
+
+
+
+
+
+
             }
             foreach (PairablePerson p in pairablePersons)
             {

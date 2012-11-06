@@ -23,7 +23,7 @@ namespace MSEKinect
         public override string ToString()
         {
             return String.Format(
-                "PairableDevice[Orientation: {0}, HeldByPersonIdentifier: {2}, PairingState: {3}]",
+                "PairableDevice[Orientation: {0}, HeldByPersonIdentifier: {1}, PairingState: {2}]",
                 Orientation,
                 HeldByPersonIdentifier,
                 PairingState); 
