@@ -40,7 +40,20 @@ namespace MSELocator
             Persons = new List<Person>();
             Devices = new List<Device>();
             Trackers = new List<Tracker>();
+
         }
+
+        public override string ToString()
+        {
+            return String.Format
+                (
+                    "Locator[Trackers: [{0}], Devices: [{1}], Persons: [{2}]]",
+                    String.Join(",", Trackers),
+                    String.Join(",", Devices),
+                    String.Join(",", Persons)
+                );
+        }
+
 
         #endregion
 
@@ -60,6 +73,7 @@ namespace MSELocator
         {
             List<Device> returnDevices = new List<Device>();
 
+            //(CB - Should we throw an exception here? Rather then just returning an empty list?)
             if (observer.Location == null || observer.Orientation == null)
                 return returnDevices;
             if (observer.FieldOfView == 0.0)

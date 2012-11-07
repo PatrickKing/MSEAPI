@@ -6,7 +6,7 @@ using MSELocator;
 
 namespace MSEKinect
 {
-    internal class PairablePerson : Person
+    public class PairablePerson : Person
     {
         private PairingState _pairingState;
         public PairingState PairingState

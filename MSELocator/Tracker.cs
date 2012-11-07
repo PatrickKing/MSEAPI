@@ -47,6 +47,26 @@ namespace MSELocator
             person.Location = new Point(updatedPosition.X, updatedPosition.Y);
         }
 
+
+        /// <summary>
+        /// Returns the device's orientation in the locator's coordinate space, under the assumption that the device is pointed toward the tracker.
+        /// For use with a calibration button/function on the device, that the user will trigger while holding the device so that it faces the tracker. 
+        /// Also sets the device's orientation to the calculated value.
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns></returns>
+        public double ZeroDeviceOrientation(Device device)
+        {
+            if (!device.Location.HasValue)
+                throw new ArgumentException("Tracker.ZeroDeviceOrientation : device Location was null. ");
+
+            // find the device's orientation with respect to the tracker's location
+            // i.e., find the angle formed by two lines: x axis and the line between the tracker and the device
+            device.Orientation = Math.Atan2(device.Location.Value.Y - this.Location.Value.Y, device.Location.Value.X - this.Location.Value.X) * 180/Math.PI;
+            return device.Orientation.Value;
+
+        }
+
         /*public void UpdatePositionForDevice(Device device, SkeletonPoint skeletonPoint)
         {
             Vector updatedPosition = Util.TranslateFromCoordinateSpace(new Vector(skeletonPoint.Z, skeletonPoint.X), Orientation, new Vector(Location.X, Location.Y));

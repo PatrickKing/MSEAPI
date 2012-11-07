@@ -10,36 +10,43 @@ namespace MSEKinect
 {
     public class MSEKinectManager
     {
-        PersonManager km;
-        DeviceManager dm;
-        GestureController gc; 
-        PairingRecognizer ri;
-        IAIntAirAct ia;
+        PersonManager personManager;
+        DeviceManager deviceManager;
+        GestureController gestureController; 
+        PairingRecognizer pairingRecognizer;
+        IAIntAirAct intAirAct;
+        private LocatorInterface locator;
+
+        public LocatorInterface Locator
+        {
+            get{ return locator; }
+        }
+
 
         public void Start()
         {
-            ia = new IAIntAirAct();
-            ia.client = false;
-            ia.capabilities.Add(new IACapability("PUT action/pairWith"));
-            ia.capabilities.Add(new IACapability("PUT action/orientationUpdate"));
-            ia.capabilities.Add(new IACapability("PUT /device/:identifier"));
-            ia.AddMappingForClass(typeof(Device), "mse-device");
+            intAirAct = new IAIntAirAct();
+            intAirAct.client = false;
+            intAirAct.capabilities.Add(new IACapability("PUT action/pairWith"));
+            intAirAct.capabilities.Add(new IACapability("PUT action/orientationUpdate"));
+            intAirAct.capabilities.Add(new IACapability("PUT /device/:identifier"));
+            intAirAct.AddMappingForClass(typeof(Device), "mse-device");
 
-            LocatorInterface locator = new Locator();
+            locator = new Locator();
 
             //Instantiate Components 
-            ri = new PairingRecognizer(locator, ia);
+            pairingRecognizer = new PairingRecognizer(locator, intAirAct);
 
-            gc = new GestureController();
-            km = new PersonManager(locator, gc);
-            dm = new DeviceManager(locator, ia);
+            gestureController = new GestureController();
+            personManager = new PersonManager(locator, gestureController);
+            deviceManager = new DeviceManager(locator, intAirAct);
 
-            ia.Start();
+            intAirAct.Start();
 
-            km.StartPersonManager();
-            dm.StartDeviceManager();
+            personManager.StartPersonManager();
+            deviceManager.StartDeviceManager();
 
-            gc.GestureRecognized += ri.PersonPairAttempt;
+            gestureController.GestureRecognized += pairingRecognizer.PersonPairAttempt;
 
             TinyIoC.TinyIoCContainer.Current.Register<LocatorInterface>(locator);
             
@@ -47,9 +54,9 @@ namespace MSEKinect
 
         public void Stop()
         {
-            km.StopPersonManager();
-            dm.StopDeviceManager();
-            ia.Stop();
+            personManager.StopPersonManager();
+            deviceManager.StopDeviceManager();
+            intAirAct.Stop();
         }
 
 

@@ -25,5 +25,28 @@ namespace MSELocator
             set;
         }
 
+
+
+        #region Query Methods
+
+        List<Device> GetDevicesInView(String identifier);
+
+        List<Device> GetDevicesInView(Device observer);
+
+        Device GetNearestDeviceInView(String identifier);
+
+        Device GetNearestDeviceInView(Device observer);
+
+        List<Device> GetDevicesWithinRange(String identifier, double distance);
+
+        List<Device> GetDevicesWithinRange(Device observer, double distance);
+
+        Device GetNearestDeviceWithinRange(String identifier, double distance);
+
+        Device GetNearestDeviceWithinRange(Device observer, double distance);
+
+        #endregion
+
+
     }
 }

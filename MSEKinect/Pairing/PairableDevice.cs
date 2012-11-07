@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 namespace MSEKinect
 {
 
-    internal class PairableDevice : Device
+    public class PairableDevice : Device
     {
         private PairingState _pairingState;
         public PairingState PairingState

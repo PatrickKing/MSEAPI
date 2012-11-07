@@ -89,6 +89,9 @@ namespace MSEKinect
             else
             {
                 List<Skeleton> skeletons = GetSkeletons(e);
+
+
+
                 UpdatePersonsAndDevices(skeletons);
                 gestureController.UpdateAllGestures(skeletons);
             }
@@ -109,26 +112,45 @@ namespace MSEKinect
             List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
             List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
 
+            // During shut down, the kinect will return some empty skeleton frames, and null skeleton lists
+            if (skeletons == null)
+                skeletons = new List<Skeleton>();
 
+            AddNewPeople(skeletons, pairablePersons);
+            RemoveOldPeople(skeletons, pairablePersons, pairableDevices);
+            UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices);
 
+            //Sync up the Locator's Person collection
+            locator.Persons = new List<Person>(pairablePersons);
+        }
 
-            // For any skeletons that have just appeared, create a new PairablePerson
+        private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
+        {
+            // PairablePersons and Skeletons now contain only corresponding elements.
+            // Update each Person
             foreach (Skeleton skeleton in skeletons)
             {
-                //New Skeleton Found
-                if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
-                {
-                    PairablePerson person = new PairablePerson
-                    {
-                        Location = new Point(0, 0),
-                        Orientation = 0.0,
-                        Identifier = skeleton.TrackingId.ToString(),
-                        PairingState = PairingState.NotPaired
-                    };
-                    pairablePersons.Add(person);
-                }
-            }
+                PairablePerson person = pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString()));
 
+                // The Kinect looks down the Z axis in its coordinate space, left right movement happens on the X axis, and vertical movement on the Y axis
+                // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
+                // the skeleton's position. See Tracker for more details.
+                tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
+
+                // TODO: Also update Person's orientation.
+
+                // If the Person has a paired device, infer that the device is located where the person is, and update its location too
+                if (person.PairingState == PairingState.Paired && person.HeldDeviceIdentifier != null)
+                {
+                    Device device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
+                    device.Location = person.Location;
+                }
+
+            }
+        }
+
+        private static void RemoveOldPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
+        {
             // For any Persons that have left the scene, remove their PairablePerson from , and if it was paired, unhook their paired device
             List<PairablePerson> vanishedPersons = new List<PairablePerson>();
             foreach (PairablePerson person in pairablePersons)
@@ -156,55 +178,26 @@ namespace MSEKinect
             {
                 pairablePersons.Remove(person);
             }
+        }
 
-            // PairablePersons and Skeletons now contain only corresponding elements.
-            // Update each Person
+        private static void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons)
+        {
+            // For any skeletons that have just appeared, create a new PairablePerson
             foreach (Skeleton skeleton in skeletons)
             {
-                PairablePerson person = pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString()));
-
-                // The Kinect looks down the Z axis in its coordinate space, left right movement happens on the X axis, and vertical movement on the Y axis
-                // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
-                // the skeleton's position. See Tracker for more details.
-                tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
-
-                // TODO: Also update Person's orientation.
-
-                // If the Person has a paired device, infer that the device is located where the person is, and update its location too
-                if (person.PairingState == PairingState.Paired && person.HeldDeviceIdentifier != null)
+                //New Skeleton Found
+                if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
                 {
-//                    Device device = pairableDevices.Find(x => x.HeldByPersonIdentifier.Equals(person.Identifier));
-                    Device device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
-                    device.Location = person.Location;
+                    PairablePerson person = new PairablePerson
+                    {
+                        Location = new Point(0, 0),
+                        Orientation = 0.0,
+                        Identifier = skeleton.TrackingId.ToString(),
+                        PairingState = PairingState.NotPaired
+                    };
+                    pairablePersons.Add(person);
                 }
-
             }
-
-                        //TODO Remove debug junk
-            foreach (PairableDevice d in pairableDevices)
-            {
-                if (d.PairingState == PairingState.Paired)
-                {
-                    System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString() + " ori: " + d.Orientation);
-                }
-                else
-                    System.Diagnostics.Debug.WriteLine(d.Identifier + " " + d.PairingState.ToString());
-
-
-
-
-
-
-            }
-            foreach (PairablePerson p in pairablePersons)
-            {
-                System.Diagnostics.Debug.WriteLine(p.Identifier + " " + p.PairingState.ToString());
-            }
-            System.Diagnostics.Debug.WriteLine(" === ");
-
-
-            //Sync up the Locator's Person collection
-            locator.Persons = new List<Person>(pairablePersons);
         }
 
         #endregion

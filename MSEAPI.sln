@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{419FE0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSELocator", "MSELocator\MSELocator.csproj", "{6D59A7FD-6F0C-484F-A4F0-3B81DEA34024}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomVisualizer", "RoomVisualizer\RoomVisualizer.csproj", "{2420CCCA-6BBD-43CF-91C3-4ECE54577530}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = MSEAPI.vsmdi
@@ -112,6 +114,16 @@ Global
 		{6D59A7FD-6F0C-484F-A4F0-3B81DEA34024}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6D59A7FD-6F0C-484F-A4F0-3B81DEA34024}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6D59A7FD-6F0C-484F-A4F0-3B81DEA34024}.Release|x86.ActiveCfg = Release|Any CPU
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Debug|x86.ActiveCfg = Debug|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Debug|x86.Build.0 = Debug|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|Any CPU.ActiveCfg = Release|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|Mixed Platforms.Build.0 = Release|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|x86.ActiveCfg = Release|x86
+		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

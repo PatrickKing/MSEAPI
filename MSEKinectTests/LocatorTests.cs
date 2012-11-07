@@ -36,5 +36,31 @@ namespace MSEKinectTests
 
 
         }
+
+        [TestMethod]
+        public void ZeroDeviceOrientationTest()
+        {
+            Tracker tracker = new Tracker() {Location = new System.Windows.Point(2,4)};
+            Device device = new Device() {Location = new System.Windows.Point(7,7)};
+
+            tracker.ZeroDeviceOrientation(device);
+            System.Diagnostics.Debug.WriteLine(device.Orientation.Value);
+
+            device.Location = new System.Windows.Point(-7, 7);
+            tracker.ZeroDeviceOrientation(device);
+            System.Diagnostics.Debug.WriteLine(device.Orientation.Value);
+
+            device.Location = new System.Windows.Point(-7, -7);
+            tracker.ZeroDeviceOrientation(device);
+            System.Diagnostics.Debug.WriteLine(device.Orientation.Value);
+
+            device.Location = new System.Windows.Point(7, -7);
+            tracker.ZeroDeviceOrientation(device);
+            System.Diagnostics.Debug.WriteLine(device.Orientation.Value);
+
+
+
+        }
+
     }
 }

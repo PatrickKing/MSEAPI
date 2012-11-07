@@ -100,7 +100,7 @@ namespace MSELocator
 
         public override string ToString()
         {
-            return String.Format("Device[Orientation: {0}, HeldByPersonIdentifier: {2}]", Orientation, HeldByPersonIdentifier);
+            return String.Format("Device[Orientation: {0}, HeldByPersonIdentifier: {1}]", Orientation, HeldByPersonIdentifier);
         }
 
 
