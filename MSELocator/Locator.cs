@@ -87,7 +87,7 @@ namespace MSELocator
 
             foreach (Device target in _devices)
             {
-                if (target == observer)
+                if (target == observer || !target.Location.HasValue)
                     continue;
 
                 // Atan2 is the inverse tangent function, given lengths for the opposite and adjacent legs of a right triangle, it returns the angle
