@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSELocator", "MSELocator\MS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomVisualizer", "RoomVisualizer\RoomVisualizer.csproj", "{2420CCCA-6BBD-43CF-91C3-4ECE54577530}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSELocatorTests", "MSELocatorTests\MSELocatorTests.csproj", "{D305F94B-C9AB-4F15-ADD0-93A912A073C7}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = MSEAPI.vsmdi
@@ -124,6 +126,16 @@ Global
 		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|Mixed Platforms.Build.0 = Release|x86
 		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|x86.ActiveCfg = Release|x86
 		{2420CCCA-6BBD-43CF-91C3-4ECE54577530}.Release|x86.Build.0 = Release|x86
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D305F94B-C9AB-4F15-ADD0-93A912A073C7}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -34,7 +34,6 @@ namespace MSELocatorTests
             locator.Devices.Add(observed);
             locator.Devices.Add(notObserved);
 
-
             //Compute intersecting devices for the observing device
             List<Device> actualIntersectingDevices = locator.GetDevicesInView(observing);
 
