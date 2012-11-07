@@ -34,7 +34,7 @@ namespace MSELocator
                 //Device Does Not Exist
                 if(!locator.Devices.Exists(d => d.Identifier == deviceIdentifier)) 
                 {
-                    logger.TraceEvent(TraceEventType.Error, 0, String.Format("Device Requested but Not Found {0}", deviceIdentifier); 
+                    logger.TraceEvent(TraceEventType.Error, 0, String.Format("Device Requested but Not Found {0}", deviceIdentifier)); 
                     return HttpStatusCode.NotFound;
                 }
 
