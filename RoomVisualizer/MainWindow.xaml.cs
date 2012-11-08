@@ -62,13 +62,22 @@ namespace RoomVisualizer
 
         const int FPS = 60;
 
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
+            
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            addUnpairedDeviceToScreen("iPad 1");
+            addUnpairedDeviceToScreen("iPhone");
+            addUnpairedDeviceToScreen("iPad 2");
+            addUnpairedDeviceToScreen("Arlo's Macbook Pro");
+            addUnpairedDeviceToScreen("ASasasadsad");
+
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
 
@@ -228,6 +237,30 @@ namespace RoomVisualizer
                 this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, RenderWidth, RenderHeight));
                 
             }
+        }
+
+        public void addUnpairedDeviceToScreen(string name)
+        {
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Orientation = Orientation.Vertical;
+
+            Ellipse myEllipse = new Ellipse();
+
+            myEllipse.StrokeThickness = 1;
+            myEllipse.Stroke = Brushes.Blue;
+            myEllipse.Width = 55;
+            myEllipse.Height = 55;
+            myEllipse.Margin = new Thickness(0, 0, 10, 0);
+            
+            TextBlock text = new TextBlock();
+            text.Text = name;
+            text.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+
+            stackPanel.Children.Add(text);
+            stackPanel.Children.Add(myEllipse);
+
+            unpairedDeviceStackPanel.Children.Add(stackPanel);
+
         }
     }
 }
