@@ -108,14 +108,53 @@ namespace RoomVisualizer
 
             using (DrawingContext dc = this.drawingGroup.Open())
             {
-                // Draw a transparent background to set the render size
-                dc.DrawRectangle(Brushes.White, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+
 
                 // Draw the room's bounding box
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(0.0, 0.0), new Point(0.0, RenderHeight));
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(0.0, RenderHeight), new Point(RenderWidth, RenderHeight));
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(RenderWidth, RenderHeight), new Point(RenderWidth, 0.0));
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(RenderWidth, 0.0), new Point(0.0, 0.0));
+
+                // Draw the Kinect(s)
+
+                foreach (Tracker tracker in kinectManager.Locator.Trackers)
+                {
+                    if (tracker.Location.HasValue == false)
+                        continue;
+
+                    if (tracker.Location.Value.X != 0.0 && tracker.Location.Value.Y != 0.0)
+                        dc.DrawEllipse(
+                            Brushes.Black,
+                            null,
+                            ConvertFromMetersToPixels(tracker.Location.Value),
+                            0.10 * RenderWidth / xRange,
+                            0.10 * RenderHeight / yRange);
+
+
+                    if (tracker.Orientation.HasValue == false)
+                            continue;
+
+                        // Draw two lines to serve as field of view indicators
+                        double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + 45);
+                        double topX = Math.Cos(topAngle * Math.PI / 180);
+                        double topY = Math.Sin(topAngle * Math.PI / 180);
+                        dc.DrawLine(
+                            new Pen(Brushes.Black, 0.3),
+                            ConvertFromMetersToPixels(tracker.Location.Value),
+                            ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + topX, tracker.Location.Value.Y + topY)));
+
+                        double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - 45);
+                        double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
+                        double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
+                        dc.DrawLine(
+                            new Pen(Brushes.Black, 0.3),
+                            ConvertFromMetersToPixels(tracker.Location.Value),
+                            ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + bottomX, tracker.Location.Value.Y + bottomY)));
+                    
+
+
+                }
 
                 foreach (Person person in kinectManager.Locator.Persons)
                 {

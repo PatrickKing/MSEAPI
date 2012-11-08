@@ -88,12 +88,8 @@ namespace MSEKinect
             //Process the skeleton frame
             else
             {
-                List<Skeleton> skeletons = GetSkeletons(e);
-
-
-
-                UpdatePersonsAndDevices(skeletons);
-                gestureController.UpdateAllGestures(skeletons);
+                UpdatePersonsAndDevices(GetAllSkeletons(e));
+                gestureController.UpdateAllGestures(GetTrackedSkeletons(e));
             }
 
 
@@ -207,13 +203,14 @@ namespace MSEKinect
         //TODO: Lost person notification
         //TODO:
         /// <summary>
-        /// Copies tracked skeleton information from a frame and returns them as a list of skeletons
+        /// Copies tracked skeleton information from a frame and returns them as a list of skeletons]
+        /// Returns only skeletons in full tracking mode... 
         /// </summary>
         /// <param name="e">
         /// Incoming skeletonframe argument
         /// </param>
         /// <returns>Tracked skeletons as a list </returns>
-        List<Skeleton> GetSkeletons(SkeletonFrameReadyEventArgs e)
+        List<Skeleton> GetTrackedSkeletons(SkeletonFrameReadyEventArgs e)
         {
             //Allocate a maximum of 6 skeletons, as per the maximum allowed by the Kinect
             Skeleton[] allSkeletons = new Skeleton[6];
@@ -238,10 +235,39 @@ namespace MSEKinect
             }
         }
 
+        
+
+        /// <summary>
+        /// Gets all skeletons seen by the Kinect, whether they are fully tracked (with skeleton data) or only positionally tracked (position only, no joint or bones).
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        List<Skeleton> GetAllSkeletons(SkeletonFrameReadyEventArgs e)
+        {
+            //Allocate a maximum of 6 skeletons, as per the maximum allowed by the Kinect
+            Skeleton[] allSkeletons = new Skeleton[6];
+
+            using (SkeletonFrame frameData = e.OpenSkeletonFrame())
+            {
+                //Check that frame is not null
+                if (frameData == null)
+                {
+                    return null;
+                }
+
+                //After checking the frame is not null, copy the skeleton data to the empty array of skeletons
+                frameData.CopySkeletonDataTo(allSkeletons);
+
+                //Capture only the Skeletons that are marked as Tracked
+                List<Skeleton> updatedSkeletons = (from s in allSkeletons
+                                                   where s.TrackingState == SkeletonTrackingState.Tracked || s.TrackingState == SkeletonTrackingState.PositionOnly
+                                                   select s).ToList();
+
+                return updatedSkeletons;
+            }
+        }
+
         #endregion
-
-
-
 
     }
 }
