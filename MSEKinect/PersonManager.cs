@@ -40,7 +40,6 @@ namespace MSEKinect
         }
 
 
-        //TODO Rename to StartPersonmM
         public void StartPersonManager()
         {
             // Checks to see how many Kinects are connected to the system. If None then exit.
@@ -123,6 +122,7 @@ namespace MSEKinect
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);
+
         }
 
         private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)

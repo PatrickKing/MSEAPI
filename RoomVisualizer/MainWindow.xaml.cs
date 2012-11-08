@@ -27,16 +27,6 @@ namespace RoomVisualizer
 
         #region ivars
         /// <summary>
-        /// Width of output drawing
-        /// </summary>
-        private const float RenderWidth = 640.0f;
-
-        /// <summary>
-        /// Height of our output drawing
-        /// </summary>
-        private const float RenderHeight = 480.0f;
-
-        /// <summary>
         /// Drawing group for skeleton rendering output
         /// </summary>
         private DrawingGroup drawingGroup;
@@ -51,8 +41,21 @@ namespace RoomVisualizer
 
         #endregion
 
+
+        #region constants
+
+        /// <summary>
+        /// Width of output drawing
+        /// </summary>
+        private const float RenderWidth = 640.0f;
+
+        /// <summary>
+        /// Height of our output drawing
+        /// </summary>
+        private const float RenderHeight = 640.0f;
+
         const double xRange = 4.5;
-        const double yRange = 3.0;
+        const double yRange = 4.5;
 
         const double deviceDrawWidth = 0.25 * RenderWidth / xRange;
         const double deviceDrawHeight = 0.25 * RenderHeight / yRange;
@@ -182,18 +185,14 @@ namespace RoomVisualizer
                     Brush brush;
 
                     // Colour the person's dot by whether they have a device, and whether they see any devices
-                    if (device != null)
-                    {
-                        List<Device> results = kinectManager.Locator.GetDevicesInView(device);
-                        if (results != null && results.Count >= 1)
-                        {
-                            brush = Brushes.Green;
-                        }
-                        else
-                            brush = Brushes.Yellow;
-                    }
-                    else
+                    PairablePerson pperson = (PairablePerson)person;
+                    if (pperson.PairingState == PairingState.NotPaired)
                         brush = Brushes.Red;
+                    else if (pperson.PairingState == PairingState.PairingAttempt)
+                        brush = Brushes.Yellow;
+                    else if (pperson.PairingState == PairingState.Paired)
+                        brush = Brushes.Green;
+
 
 
                     // Draw a dot for each person seen by the tracker
@@ -205,10 +204,13 @@ namespace RoomVisualizer
                             deviceDrawWidth,
                             deviceDrawHeight);
 
+                    
 
-                    // If we are pair a device, we can use its orientation data to draw its field of view
+
+                    // If we are pair a device, we can use its orientation data to draw its field of view and name
                     if (device != null)
                     {
+
                         if (device.Orientation.HasValue == false || device.FieldOfView.HasValue == false)
                             continue;
 
