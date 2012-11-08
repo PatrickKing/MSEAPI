@@ -54,6 +54,12 @@ namespace RoomVisualizer
         const double xRange = 4.5;
         const double yRange = 3.0;
 
+        const double deviceDrawWidth = 0.25 * RenderWidth / xRange;
+        const double deviceDrawHeight = 0.25 * RenderHeight / yRange;
+
+        const double trackerDrawWidth = 0.10 * RenderWidth / xRange;
+        const double trackerDrawHeight = 0.10 * RenderHeight / yRange;
+
         const int FPS = 60;
 
         public MainWindow()
@@ -128,8 +134,8 @@ namespace RoomVisualizer
                             Brushes.Black,
                             null,
                             ConvertFromMetersToPixels(tracker.Location.Value),
-                            0.10 * RenderWidth / xRange,
-                            0.10 * RenderHeight / yRange);
+                            trackerDrawWidth,
+                           trackerDrawHeight);
 
 
                     if (tracker.Orientation.HasValue == false)
@@ -187,8 +193,8 @@ namespace RoomVisualizer
                             Brushes.Red,
                             null,
                             ConvertFromMetersToPixels(person.Location.Value),
-                            0.25 * RenderWidth / xRange,
-                            0.25 * RenderHeight / yRange);
+                            deviceDrawWidth,
+                            deviceDrawHeight);
 
 
                     // If we are pair a device, we can use its orientation data to draw its field of view
