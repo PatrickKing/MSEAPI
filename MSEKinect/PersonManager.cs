@@ -10,6 +10,7 @@ using MSEGestureRecognizer;
 using MSELocator;
 
 using System.Windows;
+using System.Windows.Forms;
 
 namespace MSEKinect
 {
@@ -46,7 +47,8 @@ namespace MSEKinect
             if (KinectSensor.KinectSensors.Count == 0)
             {
                 logger.TraceEvent(TraceEventType.Error, 0, "There are no Kinects connected");
-                return;
+                MessageBox.Show("No Kinect detected. Please plug in a Kinect and restart the program", "No Kinect Detected!");
+                Environment.Exit(0);
             }
 
             // If there is a Kinect connected, get the Kinect
@@ -71,7 +73,10 @@ namespace MSEKinect
 
         public void StopPersonManager()
         {
-            ks.Stop();
+            if (ks != null)
+            {
+                ks.Stop();
+            }
         }
 
         #endregion
