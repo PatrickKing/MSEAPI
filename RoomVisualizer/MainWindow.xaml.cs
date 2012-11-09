@@ -132,7 +132,6 @@ namespace RoomVisualizer
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(RenderWidth, 0.0), new Point(0.0, 0.0));
 
                 // Draw the Kinect(s)
-
                 foreach (Tracker tracker in kinectManager.Locator.Trackers)
                 {
                     if (tracker.Location.HasValue == false)
@@ -167,8 +166,6 @@ namespace RoomVisualizer
                             ConvertFromMetersToPixels(tracker.Location.Value),
                             ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + bottomX, tracker.Location.Value.Y + bottomY)));
                     
-
-
                 }
 
 
@@ -180,8 +177,6 @@ namespace RoomVisualizer
 
                 // Updates the screen
                 addDevicesFromDeviceList();
-
-
 
                 foreach (Person person in kinectManager.Locator.Persons)
                 {
@@ -199,21 +194,21 @@ namespace RoomVisualizer
                         brush = Brushes.Red;
                     else if (pperson.PairingState == PairingState.PairingAttempt)
                         brush = Brushes.Yellow;
-                    else //if (pperson.PairingState == PairingState.Paired)
-                        brush = Brushes.Green;
-
+                    else
+                    { 
+                        brush = createBrushWithTextAndBackground(pperson.HeldDeviceIdentifier, Brushes.Green);
+                    }
 
 
                     // Draw a dot for each person seen by the tracker
-                    if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0)
+                    if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0) {
                         dc.DrawEllipse(
                             brush,
                             null,
                             ConvertFromMetersToPixels(person.Location.Value),
                             deviceDrawWidth,
                             deviceDrawHeight);
-
-                    
+                    }
 
 
                     // If we are pair a device, we can use its orientation data to draw its field of view and name
@@ -314,6 +309,36 @@ namespace RoomVisualizer
                     addUnpairedDeviceToScreen(device.Identifier, device.PairingState);
                 }
             }
+        }
+
+
+        /// <summary>
+        /// Creates a VisualBrush with background as the Fill color, and text centered in the middle
+        /// </summary>
+        /// <param name="text">Text to be displayed</param>
+        /// <param name="background">Brush Color</param>
+        /// <returns>Properly formatted VisualBrush</returns>
+        public VisualBrush createBrushWithTextAndBackground(string text, Brush background)
+        {
+            TextBlock textBlock = new TextBlock();
+            textBlock.FontFamily = new FontFamily("Arial");
+            textBlock.Text = text;
+            textBlock.TextTrimming = TextTrimming.CharacterEllipsis;
+            textBlock.TextAlignment = TextAlignment.Center;
+            textBlock.Padding = new Thickness(5, deviceDrawHeight - textBlock.FontSize, 5, 0);
+
+            StackPanel stackPanel = new StackPanel();
+            stackPanel.Width = deviceDrawWidth * 2;
+            stackPanel.Height = deviceDrawHeight * 2;
+            stackPanel.Background = background;
+            stackPanel.Children.Add(textBlock);
+
+            VisualBrush visualBrush = new VisualBrush();
+            visualBrush.Stretch = Stretch.None;
+            visualBrush.Visual = stackPanel;
+            visualBrush.TileMode = TileMode.None;
+
+            return visualBrush;
         }
     }
 }
