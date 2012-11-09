@@ -254,13 +254,13 @@ namespace RoomVisualizer
         {
             // stackPanel will contain a TextBlock for the name, and then a Ellipse for the Device
             StackPanel stackPanel = new StackPanel();
-
+            
             // Oriented Vertically
             stackPanel.Orientation = Orientation.Vertical;
 
             // Creating the Ellipse
             Ellipse myEllipse = new Ellipse();
-            myEllipse.StrokeThickness = 1;
+            myEllipse.StrokeThickness = 2;
             myEllipse.Stroke = Brushes.Red;
             if (state == PairingState.PairingAttempt)
             {
@@ -269,12 +269,12 @@ namespace RoomVisualizer
 
             myEllipse.Width = 55;
             myEllipse.Height = 55;
-            myEllipse.Margin = new Thickness(0, 0, 10, 0);
+            myEllipse.Margin = new Thickness(10, 0, 10, 0);
             
             // Creating the TextBlock
             TextBlock text = new TextBlock();
             text.Text = name;
-            text.Margin = new Thickness(0, 0, 10, 5);
+            text.Margin = new Thickness(10, 0, 10, 5);
             text.FontFamily = new FontFamily("Arial");
             text.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
 
