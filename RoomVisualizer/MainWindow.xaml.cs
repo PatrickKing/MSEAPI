@@ -199,7 +199,7 @@ namespace RoomVisualizer
                         brush = Brushes.Red;
                     else if (pperson.PairingState == PairingState.PairingAttempt)
                         brush = Brushes.Yellow;
-                    else if (pperson.PairingState == PairingState.Paired)
+                    else //if (pperson.PairingState == PairingState.Paired)
                         brush = Brushes.Green;
 
 
@@ -207,7 +207,7 @@ namespace RoomVisualizer
                     // Draw a dot for each person seen by the tracker
                     if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0)
                         dc.DrawEllipse(
-                            Brushes.Red,
+                            brush,
                             null,
                             ConvertFromMetersToPixels(person.Location.Value),
                             deviceDrawWidth,

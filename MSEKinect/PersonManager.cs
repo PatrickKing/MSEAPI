@@ -89,6 +89,8 @@ namespace MSEKinect
             if (!((KinectSensor)sender).SkeletonStream.IsEnabled)
                 return;
 
+
+
             //Process the skeleton frame
             else
             {
@@ -108,6 +110,13 @@ namespace MSEKinect
         //(TODO) Refactor this method
         private void UpdatePersonsAndDevices(List<Skeleton> skeletons)
         {
+            //Kinect occasionally returns null for a skeleton frame which leads to a null list<Skeleton>: skip this frame so that we don't drop any People
+            if (skeletons == null)
+            {
+                return;
+            }
+
+
             //Convert Locator List Types into PairablePerson & PairableDevice
             List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
             List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
@@ -122,6 +131,12 @@ namespace MSEKinect
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);
+
+            //foreach (PairablePerson p in pairablePersons)
+            //{
+            //    System.Diagnostics.Debug.WriteLine(p.Identifier + " " + p.PairingState);
+
+            //}
 
         }
 
@@ -146,6 +161,7 @@ namespace MSEKinect
                     Device device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
                     device.Location = person.Location;
                 }
+
 
             }
         }
