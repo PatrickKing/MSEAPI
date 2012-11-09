@@ -1,13 +1,13 @@
 ﻿<Window x:Class="RoomVisualizer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MSE API Visualizer" Height="760" Width="640" Loaded="Window_Loaded" Closing="WindowClosing" ResizeMode="NoResize">
+        Title="MSE API Visualizer" Height="765" Width="640" Loaded="Window_Loaded" Closing="WindowClosing" ResizeMode="NoResize">
     <Grid>
         <Viewbox VerticalAlignment="Top">
             <Image Name="Image" Width="640" Height="640" />
         </Viewbox>
         <StackPanel Margin="0,630,0,0" Name="stackPanel1" Width="618" Orientation="Vertical">
-            <TextBlock Name="textBlock1" Text="Unpaired Devices" Padding="0" Margin="0,5" />
+            <TextBlock Name="textBlock1" Text="Unpaired Devices" Padding="0" Margin="0,10,0,5" FontFamily="Arial" FontWeight="ExtraBlack" />
             <StackPanel Name="unpairedDeviceStackPanel" Orientation="Horizontal"></StackPanel>
         </StackPanel>
     </Grid>

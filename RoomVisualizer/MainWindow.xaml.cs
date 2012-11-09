@@ -78,14 +78,6 @@ namespace RoomVisualizer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            addUnpairedDeviceToScreen("iPad 1");
-            addUnpairedDeviceToScreen("iPhone");
-            addUnpairedDeviceToScreen("iPad 2");
-            addUnpairedDeviceToScreen("Arlo's Macbook Pro");
-            addUnpairedDeviceToScreen("ASasasadsad");
-
-            removeUnpairedDeviceFromScreen("Arlo's Macbook Pro");
-
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
 
@@ -179,6 +171,18 @@ namespace RoomVisualizer
 
                 }
 
+
+                // Removes all currently drawn unpaired devices
+                unpairedDeviceStackPanel.Children.Clear();
+
+                // Removes from dictionary as well
+                drawnUnpairedDeviceDictionary.Clear();
+
+                // Updates the screen
+                addDevicesFromDeviceList();
+
+
+
                 foreach (Person person in kinectManager.Locator.Persons)
                 {
                     if (person.Location.HasValue == false)
@@ -265,6 +269,8 @@ namespace RoomVisualizer
             // Creating the TextBlock
             TextBlock text = new TextBlock();
             text.Text = name;
+            text.Margin = new Thickness(0, 0, 10, 5);
+            text.FontFamily = new FontFamily("Arial");
             text.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
 
             // Adding the items to the Stack Panel
@@ -275,7 +281,11 @@ namespace RoomVisualizer
             unpairedDeviceStackPanel.Children.Add(stackPanel);
 
             // Adding an entry to the Dictionary to be able to remove it later
-            drawnUnpairedDeviceDictionary.Add(name, stackPanel);
+            if (!drawnUnpairedDeviceDictionary.ContainsKey(name))
+            {
+                drawnUnpairedDeviceDictionary.Add(name, stackPanel);
+            }
+
         }
 
         public void removeUnpairedDeviceFromScreen(string name)
@@ -285,6 +295,19 @@ namespace RoomVisualizer
                 // Remove from Dictionary and from Stack Panel
                 unpairedDeviceStackPanel.Children.Remove(drawnUnpairedDeviceDictionary[name]);
                 drawnUnpairedDeviceDictionary.Remove(name);
+            }
+        }
+
+        public void addDevicesFromDeviceList()
+        {
+            List<PairableDevice> deviceList = kinectManager.Locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
+            foreach(PairableDevice device in deviceList) {
+
+                // If the device is currently unpaired, then draw it to the screen
+                if (device.PairingState == PairingState.NotPaired)
+                {
+                    addUnpairedDeviceToScreen(device.Identifier);
+                }
             }
         }
     }
