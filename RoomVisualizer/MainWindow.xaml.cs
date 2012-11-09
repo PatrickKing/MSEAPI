@@ -250,7 +250,7 @@ namespace RoomVisualizer
             }
         }
 
-        public void addUnpairedDeviceToScreen(string name)
+        public void addUnpairedDeviceToScreen(string name, PairingState state)
         {
             // stackPanel will contain a TextBlock for the name, and then a Ellipse for the Device
             StackPanel stackPanel = new StackPanel();
@@ -261,7 +261,12 @@ namespace RoomVisualizer
             // Creating the Ellipse
             Ellipse myEllipse = new Ellipse();
             myEllipse.StrokeThickness = 1;
-            myEllipse.Stroke = Brushes.Blue;
+            myEllipse.Stroke = Brushes.Red;
+            if (state == PairingState.PairingAttempt)
+            {
+                myEllipse.Stroke = Brushes.Yellow;
+            }
+
             myEllipse.Width = 55;
             myEllipse.Height = 55;
             myEllipse.Margin = new Thickness(0, 0, 10, 0);
@@ -304,9 +309,9 @@ namespace RoomVisualizer
             foreach(PairableDevice device in deviceList) {
 
                 // If the device is currently unpaired, then draw it to the screen
-                if (device.PairingState == PairingState.NotPaired)
+                if (device.PairingState == PairingState.NotPaired || device.PairingState == PairingState.PairingAttempt)
                 {
-                    addUnpairedDeviceToScreen(device.Identifier);
+                    addUnpairedDeviceToScreen(device.Identifier, device.PairingState);
                 }
             }
         }
