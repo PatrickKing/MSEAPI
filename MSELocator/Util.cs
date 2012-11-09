@@ -10,7 +10,7 @@ namespace MSELocator
 {
     public class Util
     {
-        public const double DEFAULT_FIELD_OF_VIEW = 15.0; // degrees
+        public const double DEFAULT_FIELD_OF_VIEW = 25.0; // degrees
 
         /// <summary>
         /// Clamps angles so that they are in 0 &lt;= angle &lt; 360 degrees.
