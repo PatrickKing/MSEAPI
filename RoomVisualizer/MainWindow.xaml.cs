@@ -39,6 +39,9 @@ namespace RoomVisualizer
         MSEKinectManager kinectManager;
         DispatcherTimer dispatchTimer;
 
+        // Dictionary for the unpaired devices that are currently drawn in the unpaired device area
+        private Dictionary<string, StackPanel> drawnUnpairedDeviceDictionary = new Dictionary<string, StackPanel>();
+
         #endregion
 
 
@@ -80,6 +83,8 @@ namespace RoomVisualizer
             addUnpairedDeviceToScreen("iPad 2");
             addUnpairedDeviceToScreen("Arlo's Macbook Pro");
             addUnpairedDeviceToScreen("ASasasadsad");
+
+            removeUnpairedDeviceFromScreen("Arlo's Macbook Pro");
 
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
@@ -243,26 +248,44 @@ namespace RoomVisualizer
 
         public void addUnpairedDeviceToScreen(string name)
         {
+            // stackPanel will contain a TextBlock for the name, and then a Ellipse for the Device
             StackPanel stackPanel = new StackPanel();
+
+            // Oriented Vertically
             stackPanel.Orientation = Orientation.Vertical;
 
+            // Creating the Ellipse
             Ellipse myEllipse = new Ellipse();
-
             myEllipse.StrokeThickness = 1;
             myEllipse.Stroke = Brushes.Blue;
             myEllipse.Width = 55;
             myEllipse.Height = 55;
             myEllipse.Margin = new Thickness(0, 0, 10, 0);
             
+            // Creating the TextBlock
             TextBlock text = new TextBlock();
             text.Text = name;
             text.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
 
+            // Adding the items to the Stack Panel
             stackPanel.Children.Add(text);
             stackPanel.Children.Add(myEllipse);
 
+            // Adding the Stack Panel to the larger Stack Panel
             unpairedDeviceStackPanel.Children.Add(stackPanel);
 
+            // Adding an entry to the Dictionary to be able to remove it later
+            drawnUnpairedDeviceDictionary.Add(name, stackPanel);
+        }
+
+        public void removeUnpairedDeviceFromScreen(string name)
+        {
+            if (drawnUnpairedDeviceDictionary.ContainsKey(name))
+            {
+                // Remove from Dictionary and from Stack Panel
+                unpairedDeviceStackPanel.Children.Remove(drawnUnpairedDeviceDictionary[name]);
+                drawnUnpairedDeviceDictionary.Remove(name);
+            }
         }
     }
 }
