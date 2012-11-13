@@ -72,7 +72,7 @@ namespace MSEGestureRecognizer
             }
 
             GesturePartResult result = this.gestureParts[this.currentGesturePart].CheckGesture(data);
-            if (result == GesturePartResult.Suceed)
+            if (result == GesturePartResult.Succeed)
             {
                 if (this.currentGesturePart + 1 < this.gestureParts.Length)
                 {
@@ -97,7 +97,7 @@ namespace MSEGestureRecognizer
                 this.pausedFrameCount = 5;
                 this.paused = true;
             }
-            else
+            else // GesturePartResult.Pausing
             {
                 this.frameCount++;
                 this.pausedFrameCount = 5;

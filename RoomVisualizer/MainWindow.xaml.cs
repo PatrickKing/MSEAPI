@@ -25,7 +25,7 @@ namespace RoomVisualizer
     public partial class MainWindow : Window
     {
 
-        #region ivars
+        #region Instance Variables
         /// <summary>
         /// Drawing group for skeleton rendering output
         /// </summary>
@@ -41,6 +41,11 @@ namespace RoomVisualizer
 
         // Dictionary for the unpaired devices that are currently drawn in the unpaired device area
         private Dictionary<string, StackPanel> drawnUnpairedDeviceDictionary = new Dictionary<string, StackPanel>();
+
+        /// <summary>
+        /// Rendering code from the SkeletonBasics example, for demonstration purposes 
+        /// </summary>
+        private SkeletonRenderer skeletonRenderer;
 
         #endregion
 
@@ -78,12 +83,17 @@ namespace RoomVisualizer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
+
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
 
             
             dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
             dispatchTimer.Start();
+
+            skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
+
 
             // Create the drawing group we'll use for drawing
             this.drawingGroup = new DrawingGroup();

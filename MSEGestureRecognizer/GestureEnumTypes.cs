@@ -18,7 +18,7 @@ namespace MSEGestureRecognizer
             /// <summary>
             /// Gesture part suceed
             /// </summary>
-            Suceed,
+            Succeed,
 
             /// <summary>
             /// Gesture part result undetermined

@@ -27,7 +27,7 @@ namespace MSEGestureRecognizer
                 if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
                     logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 1");
-                    return GesturePartResult.Suceed;
+                    return GesturePartResult.Succeed;
                 }
 
                 // hand has not dropped but is not quite where we expect it to be, pausing till next frame
@@ -57,7 +57,7 @@ namespace MSEGestureRecognizer
                 if (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
                     logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 2");
-                    return GesturePartResult.Suceed;
+                    return GesturePartResult.Succeed;
                 }
 
                 // hand has not dropped but is not quite where we expect it to be, pausing till next frame
