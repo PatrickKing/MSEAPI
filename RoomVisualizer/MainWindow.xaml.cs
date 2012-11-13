@@ -196,25 +196,31 @@ namespace RoomVisualizer
                     // Find the person's device, if they are paired with one
                     List<PairableDevice> pairableDevices = kinectManager.Locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
                     PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
-                    Brush brush;
+                    Brush penBrush;
+                    Brush backgroundBrush = Brushes.White;
 
-                    // Colour the person's dot by whether they have a device, and whether they see any devices
+                    // Colour the person's dot by whether they are paired with a device
                     PairablePerson pperson = (PairablePerson)person;
                     if (pperson.PairingState == PairingState.NotPaired)
-                        brush = Brushes.Red;
+                    {
+                        penBrush = Brushes.Red;
+                    }
                     else if (pperson.PairingState == PairingState.PairingAttempt)
-                        brush = Brushes.Yellow;
-                    else
-                    { 
-                        brush = createBrushWithTextAndBackground(pperson.HeldDeviceIdentifier, Brushes.Green);
+                    {
+                        penBrush = Brushes.Orange;
+                    }
+                    else // pperson.PairingState == PairingState.Paired
+                    {
+                        penBrush = Brushes.Green;
+                        backgroundBrush = createBrushWithTextAndBackground(pperson.HeldDeviceIdentifier, backgroundBrush);
                     }
 
 
                     // Draw a dot for each person seen by the tracker
                     if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0) {
                         dc.DrawEllipse(
-                            brush,
-                            null,
+                            backgroundBrush,
+                            new Pen(penBrush, 2.0),
                             ConvertFromMetersToPixels(person.Location.Value),
                             deviceDrawWidth,
                             deviceDrawHeight);
