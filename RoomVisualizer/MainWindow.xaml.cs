@@ -87,7 +87,6 @@ namespace RoomVisualizer
 
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
-
             
             dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
             dispatchTimer.Start();
