@@ -58,11 +58,18 @@ namespace MSEGestureRecognizer
 
         /// <summary>
         /// Uses skeleton data from sequential Kinect frames to detect the segments that make up a gesture.
-        /// To be called each on each SkeletonFrame from the Kinect.
+        /// To be called on each SkeletonFrame from the Kinect.
         /// </summary>
         /// <param name="data">The skeleton data.</param>
         public void UpdateGesture(Skeleton data)
-        {
+        {            
+            if (data == null)
+            {
+                // We either lost the skeleton, or were never tracking it to begin with. 
+                this.Reset();
+                return;
+            }
+
             GesturePartResult result = this.gestureSegments[this.currentGestureSegment].CheckGesture(data);
 
             // If the result is Pausing, the segment can still potentially succeed, 
