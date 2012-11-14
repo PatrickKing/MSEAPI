@@ -94,8 +94,8 @@ namespace MSEKinect
             //Process the skeleton frame
             else
             {
-                UpdatePersonsAndDevices(GetAllSkeletons(e));
-                gestureController.UpdateAllGestures(GetTrackedSkeletons(e));
+                UpdatePersonsAndDevices(GetTrackedSkeletonsAndPositions(e));
+                gestureController.UpdateAllGestureGroups(GetAllSkeletonData(e));
             }
 
 
@@ -104,10 +104,8 @@ namespace MSEKinect
 
         /// <summary>
         /// Single function to update location, and eventually orientation, of persons and devices in response to new Kinect frames.
-        /// TODO: It might make sense to refactor some parts of this function into sub functions.
         /// </summary>
         /// <param name="skeletons"></param>
-        //(TODO) Refactor this method
         private void UpdatePersonsAndDevices(List<Skeleton> skeletons)
         {
             //Kinect occasionally returns null for a skeleton frame which leads to a null list<Skeleton>: skip this frame so that we don't drop any People
@@ -115,8 +113,6 @@ namespace MSEKinect
             {
                 return;
             }
-
-
             //Convert Locator List Types into PairablePerson & PairableDevice
             List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
             List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
@@ -131,13 +127,6 @@ namespace MSEKinect
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);
-
-            //foreach (PairablePerson p in pairablePersons)
-            //{
-            //    System.Diagnostics.Debug.WriteLine(p.Identifier + " " + p.PairingState);
-
-            //}
-
         }
 
         private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
@@ -222,9 +211,8 @@ namespace MSEKinect
         #region Skeleton Frame Helper
 
         //TODO: Lost person notification
-        //TODO:
         /// <summary>
-        /// Copies tracked skeleton information from a frame and returns them as a list of skeletons]
+        /// Copies tracked skeleton information from a frame and returns them as a list of skeletons
         /// Returns only skeletons in full tracking mode... 
         /// </summary>
         /// <param name="e">
@@ -263,7 +251,7 @@ namespace MSEKinect
         /// </summary>
         /// <param name="e"></param>
         /// <returns></returns>
-        List<Skeleton> GetAllSkeletons(SkeletonFrameReadyEventArgs e)
+        List<Skeleton> GetTrackedSkeletonsAndPositions(SkeletonFrameReadyEventArgs e)
         {
             //Allocate a maximum of 6 skeletons, as per the maximum allowed by the Kinect
             Skeleton[] allSkeletons = new Skeleton[6];
@@ -287,6 +275,31 @@ namespace MSEKinect
                 return updatedSkeletons;
             }
         }
+
+
+
+        Skeleton[] GetAllSkeletonData(SkeletonFrameReadyEventArgs e)
+        {
+            //Allocate a maximum of 6 skeletons, as per the maximum allowed by the Kinect
+            Skeleton[] allSkeletons = new Skeleton[6];
+
+            using (SkeletonFrame frameData = e.OpenSkeletonFrame())
+            {
+                //Check that frame is not null
+                if (frameData == null)
+                {
+                    return null;
+                }
+
+                //After checking the frame is not null, copy the skeleton data to the empty array of skeletons
+                frameData.CopySkeletonDataTo(allSkeletons);
+
+                return allSkeletons;
+            }
+        }
+
+
+
 
         #endregion
 
