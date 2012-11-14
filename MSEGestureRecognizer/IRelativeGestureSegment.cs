@@ -12,6 +12,7 @@ namespace MSEGestureRecognizer
     /// </summary>
     public interface IRelativeGestureSegment
     {
+
         /// <summary>
         /// Checks the gesture.
         /// </summary>

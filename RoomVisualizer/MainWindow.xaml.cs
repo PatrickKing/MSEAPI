@@ -203,7 +203,7 @@ namespace RoomVisualizer
                     PairablePerson pperson = (PairablePerson)person;
                     if (pperson.PairingState == PairingState.NotPaired)
                     {
-                        penBrush = Brushes.Red;
+                        penBrush = Brushes.DarkRed;
                     }
                     else if (pperson.PairingState == PairingState.PairingAttempt)
                     {

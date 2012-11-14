@@ -9,7 +9,7 @@ namespace MSEGestureRecognizer
 {
     public class WaveLeftSegment1 : IRelativeGestureSegment
     {
-        private static TraceSource logger = new TraceSource("MSEGestureRecognizer");
+        //private static TraceSource logger = new TraceSource("MSEGestureRecognizer");
 
         /// <summary>
         /// Checks the gesture.
@@ -21,12 +21,12 @@ namespace MSEGestureRecognizer
             //logger.TraceEvent(TraceEventType.Verbose, 0, skeleton.Joints[JointType.HandLeft].Position.Y);
 
             // hand above elbow
-            if (skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.ElbowLeft].Position.Y)
+            if (skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.ElbowLeft].Position.Y + Gesture.HAND_ELBOW_DISTANCE_THRESHOLD)
             {
                 // hand right of elbow
                 if (skeleton.Joints[JointType.HandLeft].Position.X > skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
-                    logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 1");
+          //          logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 1");
                     return GesturePartResult.Succeed;
                 }
 
@@ -41,7 +41,7 @@ namespace MSEGestureRecognizer
 
     public class WaveLeftSegment2 : IRelativeGestureSegment
     {
-        private static TraceSource logger = new TraceSource("MSEGestureRecognizer");
+        //private static TraceSource logger = new TraceSource("MSEGestureRecognizer");
 
         /// <summary>
         /// Checks the gesture.
@@ -50,13 +50,14 @@ namespace MSEGestureRecognizer
         /// <returns>GesturePartResult based on if the gesture part has been completed</returns>
         public GesturePartResult CheckGesture(Skeleton skeleton)
         {
+
             // hand above elbow
-            if (skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.ElbowLeft].Position.Y)
+            if (skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.ElbowLeft].Position.Y + Gesture.HAND_ELBOW_DISTANCE_THRESHOLD)
             {
                 // hand right of elbow
                 if (skeleton.Joints[JointType.HandLeft].Position.X < skeleton.Joints[JointType.ElbowLeft].Position.X)
                 {
-                    logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 2");
+          //          logger.TraceEvent(TraceEventType.Verbose, 0, "Recognized WaveLeft 2");
                     return GesturePartResult.Succeed;
                 }
 
