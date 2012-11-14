@@ -39,9 +39,6 @@ namespace RoomVisualizer
         MSEKinectManager kinectManager;
         DispatcherTimer dispatchTimer;
 
-        // Dictionary for the unpaired devices that are currently drawn in the unpaired device area
-        private Dictionary<string, StackPanel> drawnUnpairedDeviceDictionary = new Dictionary<string, StackPanel>();
-
         /// <summary>
         /// Rendering code from the SkeletonBasics example, for demonstration purposes 
         /// </summary>
@@ -180,9 +177,6 @@ namespace RoomVisualizer
 
                 // Removes all currently drawn unpaired devices
                 unpairedDeviceStackPanel.Children.Clear();
-
-                // Removes from dictionary as well
-                drawnUnpairedDeviceDictionary.Clear();
 
                 // Updates the screen
                 addDevicesFromDeviceList();
