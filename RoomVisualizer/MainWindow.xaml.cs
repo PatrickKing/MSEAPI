@@ -87,7 +87,6 @@ namespace RoomVisualizer
 
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
-
             
             dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
             dispatchTimer.Start();
@@ -340,8 +339,12 @@ namespace RoomVisualizer
             textBlock.FontFamily = new FontFamily("Arial");
             textBlock.Text = text;
             textBlock.TextTrimming = TextTrimming.CharacterEllipsis;
+            textBlock.TextWrapping = TextWrapping.WrapWithOverflow;
             textBlock.TextAlignment = TextAlignment.Center;
-            textBlock.Padding = new Thickness(5, deviceDrawHeight - textBlock.FontSize, 5, 0);
+            textBlock.Padding = new Thickness(5, deviceDrawHeight - textBlock.FontSize-5, 5, 0);
+
+            textBlock.Height = deviceDrawHeight * 2;
+            textBlock.Width = deviceDrawWidth * 2;
 
             StackPanel stackPanel = new StackPanel();
             stackPanel.Width = deviceDrawWidth * 2;
