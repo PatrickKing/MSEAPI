@@ -13,33 +13,24 @@ namespace MSEKinect
 
     public class PairableDevice : Device
     {
+        private const int TIMEOUT_TIME = 3000; // miliseconds
+
         private PairingState _pairingState;
-        private Timer timer;
-
-        // Time in ms before the PairingState gets reset from PairingAttempt to NotPaired
-        const int resetTime = 5000;
-
-        public PairableDevice() {
-
-            // Creates a new timer and attaches an event handler.
-            timer = new Timer(resetTime);
-            timer.Elapsed += new ElapsedEventHandler(resetPairingState);
-
-            // Will only trigger the Elapsed event once per time Start() is called
-            timer.AutoReset = false;
-        }
+        private Timer pairingTimeoutTimer;
 
         public PairingState PairingState
         {
             get { return _pairingState; }
-            set {
-                _pairingState = value;
-
-                // If we try to set PairingState to PairingAttempt, start the timer
+            set 
+            {
                 if (value == PairingState.PairingAttempt)
-                {                  
-                    timer.Start();               
+                {
+                    pairingTimeoutTimer = new Timer(TIMEOUT_TIME);
+                    pairingTimeoutTimer.Elapsed += pairingTimeout;
+                    pairingTimeoutTimer.AutoReset = false;
+                    pairingTimeoutTimer.Start();
                 }
+                _pairingState = value;
             }
         }
 
@@ -53,15 +44,19 @@ namespace MSEKinect
                 PairingState); 
         }
 
-        private void resetPairingState(object source, ElapsedEventArgs e)
+        /// <summary>
+        /// Handler for the pairing timeout timer, which sets us to 'not pairing' if we haven't paired yet.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void pairingTimeout(Object sender, ElapsedEventArgs e)
         {
-            // This function gets called resetTime milliseconds after timer.Start() is called.
-            timer.Stop();
-
-            // If we have not paired yet, reset the PairingState to NotPaired
-            if (this.PairingState != PairingState.Paired)
+            // Only reset our pairing state if we haven't paired, and if this timer is the most recent timer created
+            if (_pairingState == PairingState.PairingAttempt && sender == pairingTimeoutTimer)
+            {
                 this.PairingState = PairingState.NotPaired;
+                pairingTimeoutTimer = null;
+            }
         }
-        
     }
 }
