@@ -6,7 +6,6 @@ using MSELocator;
 using System.Runtime.CompilerServices;
 using System.Timers;
 
-
 [assembly: InternalsVisibleTo("MSEKinectTests")]
 
 namespace MSEKinect
@@ -17,6 +16,8 @@ namespace MSEKinect
         private const int TIMEOUT_TIME = 3000; // miliseconds
 
         private PairingState _pairingState;
+        private Timer pairingTimeoutTimer;
+
         public PairingState PairingState
         {
             get { return _pairingState; }
@@ -33,7 +34,6 @@ namespace MSEKinect
             }
         }
 
-        private Timer pairingTimeoutTimer;
 
         public override string ToString()
         {
@@ -43,7 +43,6 @@ namespace MSEKinect
                 HeldByPersonIdentifier,
                 PairingState); 
         }
-
 
         /// <summary>
         /// Handler for the pairing timeout timer, which sets us to 'not pairing' if we haven't paired yet.
@@ -59,7 +58,5 @@ namespace MSEKinect
                 pairingTimeoutTimer = null;
             }
         }
-
-        
     }
 }
