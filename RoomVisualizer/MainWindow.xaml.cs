@@ -39,9 +39,6 @@ namespace RoomVisualizer
         MSEKinectManager kinectManager;
         DispatcherTimer dispatchTimer;
 
-        // Dictionary for the unpaired devices that are currently drawn in the unpaired device area
-        private Dictionary<string, StackPanel> drawnUnpairedDeviceDictionary = new Dictionary<string, StackPanel>();
-
         /// <summary>
         /// Rendering code from the SkeletonBasics example, for demonstration purposes 
         /// </summary>
@@ -181,9 +178,6 @@ namespace RoomVisualizer
                 // Removes all currently drawn unpaired devices
                 unpairedDeviceStackPanel.Children.Clear();
 
-                // Removes from dictionary as well
-                drawnUnpairedDeviceDictionary.Clear();
-
                 // Updates the screen
                 addDevicesFromDeviceList();
 
@@ -195,22 +189,15 @@ namespace RoomVisualizer
                     // Find the person's device, if they are paired with one
                     List<PairableDevice> pairableDevices = kinectManager.Locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
                     PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
-                    Brush penBrush;
-                    Brush backgroundBrush = Brushes.White;
 
                     // Colour the person's dot by whether they are paired with a device
                     PairablePerson pperson = (PairablePerson)person;
-                    if (pperson.PairingState == PairingState.NotPaired)
+
+                    Brush penBrush = getBrushFromPairingState(pperson.PairingState);
+                    Brush backgroundBrush = Brushes.White;
+
+                    if(pperson.PairingState == PairingState.Paired)
                     {
-                        penBrush = Brushes.DarkRed;
-                    }
-                    else if (pperson.PairingState == PairingState.PairingAttempt)
-                    {
-                        penBrush = Brushes.Orange;
-                    }
-                    else // pperson.PairingState == PairingState.Paired
-                    {
-                        penBrush = Brushes.Green;
                         backgroundBrush = createBrushWithTextAndBackground(pperson.HeldDeviceIdentifier, backgroundBrush);
                     }
 
@@ -262,54 +249,31 @@ namespace RoomVisualizer
 
         public void addUnpairedDeviceToScreen(string name, PairingState state)
         {
-            // stackPanel will contain a TextBlock for the name, and then a Ellipse for the Device
-            StackPanel stackPanel = new StackPanel();
-            
-            // Oriented Vertically
-            stackPanel.Orientation = Orientation.Vertical;
+            Ellipse ellipse = new Ellipse();
+            ellipse.Width = deviceDrawWidth * 2;
+            ellipse.Height = deviceDrawHeight * 2;
+            ellipse.StrokeThickness = 2;
+            ellipse.Fill = createBrushWithTextAndBackground(name, Brushes.White);
+            ellipse.Stroke = getBrushFromPairingState(state);
+            ellipse.Margin = new Thickness(0, 0, 10, 0);
 
-            // Creating the Ellipse
-            Ellipse myEllipse = new Ellipse();
-            myEllipse.StrokeThickness = 2;
-            myEllipse.Stroke = Brushes.Red;
-            if (state == PairingState.PairingAttempt)
-            {
-                myEllipse.Stroke = Brushes.Yellow;
-            }
-
-            myEllipse.Width = 55;
-            myEllipse.Height = 55;
-            myEllipse.Margin = new Thickness(10, 0, 10, 0);
-            
-            // Creating the TextBlock
-            TextBlock text = new TextBlock();
-            text.Text = name;
-            text.Margin = new Thickness(10, 0, 10, 5);
-            text.FontFamily = new FontFamily("Arial");
-            text.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-
-            // Adding the items to the Stack Panel
-            stackPanel.Children.Add(text);
-            stackPanel.Children.Add(myEllipse);
-
-            // Adding the Stack Panel to the larger Stack Panel
-            unpairedDeviceStackPanel.Children.Add(stackPanel);
-
-            // Adding an entry to the Dictionary to be able to remove it later
-            if (!drawnUnpairedDeviceDictionary.ContainsKey(name))
-            {
-                drawnUnpairedDeviceDictionary.Add(name, stackPanel);
-            }
-
+            unpairedDeviceStackPanel.Children.Add(ellipse);
         }
 
-        public void removeUnpairedDeviceFromScreen(string name)
+
+        /// <summary>
+        /// Converts a pairing state to a Brush. This is useful so that if we want to change the color scheme for different states, we only need to do it here.
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public Brush getBrushFromPairingState(PairingState state)
         {
-            if (drawnUnpairedDeviceDictionary.ContainsKey(name))
+            switch (state)
             {
-                // Remove from Dictionary and from Stack Panel
-                unpairedDeviceStackPanel.Children.Remove(drawnUnpairedDeviceDictionary[name]);
-                drawnUnpairedDeviceDictionary.Remove(name);
+                case (PairingState.NotPaired): return Brushes.DarkRed;
+                case (PairingState.PairingAttempt): return Brushes.Orange;
+                case (PairingState.Paired): return Brushes.Green;
+                default: return Brushes.White;
             }
         }
 
