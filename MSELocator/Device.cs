@@ -23,7 +23,10 @@ namespace MSELocator
                 else
                 {
                     _Orientation = null;
-                }  
+                }
+
+                if (OrientationChanged != null)
+                    OrientationChanged(this);
             }
         }
 
@@ -51,7 +54,12 @@ namespace MSELocator
         public Point? Location
         {
             get { return _Location; }
-            set { _Location = value; }
+            set 
+            {       
+                _Location = value;
+                if (LocationChanged != null)
+                    LocationChanged(this);
+            }
         }
 
         private String _HeldByPersonIdentifier;
@@ -73,6 +81,13 @@ namespace MSELocator
                 _Identifier = value;
             }
         }
+
+
+
+        public delegate void DeviceEventSignature(Device sender);
+        public event DeviceEventSignature LocationChanged;
+        public event DeviceEventSignature OrientationChanged;
+
 
         public override bool Equals(System.Object obj)
         {

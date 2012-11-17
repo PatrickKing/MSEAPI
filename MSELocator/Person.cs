@@ -9,6 +9,7 @@ namespace MSELocator
 {
     public class Person
     {
+        
         private String _HeldDeviceIdentifier;
         public String HeldDeviceIdentifier
         {
@@ -20,7 +21,12 @@ namespace MSELocator
         public Point? Location
         {
             get { return _Location; }
-            set { _Location = value; }
+            set 
+            { 
+                _Location = value;
+                if (LocationChanged != null)
+                    LocationChanged(this);
+            }
         }
 
         private double? _Orientation;
@@ -36,7 +42,10 @@ namespace MSELocator
                 else
                 {
                     _Orientation = null;
-                }                
+                }
+
+                if (OrientationChanged != null)
+                    OrientationChanged(this);
             }
         }
 
@@ -46,6 +55,10 @@ namespace MSELocator
             get { return _Identifier; }
             set { _Identifier = value; }
         }
+
+        public delegate void PersonEventSignature(Person sender);
+        public event PersonEventSignature LocationChanged;
+        public event PersonEventSignature OrientationChanged;
 
         /// <summary>
         /// This method overrrides the equals, to allow comparison of Persons, based on their identifier.

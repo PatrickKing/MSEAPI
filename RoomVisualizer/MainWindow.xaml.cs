@@ -44,6 +44,9 @@ namespace RoomVisualizer
         /// </summary>
         private SkeletonRenderer skeletonRenderer;
 
+        private Dictionary<string, DrawnDevice> drawnDeviceDictionary;
+        private Dictionary<string, DrawnPerson> drawnPersonDictionary;   
+
         #endregion
 
 
@@ -80,13 +83,21 @@ namespace RoomVisualizer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            drawnPersonDictionary = new Dictionary<string,DrawnPerson>();
+            drawnDeviceDictionary = new Dictionary<string,DrawnDevice>();
 
 
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
-            
-            dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
-            dispatchTimer.Start();
+
+            kinectManager.DeviceManager.DeviceAdded += deviceAdded;
+            kinectManager.DeviceManager.DeviceRemoved += deviceRemoved;
+            kinectManager.PersonManager.PersonAdded += personAdded;
+            kinectManager.PersonManager.PersonRemoved += personRemoved;
+
+            //dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
+            //dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(RedrawCanvas), Dispatcher.CurrentDispatcher);
+            //dispatchTimer.Start();
 
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
 
@@ -98,7 +109,7 @@ namespace RoomVisualizer
             this.imageSource = new DrawingImage(this.drawingGroup);
 
             // Display the drawing using our image control
-            Image.Source = this.imageSource;
+           // Image.Source = this.imageSource;
 
             Point oldLocation = kinectManager.Locator.Trackers[0].Location.Value;
             Point? newLocation = new Point(xRange / 2, yRange);
@@ -114,7 +125,7 @@ namespace RoomVisualizer
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             kinectManager.Stop();
-            dispatchTimer.Stop();
+         //   dispatchTimer.Stop();
         }
 
 
@@ -124,13 +135,40 @@ namespace RoomVisualizer
             return new Point(myPoint.X * RenderWidth / xRange, RenderHeight - (myPoint.Y * RenderHeight / yRange));
         }
 
+
+        public void deviceAdded(DeviceManager deviceManager, PairableDevice pairableDevice)
+        {
+            drawnDeviceDictionary[pairableDevice.Identifier] = new DrawnDevice(pairableDevice);
+
+        }
+
+        public void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
+        {
+            drawnDeviceDictionary.Remove(pairableDevice.Identifier);
+
+        }
+
+        public void personAdded(PersonManager personManager, PairablePerson pairablePerson)
+        {
+            drawnPersonDictionary[pairablePerson.Identifier] = new DrawnPerson(pairablePerson);
+
+        }
+
+        public void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
+        {
+
+            drawnPersonDictionary.Remove(pairablePerson.Identifier);
+        }
+
+
+
+
+        /*
         public void Redraw(object s, EventArgs ev)
         {
 
             using (DrawingContext dc = this.drawingGroup.Open())
             {
-
-
                 // Draw the room's bounding box
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(0.0, 0.0), new Point(0.0, RenderHeight));
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(0.0, RenderHeight), new Point(RenderWidth, RenderHeight));
@@ -153,33 +191,33 @@ namespace RoomVisualizer
 
 
                     if (tracker.Orientation.HasValue == false)
-                            continue;
+                        continue;
 
-                        // Draw two lines to serve as field of view indicators
-                        double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + 45);
-                        double topX = Math.Cos(topAngle * Math.PI / 180);
-                        double topY = Math.Sin(topAngle * Math.PI / 180);
-                        dc.DrawLine(
-                            new Pen(Brushes.Black, 0.3),
-                            ConvertFromMetersToPixels(tracker.Location.Value),
-                            ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + topX, tracker.Location.Value.Y + topY)));
+                    // Draw two lines to serve as field of view indicators
+                    double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + 45);
+                    double topX = Math.Cos(topAngle * Math.PI / 180);
+                    double topY = Math.Sin(topAngle * Math.PI / 180);
+                    dc.DrawLine(
+                        new Pen(Brushes.Black, 0.3),
+                        ConvertFromMetersToPixels(tracker.Location.Value),
+                        ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + topX, tracker.Location.Value.Y + topY)));
 
-                        double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - 45);
-                        double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
-                        double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
-                        dc.DrawLine(
-                            new Pen(Brushes.Black, 0.3),
-                            ConvertFromMetersToPixels(tracker.Location.Value),
-                            ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + bottomX, tracker.Location.Value.Y + bottomY)));
-                    
+                    double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - 45);
+                    double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
+                    double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
+                    dc.DrawLine(
+                        new Pen(Brushes.Black, 0.3),
+                        ConvertFromMetersToPixels(tracker.Location.Value),
+                        ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + bottomX, tracker.Location.Value.Y + bottomY)));
+
                 }
 
 
-                // Removes all currently drawn unpaired devices
-                unpairedDeviceStackPanel.Children.Clear();
+                //// Removes all currently drawn unpaired devices
+                //unpairedDeviceStackPanel.Children.Clear();
 
-                // Updates the screen
-                addDevicesFromDeviceList();
+                //// Updates the screen
+                //addDevicesFromDeviceList();
 
                 foreach (Person person in kinectManager.Locator.Persons)
                 {
@@ -196,14 +234,15 @@ namespace RoomVisualizer
                     Brush penBrush = getBrushFromPairingState(pperson.PairingState);
                     Brush backgroundBrush = Brushes.White;
 
-                    if(pperson.PairingState == PairingState.Paired)
+                    if (pperson.PairingState == PairingState.Paired)
                     {
                         backgroundBrush = createBrushWithTextAndBackground(pperson.HeldDeviceIdentifier, backgroundBrush);
                     }
 
 
                     // Draw a dot for each person seen by the tracker
-                    if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0) {
+                    if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0)
+                    {
                         dc.DrawEllipse(
                             backgroundBrush,
                             new Pen(penBrush, 2.0),
@@ -322,6 +361,6 @@ namespace RoomVisualizer
             visualBrush.TileMode = TileMode.None;
 
             return visualBrush;
-        }
+        }*/
     }
 }

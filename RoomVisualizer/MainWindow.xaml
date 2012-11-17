@@ -11,7 +11,7 @@
         </Grid.ColumnDefinitions>
 
         
-        
+        <!-- 
         <Viewbox VerticalAlignment="Top" Grid.Column="0">
             <Image Name="Image" Width="640" Height="640" />
         </Viewbox>
@@ -19,7 +19,11 @@
             <TextBlock Name="textBlock1" Text="Unpaired Devices" Padding="0" Margin="0,10,0,5" FontFamily="Arial" FontWeight="ExtraBlack" />
             <StackPanel Name="unpairedDeviceStackPanel" Orientation="Horizontal"></StackPanel>
         </StackPanel>
-
+        -->
+        
+        <Canvas Name="canvas"> </Canvas>
+        
+        
         <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
             <Image Name="SkeletonBasicsImage" Width="640" Height="480"/>
         </Viewbox>

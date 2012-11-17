@@ -22,6 +22,16 @@ namespace MSEKinect
             get{ return locator; }
         }
 
+        public PersonManager PersonManager
+        {
+            get { return personManager; }
+        }
+
+        public DeviceManager DeviceManager
+        {
+            get { return deviceManager; }
+        }
+
 
         public void Start()
         {

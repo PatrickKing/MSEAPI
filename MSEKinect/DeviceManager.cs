@@ -11,15 +11,28 @@ namespace MSEKinect
 {
     public class DeviceManager
     {
+
+        #region Instance Variables
+        private int dictionaryResets;
         private static TraceSource logger = new TraceSource("MSEKinect");
 
-        event ServiceUpdateEventHandler deviceUpdateEventHandler;
         IAIntAirAct ia;
         LocatorInterface locator;
+        #endregion
+
+        #region Events
+        event ServiceUpdateEventHandler deviceUpdateEventHandler;
+        
+        public delegate void DeviceChangedEventSignature(DeviceManager sender, PairableDevice device);
+        public event DeviceChangedEventSignature DeviceAdded;
+        public event DeviceChangedEventSignature DeviceRemoved;
+        #endregion
+
 
         public DeviceManager(LocatorInterface locator, IAIntAirAct intAirAct) {
             this.locator = locator;
             this.ia = intAirAct;
+            dictionaryResets = 0;
         }
 
         public void StartDeviceManager()
@@ -46,6 +59,8 @@ namespace MSEKinect
             List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>(); 
 
             locator.Devices = ProcessDevicesOnUpdated(updatedDevices, pairableDevices, pairablePersons);
+            dictionaryResets++;
+            System.Diagnostics.Debug.WriteLine("Device Dictionary Resets: " + dictionaryResets);
  
         }
 
@@ -58,13 +73,25 @@ namespace MSEKinect
 
             List<PairableDevice> missingDevices = missing.ToList<PairableDevice>();
 
+            foreach (PairableDevice pairableDevice in missingDevices)
+            {
+                if (DeviceRemoved != null)
+                    DeviceRemoved(this, pairableDevice);
+            }
+
             ProcessMissingDevices(missingDevices, currentPersons); 
 
             var added = from ud in updatedDevices
                         where !currentDevices.Contains(ud)
                         select ud;
 
-            List<Device> addedDevices = added.ToList<Device>();
+            List<PairableDevice> addedDevices = added.ToList<PairableDevice>();
+
+            foreach (PairableDevice pairableDevice in addedDevices)
+            {
+                if (DeviceAdded != null)
+                    DeviceAdded(this, pairableDevice);
+            }
 
             //ProcessAddedDevices(addedDevices); 
 

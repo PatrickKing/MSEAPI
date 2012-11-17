@@ -12,6 +12,12 @@ namespace MSEKinect
     {
         private const int TIMEOUT_TIME = 3000; // miliseconds
 
+
+        public delegate void PairablePersonEventSignature(PairablePerson sender);
+
+        public event PairablePersonEventSignature PairingStateChanged;
+
+
         private PairingState _pairingState;
         public PairingState PairingState
         {

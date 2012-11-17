@@ -15,6 +15,9 @@ namespace MSEKinect
     {
         private const int TIMEOUT_TIME = 3000; // miliseconds
 
+        public delegate void PairableDeviceEventSignature(PairableDevice sender);
+        public event PairableDeviceEventSignature PairingStateChanged;
+        
         private PairingState _pairingState;
         private Timer pairingTimeoutTimer;
 
@@ -22,7 +25,8 @@ namespace MSEKinect
         {
             get { return _pairingState; }
             set 
-            {
+            {   
+
                 if (value == PairingState.PairingAttempt)
                 {
                     pairingTimeoutTimer = new Timer(TIMEOUT_TIME);
@@ -30,7 +34,17 @@ namespace MSEKinect
                     pairingTimeoutTimer.AutoReset = false;
                     pairingTimeoutTimer.Start();
                 }
-                _pairingState = value;
+
+                if (PairingStateChanged != null && value != PairingState)
+                {
+                    _pairingState = value;
+                    PairingStateChanged(this);
+                }
+                else
+                {
+                    _pairingState = value;
+
+                }
             }
         }
 

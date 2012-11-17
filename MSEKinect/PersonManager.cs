@@ -24,9 +24,20 @@ namespace MSEKinect
         KinectSensor ks;
         GestureController gestureController;
         LocatorInterface locator;
+        
         Tracker tracker;
+        public Tracker Tracker { get { return tracker; } }
+
+        int dictionaryResets;
 
         #endregion
+
+        #region Events
+        public delegate void PersonChangedEventSignature(PersonManager sender, PairablePerson person);
+        public event PersonChangedEventSignature PersonAdded;
+        public event PersonChangedEventSignature PersonRemoved;
+        #endregion
+
 
         #region Constructor, Start and Stop
 
@@ -127,6 +138,10 @@ namespace MSEKinect
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);
+
+            dictionaryResets++;
+            System.Diagnostics.Debug.WriteLine("Person Dictionary Resets: " + dictionaryResets);
+
         }
 
         private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
@@ -155,7 +170,7 @@ namespace MSEKinect
             }
         }
 
-        private static void RemoveOldPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
+        private void RemoveOldPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
         {
             // For any Persons that have left the scene, remove their PairablePerson from , and if it was paired, unhook their paired device
             List<PairablePerson> vanishedPersons = new List<PairablePerson>();
@@ -178,6 +193,9 @@ namespace MSEKinect
                     person.HeldDeviceIdentifier = null;
 
                     vanishedPersons.Add(person);
+
+                    if (PersonRemoved != null)
+                        PersonRemoved(this, person);
                 }
             }
             foreach (PairablePerson person in vanishedPersons)
@@ -186,7 +204,7 @@ namespace MSEKinect
             }
         }
 
-        private static void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons)
+        private void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons)
         {
             // For any skeletons that have just appeared, create a new PairablePerson
             foreach (Skeleton skeleton in skeletons)
@@ -202,6 +220,9 @@ namespace MSEKinect
                         PairingState = PairingState.NotPaired
                     };
                     pairablePersons.Add(person);
+
+                    if (PersonAdded != null)
+                        PersonAdded(this, person);
                 }
             }
         }
