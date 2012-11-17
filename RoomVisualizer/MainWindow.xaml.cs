@@ -95,6 +95,8 @@ namespace RoomVisualizer
             kinectManager.PersonManager.PersonAdded += personAdded;
             kinectManager.PersonManager.PersonRemoved += personRemoved;
 
+
+
             //dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
             //dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(RedrawCanvas), Dispatcher.CurrentDispatcher);
             //dispatchTimer.Start();
@@ -136,6 +138,8 @@ namespace RoomVisualizer
         }
 
 
+
+        #region Handlers for Person and Device manager events
         public void deviceAdded(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
             drawnDeviceDictionary[pairableDevice.Identifier] = new DrawnDevice(pairableDevice);
@@ -159,6 +163,14 @@ namespace RoomVisualizer
 
             drawnPersonDictionary.Remove(pairablePerson.Identifier);
         }
+
+        public void trackerChanged(PersonManager sender, Tracker tracker)
+        {
+            if (tracker != null);
+
+        }
+
+        #endregion
 
 
 

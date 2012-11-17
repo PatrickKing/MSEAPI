@@ -24,10 +24,19 @@ namespace MSEKinect
         KinectSensor ks;
         GestureController gestureController;
         LocatorInterface locator;
+
         
         Tracker tracker;
-        public Tracker Tracker { get { return tracker; } }
-
+        public Tracker Tracker 
+        { 
+            get { return tracker; } 
+            private set 
+            { 
+                tracker = value;
+                TrackerSet(this, tracker);
+            }
+        }
+        
         int dictionaryResets;
 
         #endregion
@@ -36,6 +45,10 @@ namespace MSEKinect
         public delegate void PersonChangedEventSignature(PersonManager sender, PairablePerson person);
         public event PersonChangedEventSignature PersonAdded;
         public event PersonChangedEventSignature PersonRemoved;
+
+        public delegate void TrackerChangedEventSignature(PersonManager sender, Tracker tracker);
+        public event TrackerChangedEventSignature TrackerSet;
+
         #endregion
 
 
