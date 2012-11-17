@@ -21,7 +21,7 @@
         </StackPanel>
         -->
         
-        <Canvas Name="canvas"> </Canvas>
+        <Canvas Name="canvas" Width="600" Height="800"> </Canvas>
         
         
         <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">

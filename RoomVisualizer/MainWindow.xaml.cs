@@ -25,6 +25,17 @@ namespace RoomVisualizer
     public partial class MainWindow : Window
     {
 
+        /// <summary>
+        /// Shared accessor for the window's canvas object.
+        /// </summary>
+        public static Canvas SharedCanvas
+        {
+            get { return sharedCanvas; }
+        }
+        private static Canvas sharedCanvas;
+
+
+
         #region Instance Variables
         /// <summary>
         /// Drawing group for skeleton rendering output
@@ -37,7 +48,7 @@ namespace RoomVisualizer
         private DrawingImage imageSource;
 
         MSEKinectManager kinectManager;
-        DispatcherTimer dispatchTimer;
+        //DispatcherTimer dispatchTimer;
 
         /// <summary>
         /// Rendering code from the SkeletonBasics example, for demonstration purposes 
@@ -45,10 +56,10 @@ namespace RoomVisualizer
         private SkeletonRenderer skeletonRenderer;
 
         private Dictionary<string, DrawnDevice> drawnDeviceDictionary;
-        private Dictionary<string, DrawnPerson> drawnPersonDictionary;   
+        private Dictionary<string, DrawnPerson> drawnPersonDictionary;
+        private DrawnTracker drawnTracker;
 
         #endregion
-
 
         #region constants
 
@@ -78,7 +89,7 @@ namespace RoomVisualizer
         public MainWindow()
         {
             InitializeComponent();
-            
+            sharedCanvas = canvas;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -87,14 +98,19 @@ namespace RoomVisualizer
             drawnDeviceDictionary = new Dictionary<string,DrawnDevice>();
 
 
-            kinectManager = new MSEKinectManager();
-            kinectManager.Start();
 
+            kinectManager = new MSEKinectManager();
+
+            // The tracker is created in the PersonManager constructor, so there's actually no way for us to listen for its creation the first time
+            trackerChanged(kinectManager.PersonManager, kinectManager.PersonManager.Tracker);
+
+            // For Devices and Persons, we catch their addition and removal from the system, to keep our graphics in sync.
             kinectManager.DeviceManager.DeviceAdded += deviceAdded;
             kinectManager.DeviceManager.DeviceRemoved += deviceRemoved;
             kinectManager.PersonManager.PersonAdded += personAdded;
             kinectManager.PersonManager.PersonRemoved += personRemoved;
 
+            kinectManager.Start();
 
 
             //dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
@@ -137,36 +153,37 @@ namespace RoomVisualizer
             return new Point(myPoint.X * RenderWidth / xRange, RenderHeight - (myPoint.Y * RenderHeight / yRange));
         }
 
-
-
         #region Handlers for Person and Device manager events
-        public void deviceAdded(DeviceManager deviceManager, PairableDevice pairableDevice)
+        void deviceAdded(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
             drawnDeviceDictionary[pairableDevice.Identifier] = new DrawnDevice(pairableDevice);
 
         }
 
-        public void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
+        void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
             drawnDeviceDictionary.Remove(pairableDevice.Identifier);
 
         }
 
-        public void personAdded(PersonManager personManager, PairablePerson pairablePerson)
+        void personAdded(PersonManager personManager, PairablePerson pairablePerson)
         {
             drawnPersonDictionary[pairablePerson.Identifier] = new DrawnPerson(pairablePerson);
 
         }
 
-        public void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
+        void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
         {
 
             drawnPersonDictionary.Remove(pairablePerson.Identifier);
         }
 
-        public void trackerChanged(PersonManager sender, Tracker tracker)
+        void trackerChanged(PersonManager sender, Tracker tracker)
         {
-            if (tracker != null);
+            if (tracker != null)
+            {
+                drawnTracker = new DrawnTracker(tracker);
+            }
 
         }
 
