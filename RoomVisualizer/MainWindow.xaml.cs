@@ -35,6 +35,11 @@ namespace RoomVisualizer
         private static Canvas sharedCanvas;
 
 
+        public static StackPanel SharedDeviceStackPanel
+        {
+            get { return sharedStackPanel; }
+        }
+        private static StackPanel sharedStackPanel;
 
         #region Instance Variables
         /// <summary>
@@ -55,8 +60,8 @@ namespace RoomVisualizer
         /// </summary>
         private SkeletonRenderer skeletonRenderer;
 
-        private Dictionary<string, DrawnDevice> drawnDeviceDictionary;
-        private Dictionary<string, DrawnPerson> drawnPersonDictionary;
+        private Dictionary<string, PersonControl> PersonControlDictionary;
+        private Dictionary<string, DeviceControl> DeviceControlDictionary;
         private DrawnTracker drawnTracker;
 
         #endregion
@@ -90,92 +95,76 @@ namespace RoomVisualizer
         {
             InitializeComponent();
             sharedCanvas = canvas;
+            sharedStackPanel = unpairedDeviceStackPanel;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            drawnPersonDictionary = new Dictionary<string,DrawnPerson>();
-            drawnDeviceDictionary = new Dictionary<string,DrawnDevice>();
+            //Create Dictionaries for DeviceControl, PersonControl
+            DeviceControlDictionary = new Dictionary<string, DeviceControl>();
+            PersonControlDictionary = new Dictionary<string, PersonControl>();
 
 
-
+            //Initialize and Start MSEKinectManager
             kinectManager = new MSEKinectManager();
+            kinectManager.Start();
 
             // The tracker is created in the PersonManager constructor, so there's actually no way for us to listen for its creation the first time
             trackerChanged(kinectManager.PersonManager, kinectManager.PersonManager.Tracker);
 
-            // For Devices and Persons, we catch their addition and removal from the system, to keep our graphics in sync.
+            //Setup Events for Device Addition and Removal, Person Addition and Removal 
             kinectManager.DeviceManager.DeviceAdded += deviceAdded;
             kinectManager.DeviceManager.DeviceRemoved += deviceRemoved;
             kinectManager.PersonManager.PersonAdded += personAdded;
             kinectManager.PersonManager.PersonRemoved += personRemoved;
 
-            kinectManager.Start();
-
-
-            //dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
-            //dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(RedrawCanvas), Dispatcher.CurrentDispatcher);
-            //dispatchTimer.Start();
-
+            //Seperate components for displaying the visible skeletons
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
 
-
-            // Create the drawing group we'll use for drawing
-            this.drawingGroup = new DrawingGroup();
-
-            // Create an image source that we can use in our image control
-            this.imageSource = new DrawingImage(this.drawingGroup);
-
-            // Display the drawing using our image control
-           // Image.Source = this.imageSource;
-
-            Point oldLocation = kinectManager.Locator.Trackers[0].Location.Value;
-            Point? newLocation = new Point(xRange / 2, yRange);
-
+            //Hardcode tracker position and orientation
             Tracker tracker = kinectManager.Locator.Trackers[0];
+            tracker.Location = new Point(xRange / 2, yRange); 
+            tracker.Orientation = 270; 
 
-            tracker.Location = newLocation;
-            tracker.Orientation = 270;
 
 
         }
 
+        //Window Close (End the Kinect Manager) 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             kinectManager.Stop();
-         //   dispatchTimer.Stop();
         }
-
-
     
+        //Utility Function - Coverting from Meters into Pixels
         private Point ConvertFromMetersToPixels(Point myPoint)
         {
             return new Point(myPoint.X * RenderWidth / xRange, RenderHeight - (myPoint.Y * RenderHeight / yRange));
         }
 
+
         #region Handlers for Person and Device manager events
+        
         void deviceAdded(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
-            drawnDeviceDictionary[pairableDevice.Identifier] = new DrawnDevice(pairableDevice);
-
+            DeviceControlDictionary[pairableDevice.Identifier] = new DeviceControl(pairableDevice);
+            unpairedDeviceStackPanel.Children.Add(DeviceControlDictionary[pairableDevice.Identifier]);
         }
 
         void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
-            drawnDeviceDictionary.Remove(pairableDevice.Identifier);
-
+            DeviceControlDictionary.Remove(pairableDevice.Identifier);
         }
 
         void personAdded(PersonManager personManager, PairablePerson pairablePerson)
         {
-            drawnPersonDictionary[pairablePerson.Identifier] = new DrawnPerson(pairablePerson);
-
+            PersonControlDictionary[pairablePerson.Identifier] = new PersonControl(pairablePerson);
+            canvas.Children.Add(PersonControlDictionary[pairablePerson.Identifier]);
         }
 
         void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
         {
-
-            drawnPersonDictionary.Remove(pairablePerson.Identifier);
+            PersonControlDictionary.Remove(pairablePerson.Identifier);
         }
 
         void trackerChanged(PersonManager sender, Tracker tracker)

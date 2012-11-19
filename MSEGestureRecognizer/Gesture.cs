@@ -36,7 +36,7 @@ namespace MSEGestureRecognizer
         /// by the amount of this threshold. This makes it less likely to trigger accidental wave gestures.
         /// This may need to be bumped downward for people with short forearms =/
         /// </summary>
-        public const double HAND_ELBOW_DISTANCE_THRESHOLD = 0.1; // meters
+        public const double HAND_ELBOW_DISTANCE_THRESHOLD = 0.0; // meters
         #endregion
 
 

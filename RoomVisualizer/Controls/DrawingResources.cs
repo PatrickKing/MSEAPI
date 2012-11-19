@@ -13,8 +13,9 @@ namespace RoomVisualizer
         public static Brush pairingAttemptBrush = Brushes.Orange;
         public static Brush pairedBrush = Brushes.Green;
 
-        public static const int DOT_WIDTH = 20;
-        public static const int STROKE_WIDTH = 2;
+        public const int DOT_WIDTH = 20;
+        public const int SQUARE_LENGTH = 20;
+        public const int STROKE_WIDTH = 2;
 
 
     }

@@ -56,11 +56,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Drawn Items\DrawingResources.cs" />
+    <Compile Include="Controls\DeviceControl.xaml.cs">
+      <DependentUpon>DeviceControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PersonControl.xaml.cs">
+      <DependentUpon>PersonControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DrawingResources.cs" />
     <Compile Include="Drawn Items\DrawnDevice.cs" />
     <Compile Include="Drawn Items\DrawnPerson.cs" />
     <Compile Include="Drawn Items\DrawnTracker.cs" />
     <Compile Include="SkeletonRenderer.cs" />
+    <Page Include="Controls\DeviceControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PersonControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
