@@ -47,8 +47,10 @@ namespace RoomVisualizer
             
             //Setup the person's identifier
             IdentifierLabel.Content = pairablePerson.Identifier;
+            IdentifierLabel.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
+            IdentifierLabel.Width = 50;
             Canvas.SetTop(IdentifierLabel, -5);
-            Canvas.SetRight(IdentifierLabel, -5);
+            Canvas.SetLeft(IdentifierLabel, -50);
 
         }
 
@@ -80,5 +82,6 @@ namespace RoomVisualizer
             }));
    
         }
+
     }
 }

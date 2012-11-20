@@ -28,6 +28,7 @@ namespace RoomVisualizer
             PairedAndOnCanvas,
         }
 
+
         // DeviceControl can be displayed on the room visualizer canvas, or the stack panel of unpaired devices.
         private DisplayState myDisplayState;
         private DisplayState MyDisplayState
@@ -42,34 +43,50 @@ namespace RoomVisualizer
                 {
                     //Handle transition to display on Canvas
                     MainWindow.SharedDeviceStackPanel.Children.Remove(this);
+
+                    formatForCanvas();
+
                     MainWindow.SharedCanvas.Children.Add(this);
 
 
-                    double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
-                    this.Width = Math.Ceiling(deviceSize);
-                    this.Height = Math.Ceiling(deviceSize);
 
-                    InnerBorder.Margin = new Thickness(0);
 
                 }
                 else if (value == DisplayState.UnpairedAndOnStackPanel && myDisplayState == DisplayState.PairedAndOnCanvas)
                 {
                     //Handle transition to display on StackPanel
                     MainWindow.SharedCanvas.Children.Remove(this);
+
+                    formatForStackPanel();
+
                     MainWindow.SharedDeviceStackPanel.Children.Add(this);
-
-                    this.Width = 150;
-                    this.Height = 150;
-
-                    Canvas.SetTop(this, 0);
-                    Canvas.SetLeft(this, 0);
-                    InnerBorder.Margin = new Thickness(25);
-
-
                 }
 
                 myDisplayState = value;
             }
+        }
+
+        public void formatForCanvas()
+        {
+            double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
+            InnerBorder.Width = Math.Ceiling(deviceSize);
+            InnerBorder.Height = Math.Ceiling(deviceSize);
+
+
+            Canvas.SetLeft(DeviceNameLabel, Canvas.GetLeft(DeviceNameLabel) - 10);
+            DeviceNameLabel.Width = deviceSize + 20;
+            InnerBorder.Margin = new Thickness(0);
+
+        }
+
+        public void formatForStackPanel()
+        {
+            InnerBorder.Width = 64;
+            InnerBorder.Height = 64;
+
+            DeviceNameLabel.Width = this.Width;
+            Canvas.SetLeft(DeviceNameLabel, 0);
+            InnerBorder.Margin = new Thickness(18,0,0,0);
         }
 
         public DeviceControl(PairableDevice pairableDevice)
@@ -85,6 +102,8 @@ namespace RoomVisualizer
             DeviceNameLabel.Content = pairableDevice.Identifier;
             InnerBorder.BorderBrush = DrawingResources.unpairedBrush;
             MyDisplayState = DisplayState.UnpairedAndOnStackPanel;
+
+            formatForStackPanel();
 
         }
 
