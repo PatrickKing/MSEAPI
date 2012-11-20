@@ -63,9 +63,6 @@
       <DependentUpon>PersonControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\DrawingResources.cs" />
-    <Compile Include="Drawn Items\DrawnDevice.cs" />
-    <Compile Include="Drawn Items\DrawnPerson.cs" />
-    <Compile Include="Drawn Items\DrawnTracker.cs" />
     <Compile Include="SkeletonRenderer.cs" />
     <Page Include="Controls\DeviceControl.xaml">
       <SubType>Designer</SubType>

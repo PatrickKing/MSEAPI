@@ -42,15 +42,6 @@ namespace RoomVisualizer
         private static StackPanel sharedStackPanel;
 
         #region Instance Variables
-        /// <summary>
-        /// Drawing group for skeleton rendering output
-        /// </summary>
-        private DrawingGroup drawingGroup;
-
-        /// <summary>
-        /// Drawing image that we will display
-        /// </summary>
-        private DrawingImage imageSource;
 
         MSEKinectManager kinectManager;
         //DispatcherTimer dispatchTimer;
@@ -62,32 +53,29 @@ namespace RoomVisualizer
 
         private Dictionary<string, PersonControl> PersonControlDictionary;
         private Dictionary<string, DeviceControl> DeviceControlDictionary;
-        private DrawnTracker drawnTracker;
+        //private DrawnTracker drawnTracker;
 
         #endregion
 
         #region constants
 
-        /// <summary>
-        /// Width of output drawing
-        /// </summary>
-        private const float RenderWidth = 640.0f;
+        ///// <summary>
+        ///// Width of output drawing
+        ///// </summary>
+        //private const float RenderWidth = 640.0f;
 
-        /// <summary>
-        /// Height of our output drawing
-        /// </summary>
-        private const float RenderHeight = 640.0f;
+        ///// <summary>
+        ///// Height of our output drawing
+        ///// </summary>
+        //private const float RenderHeight = 640.0f;
 
-        const double xRange = 4.5;
-        const double yRange = 4.5;
+        //const double deviceDrawWidth = 0.25 * RenderWidth / ROOM_WIDTH;
+        //const double deviceDrawHeight = 0.25 * RenderHeight / ROOM_HEIGHT;
 
-        const double deviceDrawWidth = 0.25 * RenderWidth / xRange;
-        const double deviceDrawHeight = 0.25 * RenderHeight / yRange;
+        //const double trackerDrawWidth = 0.10 * RenderWidth / ROOM_WIDTH;
+        //const double trackerDrawHeight = 0.10 * RenderHeight / ROOM_HEIGHT;
 
-        const double trackerDrawWidth = 0.10 * RenderWidth / xRange;
-        const double trackerDrawHeight = 0.10 * RenderHeight / yRange;
-
-        const int FPS = 60;
+        //const int FPS = 60;
 
         #endregion
 
@@ -123,7 +111,7 @@ namespace RoomVisualizer
 
             //Hardcode tracker position and orientation
             Tracker tracker = kinectManager.Locator.Trackers[0];
-            tracker.Location = new Point(xRange / 2, yRange); 
+            tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT); 
             tracker.Orientation = 270; 
 
 
@@ -136,11 +124,6 @@ namespace RoomVisualizer
             kinectManager.Stop();
         }
     
-        //Utility Function - Coverting from Meters into Pixels
-        private Point ConvertFromMetersToPixels(Point myPoint)
-        {
-            return new Point(myPoint.X * RenderWidth / xRange, RenderHeight - (myPoint.Y * RenderHeight / yRange));
-        }
 
 
         #region Handlers for Person and Device manager events
@@ -153,6 +136,9 @@ namespace RoomVisualizer
 
         void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
+            canvas.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
+            unpairedDeviceStackPanel.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
+
             DeviceControlDictionary.Remove(pairableDevice.Identifier);
         }
 
@@ -164,6 +150,7 @@ namespace RoomVisualizer
 
         void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
         {
+            canvas.Children.Remove(PersonControlDictionary[pairablePerson.Identifier]);
             PersonControlDictionary.Remove(pairablePerson.Identifier);
         }
 
@@ -171,7 +158,7 @@ namespace RoomVisualizer
         {
             if (tracker != null)
             {
-                drawnTracker = new DrawnTracker(tracker);
+                //drawnTracker = new DrawnTracker(tracker);
             }
 
         }
@@ -318,21 +305,7 @@ namespace RoomVisualizer
         }
 
 
-        /// <summary>
-        /// Converts a pairing state to a Brush. This is useful so that if we want to change the color scheme for different states, we only need to do it here.
-        /// </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        public Brush getBrushFromPairingState(PairingState state)
-        {
-            switch (state)
-            {
-                case (PairingState.NotPaired): return Brushes.DarkRed;
-                case (PairingState.PairingAttempt): return Brushes.Orange;
-                case (PairingState.Paired): return Brushes.Green;
-                default: return Brushes.White;
-            }
-        }
+
 
         public void addDevicesFromDeviceList()
         {
