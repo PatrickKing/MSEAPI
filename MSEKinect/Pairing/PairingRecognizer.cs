@@ -89,8 +89,8 @@ namespace MSEKinect
             pairingPerson.HeldDeviceIdentifier = pairingDevice.Identifier;
             pairingDevice.HeldByPersonIdentifier = pairingPerson.Identifier;
 
-            List<IADevice> devices = intAirAct.devices;
-            IADevice device = devices.Find(d => d.name == pairingDevice.Identifier);
+            List<IADevice> devices = intAirAct.Devices;
+            IADevice device = devices.Find(d => d.Name == pairingDevice.Identifier);
             if (device != null)
             {
                 IAAction action = new IAAction();

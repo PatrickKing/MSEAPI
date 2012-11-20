@@ -12,12 +12,12 @@ namespace MSEKinect
     {
         private static TraceSource logger = new TraceSource("MSEKinect");
 
-        public PairingModule(PairingRecognizer room)
+        public PairingModule(PairingRecognizer recognizer)
         {
             Action<IADevice> action = delegate(IADevice device) 
             {
-                logger.TraceEvent(TraceEventType.Information, 0, "Device" + device.name + "requesting pairing");
-                room.DevicePairAttempt(device.name); 
+                logger.TraceEvent(TraceEventType.Information, 0, "Device" + device.Name + "requesting pairing");
+                recognizer.DevicePairAttempt(device.Name); 
             }; 
 
             Put["action/pairWith"] = _ => Response.Execute(action);

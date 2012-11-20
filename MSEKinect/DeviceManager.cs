@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using IntAirAct;
-using ZeroConf;
 using System.Diagnostics;
 using MSELocator;
 
@@ -38,7 +37,7 @@ namespace MSEKinect
             logger.TraceEvent(TraceEventType.Information, 0, "Device List Updated");
 
             //Capture the updated devices from IntAirAct
-            List<PairableDevice> updatedDevices = GetDevices(ia.devices);
+            List<PairableDevice> updatedDevices = GetDevices(ia.Devices);
 
 
             //Cast Into List Containing PairableDevices, PairablePersons
@@ -104,7 +103,7 @@ namespace MSEKinect
                 //Create a new Device for each IADevice found
                 PairableDevice d = new PairableDevice
                 {
-                    Identifier = iad.name, 
+                    Identifier = iad.Name, 
                     PairingState = PairingState.NotPaired
                 };
 

@@ -25,14 +25,7 @@ namespace MSEKinect
 
         public void Start()
         {
-            intAirAct = new IAIntAirAct();
-            intAirAct.client = false;
-            intAirAct.capabilities.Add(new IACapability("PUT action/pairWith"));
-            intAirAct.capabilities.Add(new IACapability("PUT action/orientationUpdate"));
-            intAirAct.capabilities.Add(new IACapability("PUT /device/:identifier"));
-            intAirAct.capabilities.Add(new IACapability("GET /device/:identifier/intersections"));
-
-            intAirAct.AddMappingForClass(typeof(Device), "mse-device");
+            intAirAct = IAIntAirAct.New();
 
             locator = new Locator();
 
