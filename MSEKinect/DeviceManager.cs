@@ -12,105 +12,76 @@ namespace MSEKinect
     {
         private static TraceSource logger = new TraceSource("MSEKinect");
 
-        event ServiceUpdateEventHandler deviceUpdateEventHandler;
         IAIntAirAct ia;
         LocatorInterface locator;
 
-        public DeviceManager(LocatorInterface locator, IAIntAirAct intAirAct) {
+        #region Constructor, Start and Stop
+
+        public DeviceManager(LocatorInterface locator, IAIntAirAct intAirAct)
+        {
             this.locator = locator;
             this.ia = intAirAct;
         }
 
         public void StartDeviceManager()
         {
-            deviceUpdateEventHandler = new ServiceUpdateEventHandler(DeviceListUpdated);
-            ia.deviceUpdateEventHandler += deviceUpdateEventHandler;
+            ia.DeviceFound += DeviceFound;
+            ia.DeviceLost += DeviceLost;
         }
 
         public void StopDeviceManager()
         {
-            ia.deviceUpdateEventHandler -= deviceUpdateEventHandler;
+            ia.DeviceFound -= DeviceFound;
+            ia.DeviceLost -= DeviceLost;
         }
 
-        internal void DeviceListUpdated(object sender, EventArgs e)
+        #endregion
+
+        #region Device discovery and loss event handlers
+
+        public void DeviceFound(IADevice iaDevice, bool ownDevice)
         {
-            logger.TraceEvent(TraceEventType.Information, 0, "Device List Updated");
-
-            //Capture the updated devices from IntAirAct
-            List<PairableDevice> updatedDevices = GetDevices(ia.Devices);
-
-
-            //Cast Into List Containing PairableDevices, PairablePersons
-            List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>(); 
-            List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>(); 
-
-            locator.Devices = ProcessDevicesOnUpdated(updatedDevices, pairableDevices, pairablePersons);
- 
-        }
-
-        private List<Device> ProcessDevicesOnUpdated(List<PairableDevice> updatedDevices, List<PairableDevice> currentDevices, List<PairablePerson> currentPersons)
-        {
-
-            var missing = from cd in currentDevices
-                          where !updatedDevices.Contains(cd)
-                          select cd;
-
-            List<PairableDevice> missingDevices = missing.ToList<PairableDevice>();
-
-            ProcessMissingDevices(missingDevices, currentPersons); 
-
-            var added = from ud in updatedDevices
-                        where !currentDevices.Contains(ud)
-                        select ud;
-
-            List<Device> addedDevices = added.ToList<Device>();
-
-            //ProcessAddedDevices(addedDevices); 
-
-            List<Device> processedDevices = new List<Device>();
-            processedDevices.AddRange(currentDevices);
-            processedDevices.AddRange(addedDevices);
-            processedDevices.RemoveAll(device => missingDevices.Contains(device));
-
-            return processedDevices;           
-        }
-
-        //TODO Why is the self device missing?
-        internal void ProcessMissingDevices(List<PairableDevice> missingDevices, List<PairablePerson> currentPersons)
-        {
-            foreach (Device d in missingDevices)
+            PairableDevice pairabledevice = new PairableDevice
             {
-                PairablePerson p = currentPersons.Find(person => person.Identifier.Equals(d.HeldByPersonIdentifier));
+                Identifier = iaDevice.Name,
+                PairingState = PairingState.NotPaired
+            };
 
-                if (p != null)
-                {
-                    //Remove the pairing information associated with the Person
-                    p.HeldDeviceIdentifier = null;
-                    p.PairingState = PairingState.NotPaired;
-                }
-
-                d.HeldByPersonIdentifier = null;
-            }
+            locator.Devices.Add(pairabledevice);
+            //TODO New device event notification goes here
         }
 
-        List<PairableDevice> GetDevices(List<IADevice> updatedDevices)
+        public void DeviceLost(IADevice iaDevice)
         {
-            List<PairableDevice> devices = new List<PairableDevice>(); 
+            List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+            List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
 
-            foreach (IADevice iad in updatedDevices) {
+            // Find and remove the pairable device from the Locator's list of devices
+            PairableDevice pairableDevice = pairableDevices.Find(d => d.Identifier.Equals(iaDevice.Name));
+            locator.Devices.Remove(pairableDevice);
 
-                //TODO Figure out if we should attach an IADevice
-                //Create a new Device for each IADevice found
-                PairableDevice d = new PairableDevice
-                {
-                    Identifier = iad.Name, 
-                    PairingState = PairingState.NotPaired
-                };
-
-                devices.Add(d); 
+            // If the device was paired, we mark its corresponding person unpaired.
+            PairablePerson person = pairablePersons.Find(p => p.Identifier.Equals(pairableDevice.HeldByPersonIdentifier));
+            if (person != null)
+            {
+                //Remove the pairing information associated with the Perpon
+                person.HeldDeviceIdentifier = null;
+                person.PairingState = PairingState.NotPaired;
             }
+            pairableDevice.HeldByPersonIdentifier = null;
 
-            return devices; 
+            //TODO Device removed event notfication goes here
+
         }
+
+        #endregion
+
+
+
+
+
+
+
+
     }
 }
