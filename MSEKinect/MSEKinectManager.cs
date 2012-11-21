@@ -15,8 +15,9 @@ namespace MSEKinect
         GestureController gestureController; 
         PairingRecognizer pairingRecognizer;
         IAIntAirAct intAirAct;
-        private LocatorInterface locator;
+        CommunicationManager communicationManager;
 
+        private LocatorInterface locator;
         public LocatorInterface Locator
         {
             get{ return locator; }
@@ -43,7 +44,7 @@ namespace MSEKinect
 
             gestureController.GestureRecognized += pairingRecognizer.PersonPairAttempt;
 
-            TinyIoC.TinyIoCContainer.Current.Register<LocatorInterface>(locator);
+            communicationManager = new CommunicationManager(intAirAct, pairingRecognizer, gestureController, locator);
             
         }
 

@@ -5,7 +5,6 @@ using System.Text;
 using MSEGestureRecognizer;
 using System.Diagnostics;
 using IntAirAct;
-using RestSharp;
 using MSELocator; 
 
 namespace MSEKinect
@@ -93,9 +92,9 @@ namespace MSEKinect
             IADevice device = devices.Find(d => d.Name == pairingDevice.Identifier);
             if (device != null)
             {
-                IAAction action = new IAAction();
-                action.action = "pairingSucceeded";
-                intAirAct.CallAction(action, device);
+                //TODO: Verify that this works at all! 
+                IARequest request = new IARequest(new IARoute("put", "/pairingSucceeded/"));
+                intAirAct.SendRequest(request, device);
             }
 
             logger.TraceEvent(TraceEventType.Information, 0, "Pairing Succeeded with Device {0} and Person {1}", pairingDevice.Identifier, pairingPerson.Identifier); 
@@ -106,7 +105,7 @@ namespace MSEKinect
         /// <summary>
         /// This function is called when the Gesture Recognizer recognizes a Pair gesture. This function determines 
         /// which Person is performing this gesture, and changes the PairingState of that Person.
-        /// </summary>
+        /// </summary>s
         /// <param name="sender"> The Gesture Recognizer</param>
         /// <param name="e"> The Gesture Event Arguments, which includes the tracking id</param>
         public void PersonPairAttempt(object sender, GestureEventArgs e)
