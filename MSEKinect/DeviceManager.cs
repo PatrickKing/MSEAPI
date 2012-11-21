@@ -21,12 +21,12 @@ namespace MSEKinect
         {
             this.locator = locator;
             this.ia = intAirAct;
-            ia.DeviceFound += DeviceFound;
-            ia.DeviceLost += DeviceLost;
         }
 
         public void StartDeviceManager()
         {
+            ia.DeviceFound += DeviceFound;
+            ia.DeviceLost += DeviceLost;
             
         }
 

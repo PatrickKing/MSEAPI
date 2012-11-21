@@ -37,10 +37,11 @@ namespace MSEKinect
             personManager = new PersonManager(locator, gestureController);
             deviceManager = new DeviceManager(locator, intAirAct);
 
-            intAirAct.Start();
 
             personManager.StartPersonManager();
             deviceManager.StartDeviceManager();
+
+            intAirAct.Start();
 
             gestureController.GestureRecognized += pairingRecognizer.PersonPairAttempt;
 
