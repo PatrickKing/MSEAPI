@@ -35,9 +35,9 @@ namespace MSEKinect
             // Routes to hook up ... 
             //        public void Route(IARoute route, Action<IARequest, IAResponse> action)
 
-            intAirAct.Route(IARoute.Get("device/{identifier}"), new Action<IARequest, IAResponse>(GetDeviceHandler));
-            intAirAct.Route(IARoute.Put("device/{identifier}"), new Action<IARequest, IAResponse>(PutDeviceHandler));
-            intAirAct.Route(IARoute.Put("action/pairWith"), new Action<IARequest, IAResponse>(PutPairWith));
+            intAirAct.Route(IARoute.Get("device/{identifier}"), new Action<IARequest, IAResponse>(GetDeviceInformation));
+            intAirAct.Route(IARoute.Put("device/{identifier}"), new Action<IARequest, IAResponse>(UpdateDeviceOrientation));
+            intAirAct.Route(IARoute.Put("action/pairWith"), new Action<IARequest, IAResponse>(UpdateDevicePairingState));
             intAirAct.Route(IARoute.Get("device/{identifier}/intersections"), new Action<IARequest, IAResponse>(GetDevicesInView));
 
              
@@ -49,7 +49,7 @@ namespace MSEKinect
         /// </summary>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        void GetDeviceHandler(IARequest request, IAResponse response)
+        void GetDeviceInformation(IARequest request, IAResponse response)
         {
             String deviceIdentifier = request.Parameters["identifier"];
 
@@ -68,7 +68,7 @@ namespace MSEKinect
         /// </summary>
         /// <param name="request"></param>
         /// <param name="response"></param>
-        void PutDeviceHandler(IARequest request, IAResponse response)
+        void UpdateDeviceOrientation(IARequest request, IAResponse response)
         {
 
             // TODO: Also test whether this works.
@@ -90,7 +90,7 @@ namespace MSEKinect
 
         }
 
-        void PutPairWith(IARequest request, IAResponse response)
+        void UpdateDevicePairingState(IARequest request, IAResponse response)
         {
             pairingRecognizer.DevicePairAttempt(request.Origin.Name);
         }
