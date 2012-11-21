@@ -35,10 +35,10 @@ namespace MSEKinect
             // Routes to hook up ... 
             //        public void Route(IARoute route, Action<IARequest, IAResponse> action)
 
-            intAirAct.Route(IARoute.Get("device/{identifier}"), new Action<IARequest, IAResponse>(GetDeviceInformation));
-            intAirAct.Route(IARoute.Put("device/{identifier}"), new Action<IARequest, IAResponse>(UpdateDeviceOrientation));
-            intAirAct.Route(IARoute.Put("action/pairWith"), new Action<IARequest, IAResponse>(UpdateDevicePairingState));
-            intAirAct.Route(IARoute.Get("device/{identifier}/intersections"), new Action<IARequest, IAResponse>(GetDevicesInView));
+            intAirAct.Route(IARoute.Get("/device/{identifier}"), new Action<IARequest, IAResponse>(GetDeviceInformation));
+            intAirAct.Route(IARoute.Put("/device/{identifier}"), new Action<IARequest, IAResponse>(UpdateDeviceOrientation));
+            intAirAct.Route(IARoute.Put("/device/pairWith"), new Action<IARequest, IAResponse>(UpdateDevicePairingState));
+            intAirAct.Route(IARoute.Get("/device/{identifier}/intersections"), new Action<IARequest, IAResponse>(GetDevicesInView));
 
              
         }

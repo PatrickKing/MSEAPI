@@ -93,8 +93,9 @@ namespace MSEKinect
             if (device != null)
             {
                 //TODO: Verify that this works at all! 
-                IARequest request = new IARequest(new IARoute("put", "/pairingSucceeded/"));
+                IARequest request = new IARequest(IARoute.Put("/device/pairingSucceeded"));
                 intAirAct.SendRequest(request, device);
+                System.Diagnostics.Debug.WriteLine(device.Name + " " + device.Host);
             }
 
             logger.TraceEvent(TraceEventType.Information, 0, "Pairing Succeeded with Device {0} and Person {1}", pairingDevice.Identifier, pairingPerson.Identifier); 
