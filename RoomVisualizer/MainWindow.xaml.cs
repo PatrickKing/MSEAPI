@@ -53,6 +53,7 @@ namespace RoomVisualizer
 
         private Dictionary<string, PersonControl> PersonControlDictionary;
         private Dictionary<string, DeviceControl> DeviceControlDictionary;
+        private Dictionary<string, TrackerControl> TrackerControlDictionary;
         //private DrawnTracker drawnTracker;
 
         #endregion
@@ -91,6 +92,7 @@ namespace RoomVisualizer
             //Create Dictionaries for DeviceControl, PersonControl
             DeviceControlDictionary = new Dictionary<string, DeviceControl>();
             PersonControlDictionary = new Dictionary<string, PersonControl>();
+            TrackerControlDictionary = new Dictionary<string, TrackerControl>();
 
 
             //Initialize and Start MSEKinectManager
@@ -109,10 +111,18 @@ namespace RoomVisualizer
             //Seperate components for displaying the visible skeletons
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
 
+
             //Hardcode tracker position and orientation
             Tracker tracker = kinectManager.Locator.Trackers[0];
-            tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT); 
-            tracker.Orientation = 270; 
+
+            //TODO - Set up event handling for new Trackers and put this code in there.
+            TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+            canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+
+            tracker.FieldOfView = 45;
+            tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
+            tracker.Orientation = 270;
+
 
 
 
