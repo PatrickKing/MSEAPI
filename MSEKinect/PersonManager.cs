@@ -153,7 +153,7 @@ namespace MSEKinect
             locator.Persons = new List<Person>(pairablePersons);
 
             dictionaryResets++;
-            System.Diagnostics.Debug.WriteLine("Person Dictionary Resets: " + dictionaryResets);
+            //System.Diagnostics.Debug.WriteLine("Person Dictionary Resets: " + dictionaryResets);
 
         }
 
