@@ -25,7 +25,6 @@ namespace RoomVisualizer
     {
 
 
-
         public PersonControl(PairablePerson pairablePerson)
         {
             InitializeComponent();
@@ -57,7 +56,6 @@ namespace RoomVisualizer
 
         public void OnOrientationChanged(Person person)
         {
-
 
         }
 

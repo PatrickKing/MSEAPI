@@ -21,6 +21,12 @@ namespace RoomVisualizer
         public const int SQUARE_LENGTH = 20;
         public const int STROKE_WIDTH = 4;
 
+        public const int DEVICE_FOV_WIDTH = 2;
+        public const int TRACKER_FOV_WIDTH = 3;
+
+        public const double DEVICE_FOV_LENGTH = 100;
+        public const double TRACKER_FOV_LENGTH = 300;
+
 
         public const double ROOM_WIDTH = 4.5;
         public const double ROOM_HEIGHT = 4.5;
@@ -29,6 +35,13 @@ namespace RoomVisualizer
         public static Point ConvertFromMetersToDisplayCoordinates(Point myPoint, Canvas canvas)
         {
             return new Point(myPoint.X * canvas.ActualWidth / ROOM_WIDTH, canvas.ActualHeight - (myPoint.Y * canvas.ActualHeight / ROOM_HEIGHT));
+        }
+
+        // Takes a Point and a Length and returns a Point on the line between point and origin (0,0) with the specified length
+        public static Point ConvertPointToProperLength(Point point, double length)
+        {
+            double t = Math.Sqrt( Math.Pow(length,2)  / ( Math.Pow(point.X,2) + Math.Pow(point.Y,2) ));
+            return new Point(point.X * t, point.Y * t);
         }
 
 

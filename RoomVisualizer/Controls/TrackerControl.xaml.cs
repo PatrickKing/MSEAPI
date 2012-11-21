@@ -22,14 +22,14 @@ namespace RoomVisualizer
 
     public partial class TrackerControl : UserControl
     {
-        // Scale for FOV Lines
-        public double FOVScale = 100;
 
         public TrackerControl(Tracker tracker)
         {
             InitializeComponent();
 
 
+            LeftLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
+            RightLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
 
             tracker.LocationChanged += onLocationChanged;
             tracker.OrientationChanged += onOrientationChanged;
@@ -45,14 +45,17 @@ namespace RoomVisualizer
             double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + tracker.FieldOfView.Value);
             double topX = Math.Cos(topAngle * Math.PI / 180);
             double topY = Math.Sin(topAngle * Math.PI / 180);
-            LeftLine.X2 = topX * FOVScale;
-            LeftLine.Y2 = topY * -FOVScale;
+            Point newLeft = DrawingResources.ConvertPointToProperLength(new Point(topX, topY), DrawingResources.TRACKER_FOV_LENGTH);
+            LeftLine.X2 = newLeft.X;
+            LeftLine.Y2 = -newLeft.Y;
 
             double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - tracker.FieldOfView.Value);
             double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
             double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
-            RightLine.X2 = bottomX*FOVScale;
-            RightLine.Y2 = bottomY*-FOVScale;
+            Point newRight = DrawingResources.ConvertPointToProperLength(new Point(bottomX, bottomY), DrawingResources.TRACKER_FOV_LENGTH);
+            RightLine.X2 = newRight.X;
+            RightLine.Y2 = -newRight.Y; ;
+
         }
 
         // Since Tracker is a subclass of Device, we and the events are handled in Device, we must cast it to a Tracker

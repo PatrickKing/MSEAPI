@@ -6,8 +6,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Canvas>
-        <Line Name="LeftLine" X1="0" Y1="0" X2="200" Y2="200" Stroke="Black" StrokeThickness="2"></Line>
-        <Line Name="RightLine" X1="0" Y1="0" X2="-200" Y2="200" Stroke="Black" StrokeThickness="2"></Line>
+        <Line Name="LeftLine" X1="0" Y1="0" X2="100" Y2="100" Stroke="Black" StrokeThickness="2"></Line>
+        <Line Name="RightLine" X1="0" Y1="0" X2="-100" Y2="100" Stroke="Black" StrokeThickness="2"></Line>
         <Ellipse Height="50" HorizontalAlignment="Left" Name="TrackerEllipse" Stroke="#FF52318F" VerticalAlignment="Top" Width="50" StrokeThickness="3" Fill="#FF00BCF2" Canvas.Left="-25" Canvas.Top="-25" />
     </Canvas>
 </UserControl>

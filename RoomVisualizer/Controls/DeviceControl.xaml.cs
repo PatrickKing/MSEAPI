@@ -28,7 +28,6 @@ namespace RoomVisualizer
             PairedAndOnCanvas,
         }
 
-
         // DeviceControl can be displayed on the room visualizer canvas, or the stack panel of unpaired devices.
         private DisplayState myDisplayState;
         private DisplayState MyDisplayState
@@ -47,9 +46,6 @@ namespace RoomVisualizer
                     formatForCanvas();
 
                     MainWindow.SharedCanvas.Children.Add(this);
-
-
-
 
                 }
                 else if (value == DisplayState.UnpairedAndOnStackPanel && myDisplayState == DisplayState.PairedAndOnCanvas)
@@ -77,6 +73,12 @@ namespace RoomVisualizer
             DeviceNameLabel.Width = deviceSize + 20;
             InnerBorder.Margin = new Thickness(0);
 
+            Canvas.SetLeft(LeftLine, InnerBorder.Width / 2);
+            Canvas.SetTop(LeftLine, InnerBorder.Height / 2);
+
+            Canvas.SetLeft(RightLine, InnerBorder.Width / 2);
+            Canvas.SetTop(RightLine, InnerBorder.Height / 2);
+
         }
 
         public void formatForStackPanel()
@@ -87,6 +89,9 @@ namespace RoomVisualizer
             DeviceNameLabel.Width = this.Width;
             Canvas.SetLeft(DeviceNameLabel, 0);
             InnerBorder.Margin = new Thickness(18,0,0,0);
+
+            LeftLine.Visibility = System.Windows.Visibility.Hidden;
+            RightLine.Visibility = System.Windows.Visibility.Hidden;
         }
 
         public DeviceControl(PairableDevice pairableDevice)
@@ -97,6 +102,11 @@ namespace RoomVisualizer
             pairableDevice.LocationChanged += onLocationChanged;
             pairableDevice.OrientationChanged += onOrientationChanged;
             pairableDevice.PairingStateChanged += onPairingStateChanged;
+
+            LeftLine.StrokeThickness = DrawingResources.DEVICE_FOV_WIDTH;
+            RightLine.StrokeThickness = DrawingResources.DEVICE_FOV_WIDTH;
+
+
 
             //Setup Display
             DeviceNameLabel.Content = pairableDevice.Identifier;
@@ -109,7 +119,36 @@ namespace RoomVisualizer
 
         public void onOrientationChanged(Device device)
         {
+            PairableDevice pairableDevice = (PairableDevice)device;
+            // Draw two lines to serve as field of view indicators
+            double topAngle = Util.NormalizeAngle(pairableDevice.Orientation.Value + pairableDevice.FieldOfView.Value);
+            double topX = Math.Cos(topAngle * Math.PI / 180);
+            double topY = Math.Sin(topAngle * Math.PI / 180);
 
+
+            double bottomAngle = Util.NormalizeAngle(pairableDevice.Orientation.Value - pairableDevice.FieldOfView.Value);
+            double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
+            double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
+
+            Point newLeft = DrawingResources.ConvertPointToProperLength(new Point(topX, topY), DrawingResources.DEVICE_FOV_LENGTH);
+            Point newRight = DrawingResources.ConvertPointToProperLength(new Point(bottomX, bottomY), DrawingResources.DEVICE_FOV_LENGTH);
+
+            //Dispatch UI Changes to Main Thread
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                LeftLine.X2 = newLeft.X;
+                LeftLine.Y2 = -newLeft.Y;
+
+                RightLine.X2 = newRight.X;
+                RightLine.Y2 = -newRight.Y;
+
+                if (pairableDevice.PairingState == PairingState.Paired)
+                {
+                    LeftLine.Visibility = System.Windows.Visibility.Visible;
+                    RightLine.Visibility = System.Windows.Visibility.Visible;
+                }
+
+            }));
 
         }
 
