@@ -62,6 +62,33 @@ namespace RoomVisualizer
             }
         }
 
+        // Adds Gridlines based on the width and height of the canvas onto the Grid gridLines
+        public static void GenerateGridLines(Canvas canvas, Grid gridLines)
+        {
+            // Finds out how many pixels 1 meter is
+            double gridWidth = DrawingResources.ConvertFromMetersToDisplayCoordinates(new Point(1, 1), canvas).X;
+
+            // Calculates the number of rows and columns to add
+            double numberOfLinesWide = canvas.Width / gridWidth;
+            double numberOfLinesHigh = canvas.Height / gridWidth;
+
+            // Generate Columns
+            for (int i = 0; i < numberOfLinesWide; i++)
+            {
+                ColumnDefinition columnDefinition = new ColumnDefinition();
+                columnDefinition.Width = new GridLength(gridWidth);
+                gridLines.ColumnDefinitions.Add(columnDefinition);
+            }
+
+            // Generate Rows
+            for (int i = 0; i < numberOfLinesHigh; i++)
+            {
+                RowDefinition rowDefinition = new RowDefinition();
+                rowDefinition.Height = new GridLength(gridWidth);
+                gridLines.RowDefinitions.Add(rowDefinition);
+            }
+        }
+
 
     }
 }

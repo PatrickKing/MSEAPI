@@ -89,6 +89,7 @@ namespace RoomVisualizer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            DrawingResources.GenerateGridLines(canvas, GridLines);
                    
             //Create Dictionaries for DeviceControl, PersonControl
             DeviceControlDictionary = new Dictionary<string, DeviceControl>();

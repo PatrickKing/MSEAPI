@@ -6,6 +6,7 @@
     <Canvas>
         <Canvas Name="canvas" Width="812" Height="756" ClipToBounds="True" Canvas.Left="5" Canvas.Top="5">
             <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Canvas.Left="0" Canvas.Top="0" Height="756" CornerRadius="5" Panel.ZIndex="9999"></Border>
+            <Grid ShowGridLines="True" Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" Name="GridLines"></Grid>
         </Canvas>
 
         
