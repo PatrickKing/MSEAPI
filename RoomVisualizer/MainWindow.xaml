@@ -4,22 +4,25 @@
         Title="MSE API Visualizer" Height="800" Width="1280" Loaded="Window_Loaded" Closing="WindowClosing"  
         Left="0" Top="0" Icon="/RoomVisualizer;component/Images/Icon-110.png" ResizeMode="NoResize">
     <Canvas>
-        <Canvas Name="canvas" Width="812" Height="737" ClipToBounds="True" Canvas.Left="5" Canvas.Top="5">
-            <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Canvas.Left="0" Canvas.Top="0" Height="{Binding ElementName=canvas, Path=Height}" CornerRadius="5">
-               
-            </Border>
+        <Canvas Name="canvas" Width="812" Height="756" ClipToBounds="True" Canvas.Left="5" Canvas.Top="5">
+            <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Canvas.Left="0" Canvas.Top="0" Height="756" CornerRadius="5" Panel.ZIndex="9999"></Border>
         </Canvas>
 
         
-        <StackPanel Canvas.Left="823" Canvas.Top="5" Height="737" Name="stackPanel1" Width="435">
-        
-            <Expander Header="Skeleton Tracker" Name="expander1" IsExpanded="True">
-                <Image Name="SkeletonBasicsImage" Margin="0,5" />
-            </Expander>
+        <StackPanel Canvas.Left="823" Canvas.Top="5" Height="756" Name="stackPanel1" Width="435">
 
-            <Expander Header="Unpaired Devices" Name="expander2" IsExpanded="True">
-                <StackPanel Name="unpairedDeviceStackPanel" Orientation="Vertical"></StackPanel>
-            </Expander>
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+                <Expander Header="Skeleton Tracker" Name="expander1" IsExpanded="True" Margin="5,0,0,0">
+                    <Image Name="SkeletonBasicsImage" Margin="0,5,5,5"/>
+                </Expander>
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5">
+                <Expander Header="Unpaired Devices" Name="expander2" IsExpanded="True" Margin="5,0,0,0">
+                    <WrapPanel Name="unpairedDeviceStackPanel" Margin="0,5,0,0"></WrapPanel>
+                </Expander>
+            </Border>
+            
         </StackPanel>
         
     </Canvas>

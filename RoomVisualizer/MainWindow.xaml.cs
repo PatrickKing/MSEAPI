@@ -35,11 +35,11 @@ namespace RoomVisualizer
         private static Canvas sharedCanvas;
 
 
-        public static StackPanel SharedDeviceStackPanel
+        public static WrapPanel SharedDeviceStackPanel
         {
-            get { return sharedStackPanel; }
+            get { return sharedWrapPanel; }
         }
-        private static StackPanel sharedStackPanel;
+        private static WrapPanel sharedWrapPanel;
 
         #region Instance Variables
 
@@ -84,11 +84,12 @@ namespace RoomVisualizer
         {
             InitializeComponent();
             sharedCanvas = canvas;
-            sharedStackPanel = unpairedDeviceStackPanel;
+            sharedWrapPanel = unpairedDeviceStackPanel;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+                   
             //Create Dictionaries for DeviceControl, PersonControl
             DeviceControlDictionary = new Dictionary<string, DeviceControl>();
             PersonControlDictionary = new Dictionary<string, PersonControl>();
@@ -122,6 +123,7 @@ namespace RoomVisualizer
             tracker.FieldOfView = 45;
             tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
             tracker.Orientation = 270;
+            
 
         }
 

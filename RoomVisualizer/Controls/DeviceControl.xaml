@@ -8,7 +8,7 @@
 
     <Canvas>
         <Border x:Name="InnerBorder" Height="64" Width="64" BorderThickness="4" Canvas.Left="0" Canvas.Top="0"></Border>
-        <Label x:Name="DeviceNameLabel" Content="Device Name" Height="30" Width="100" Canvas.Left="0" Canvas.Top="70" HorizontalContentAlignment="Center"></Label>
+        <TextBlock x:Name="DeviceNameLabel" Text="Device Name" Height="30" Width="100" Canvas.Left="0" Canvas.Top="70" TextAlignment="Center" TextTrimming="CharacterEllipsis"></TextBlock>
         <Line Name="LeftLine" X1="0" Y1="0" X2="200" Y2="200" Stroke="Black" StrokeThickness="2"></Line>
         <Line Name="RightLine" X1="0" Y1="0" X2="-200" Y2="200" Stroke="Black" StrokeThickness="2"></Line>
     </Canvas>

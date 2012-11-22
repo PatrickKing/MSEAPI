@@ -71,6 +71,7 @@ namespace RoomVisualizer
 
             Canvas.SetLeft(DeviceNameLabel, Canvas.GetLeft(DeviceNameLabel) - 10);
             DeviceNameLabel.Width = deviceSize + 20;
+            DeviceNameLabel.Margin = new Thickness(0, 25, 0, 0);
             InnerBorder.Margin = new Thickness(0);
 
             Canvas.SetLeft(LeftLine, InnerBorder.Width / 2);
@@ -87,6 +88,7 @@ namespace RoomVisualizer
             InnerBorder.Height = 64;
 
             DeviceNameLabel.Width = this.Width;
+            DeviceNameLabel.Margin = new Thickness(0);
             Canvas.SetLeft(DeviceNameLabel, 0);
             InnerBorder.Margin = new Thickness(18,0,0,0);
 
@@ -109,7 +111,7 @@ namespace RoomVisualizer
 
 
             //Setup Display
-            DeviceNameLabel.Content = pairableDevice.Identifier;
+            DeviceNameLabel.Text = pairableDevice.Identifier;
             InnerBorder.BorderBrush = DrawingResources.unpairedBrush;
             MyDisplayState = DisplayState.UnpairedAndOnStackPanel;
 
