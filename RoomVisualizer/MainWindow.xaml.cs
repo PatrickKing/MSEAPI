@@ -123,9 +123,6 @@ namespace RoomVisualizer
             tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
             tracker.Orientation = 270;
 
-
-
-
         }
 
         //Window Close (End the Kinect Manager) 
