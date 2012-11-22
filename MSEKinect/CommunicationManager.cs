@@ -32,9 +32,7 @@ namespace MSEKinect
             this.gestureController = gestureController;
             this.locator = locator;
 
-            // Routes to hook up ... 
-            //        public void Route(IARoute route, Action<IARequest, IAResponse> action)
-
+            // Routes to hook up
             intAirAct.Route(IARoute.Get("/device/{identifier}"), new Action<IARequest, IAResponse>(GetDeviceInformation));
             intAirAct.Route(IARoute.Put("/device/{identifier}"), new Action<IARequest, IAResponse>(UpdateDeviceOrientation));
             intAirAct.Route(IARoute.Put("/device/pairWith"), new Action<IARequest, IAResponse>(UpdateDevicePairingState));
@@ -57,7 +55,6 @@ namespace MSEKinect
             Device device = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
 
             // Respond with the device
-            // TODO: find out if this is will work! 
             response.SetBodyWith(device);
 
         }
@@ -71,7 +68,6 @@ namespace MSEKinect
         void UpdateDeviceOrientation(IARequest request, IAResponse response)
         {
 
-            // TODO: Also test whether this works.
             Device requestDevice = request.BodyAs<Device>();
 
             String name = request.Parameters["identifier"];
@@ -110,7 +106,7 @@ namespace MSEKinect
             // Device Exists
             else
             {
-                //Compute the list of intersecting devices
+                //Compute the list of intersecting devices, respond with the list
                 List<Device> intersectingDevices = locator.GetDevicesInView(observingDevice);
                 response.SetBodyWith(intersectingDevices);
             }
