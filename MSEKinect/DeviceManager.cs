@@ -71,6 +71,12 @@ namespace MSEKinect
             }
             pairableDevice.HeldByPersonIdentifier = null;
 
+            if (pairableDevice == null)
+            {
+                System.Diagnostics.Debug.WriteLine("ERROR: tried to remove nonexistent pairable device.");
+            }
+
+
             //TODO Device removed event notfication goes here
 
         }
