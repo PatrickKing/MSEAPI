@@ -25,112 +25,197 @@ namespace RoomVisualizer
     public partial class MainWindow : Window
     {
 
-        #region Instance Variables
         /// <summary>
-        /// Drawing group for skeleton rendering output
+        /// Shared accessor for the window's canvas object.
         /// </summary>
-        private DrawingGroup drawingGroup;
+        public static Canvas SharedCanvas
+        {
+            get { return sharedCanvas; }
+        }
+        private static Canvas sharedCanvas;
 
-        /// <summary>
-        /// Drawing image that we will display
-        /// </summary>
-        private DrawingImage imageSource;
+
+        public static WrapPanel SharedDeviceStackPanel
+        {
+            get { return sharedWrapPanel; }
+        }
+        private static WrapPanel sharedWrapPanel;
+
+        #region Instance Variables
 
         MSEKinectManager kinectManager;
-        DispatcherTimer dispatchTimer;
+        //DispatcherTimer dispatchTimer;
 
         /// <summary>
         /// Rendering code from the SkeletonBasics example, for demonstration purposes 
         /// </summary>
         private SkeletonRenderer skeletonRenderer;
 
-        #endregion
+        private Dictionary<string, PersonControl> PersonControlDictionary;
+        private Dictionary<string, DeviceControl> DeviceControlDictionary;
+        private Dictionary<string, TrackerControl> TrackerControlDictionary;
+        //private DrawnTracker drawnTracker;
 
+        #endregion
 
         #region constants
 
-        /// <summary>
-        /// Width of output drawing
-        /// </summary>
-        private const float RenderWidth = 640.0f;
+        ///// <summary>
+        ///// Width of output drawing
+        ///// </summary>
+        //private const float RenderWidth = 640.0f;
 
-        /// <summary>
-        /// Height of our output drawing
-        /// </summary>
-        private const float RenderHeight = 640.0f;
+        ///// <summary>
+        ///// Height of our output drawing
+        ///// </summary>
+        //private const float RenderHeight = 640.0f;
 
-        const double xRange = 4.5;
-        const double yRange = 4.5;
+        //const double deviceDrawWidth = 0.25 * RenderWidth / ROOM_WIDTH;
+        //const double deviceDrawHeight = 0.25 * RenderHeight / ROOM_HEIGHT;
 
-        const double deviceDrawWidth = 0.25 * RenderWidth / xRange;
-        const double deviceDrawHeight = 0.25 * RenderHeight / yRange;
+        //const double trackerDrawWidth = 0.10 * RenderWidth / ROOM_WIDTH;
+        //const double trackerDrawHeight = 0.10 * RenderHeight / ROOM_HEIGHT;
 
-        const double trackerDrawWidth = 0.10 * RenderWidth / xRange;
-        const double trackerDrawHeight = 0.10 * RenderHeight / yRange;
-
-        const int FPS = 60;
+        //const int FPS = 60;
 
         #endregion
 
         public MainWindow()
         {
             InitializeComponent();
-            
+            sharedCanvas = canvas;
+            sharedWrapPanel = unpairedDeviceStackPanel;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
+            GridLines.ShowGridLines = true;
+
+            // When we do the event handling through XAML, an event fires before the Window is loaded, and it freezes the program, so we do event binding after Window is loaded
+            GridLinesScaleSlider.ValueChanged += UpdateGridlines;
+            GridLinesCheckBox.Checked += ChangeGridlineVisibility;
+            GridLinesCheckBox.Unchecked += ChangeGridlineVisibility;
+                   
+            //Create Dictionaries for DeviceControl, PersonControl
+            DeviceControlDictionary = new Dictionary<string, DeviceControl>();
+            PersonControlDictionary = new Dictionary<string, PersonControl>();
+            TrackerControlDictionary = new Dictionary<string, TrackerControl>();
 
 
+            //Initialize and Start MSEKinectManager
             kinectManager = new MSEKinectManager();
             kinectManager.Start();
-            
-            dispatchTimer = new DispatcherTimer(new TimeSpan(1000 / FPS * 1000), DispatcherPriority.Normal, new EventHandler(Redraw), Dispatcher.CurrentDispatcher);
-            dispatchTimer.Start();
 
+            // The tracker is created in the PersonManager constructor, so there's actually no way for us to listen for its creation the first time
+            trackerChanged(kinectManager.PersonManager, kinectManager.PersonManager.Tracker);
+
+            //Setup Events for Device Addition and Removal, Person Addition and Removal 
+            kinectManager.DeviceManager.DeviceAdded += deviceAdded;
+            kinectManager.DeviceManager.DeviceRemoved += deviceRemoved;
+            kinectManager.PersonManager.PersonAdded += personAdded;
+            kinectManager.PersonManager.PersonRemoved += personRemoved;
+
+            //Seperate components for displaying the visible skeletons
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
 
 
-            // Create the drawing group we'll use for drawing
-            this.drawingGroup = new DrawingGroup();
-
-            // Create an image source that we can use in our image control
-            this.imageSource = new DrawingImage(this.drawingGroup);
-
-            // Display the drawing using our image control
-            Image.Source = this.imageSource;
-
-            Point oldLocation = kinectManager.Locator.Trackers[0].Location.Value;
-            Point? newLocation = new Point(xRange / 2, yRange);
-
+            //Hardcode tracker position and orientation
             Tracker tracker = kinectManager.Locator.Trackers[0];
 
-            tracker.Location = newLocation;
-            tracker.Orientation = 270;
+            //TODO - Set up event handling for new Trackers and put this code in there.
+            TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+            canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
+            tracker.FieldOfView = 45;
+            tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
+            tracker.Orientation = 270;
+            
 
         }
 
+        //Window Close (End the Kinect Manager) 
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             kinectManager.Stop();
-            dispatchTimer.Stop();
         }
-
-
     
-        private Point ConvertFromMetersToPixels(Point myPoint)
+
+
+        #region Handlers for Person and Device manager events
+        
+        void deviceAdded(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
-            return new Point(myPoint.X * RenderWidth / xRange, RenderHeight - (myPoint.Y * RenderHeight / yRange));
+            DeviceControlDictionary[pairableDevice.Identifier] = new DeviceControl(pairableDevice);
+            unpairedDeviceStackPanel.Children.Add(DeviceControlDictionary[pairableDevice.Identifier]);
         }
 
+        void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
+        {
+            canvas.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
+            unpairedDeviceStackPanel.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
+
+            DeviceControlDictionary.Remove(pairableDevice.Identifier);
+        }
+
+        void personAdded(PersonManager personManager, PairablePerson pairablePerson)
+        {
+            PersonControlDictionary[pairablePerson.Identifier] = new PersonControl(pairablePerson);
+            canvas.Children.Add(PersonControlDictionary[pairablePerson.Identifier]);
+        }
+
+        void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
+        {
+            canvas.Children.Remove(PersonControlDictionary[pairablePerson.Identifier]);
+            PersonControlDictionary.Remove(pairablePerson.Identifier);
+        }
+
+        void trackerChanged(PersonManager sender, Tracker tracker)
+        {
+            if (tracker != null)
+            {
+                //drawnTracker = new DrawnTracker(tracker);
+            }
+
+        }
+
+        #endregion
+
+        // Updates the scale of the Gridlines
+        private void UpdateGridlines(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
+        }
+
+        // Hides/Shows the Gridlines and Slider based on the Checkbox's state
+        private void ChangeGridlineVisibility(object sender, RoutedEventArgs e)
+        {
+            if (GridLinesCheckBox.IsChecked.HasValue && GridLinesCheckBox.IsChecked.Value == true)
+            {
+                // Show Gridlines
+                GridLines.ShowGridLines = true;
+                GridLinesScaleSlider.Visibility = System.Windows.Visibility.Visible;
+                GridLinesScaleStackPanel.Visibility = System.Windows.Visibility.Visible;
+
+            }
+            else if (GridLinesCheckBox.IsChecked.HasValue && GridLinesCheckBox.IsChecked.Value == false)
+            {
+                // Hide Gridlines
+                GridLines.ShowGridLines = false;
+                GridLinesScaleSlider.Visibility = System.Windows.Visibility.Collapsed;
+                GridLinesScaleStackPanel.Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
+
+
+
+
+        /*
         public void Redraw(object s, EventArgs ev)
         {
 
             using (DrawingContext dc = this.drawingGroup.Open())
             {
-
-
                 // Draw the room's bounding box
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(0.0, 0.0), new Point(0.0, RenderHeight));
                 dc.DrawLine(new Pen(Brushes.Black, 1.0), new Point(0.0, RenderHeight), new Point(RenderWidth, RenderHeight));
@@ -153,33 +238,33 @@ namespace RoomVisualizer
 
 
                     if (tracker.Orientation.HasValue == false)
-                            continue;
+                        continue;
 
-                        // Draw two lines to serve as field of view indicators
-                        double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + 45);
-                        double topX = Math.Cos(topAngle * Math.PI / 180);
-                        double topY = Math.Sin(topAngle * Math.PI / 180);
-                        dc.DrawLine(
-                            new Pen(Brushes.Black, 0.3),
-                            ConvertFromMetersToPixels(tracker.Location.Value),
-                            ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + topX, tracker.Location.Value.Y + topY)));
+                    // Draw two lines to serve as field of view indicators
+                    double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + 45);
+                    double topX = Math.Cos(topAngle * Math.PI / 180);
+                    double topY = Math.Sin(topAngle * Math.PI / 180);
+                    dc.DrawLine(
+                        new Pen(Brushes.Black, 0.3),
+                        ConvertFromMetersToPixels(tracker.Location.Value),
+                        ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + topX, tracker.Location.Value.Y + topY)));
 
-                        double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - 45);
-                        double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
-                        double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
-                        dc.DrawLine(
-                            new Pen(Brushes.Black, 0.3),
-                            ConvertFromMetersToPixels(tracker.Location.Value),
-                            ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + bottomX, tracker.Location.Value.Y + bottomY)));
-                    
+                    double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - 45);
+                    double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
+                    double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
+                    dc.DrawLine(
+                        new Pen(Brushes.Black, 0.3),
+                        ConvertFromMetersToPixels(tracker.Location.Value),
+                        ConvertFromMetersToPixels(new Point(tracker.Location.Value.X + bottomX, tracker.Location.Value.Y + bottomY)));
+
                 }
 
 
-                // Removes all currently drawn unpaired devices
-                unpairedDeviceStackPanel.Children.Clear();
+                //// Removes all currently drawn unpaired devices
+                //unpairedDeviceStackPanel.Children.Clear();
 
-                // Updates the screen
-                addDevicesFromDeviceList();
+                //// Updates the screen
+                //addDevicesFromDeviceList();
 
                 foreach (Person person in kinectManager.Locator.Persons)
                 {
@@ -196,14 +281,15 @@ namespace RoomVisualizer
                     Brush penBrush = getBrushFromPairingState(pperson.PairingState);
                     Brush backgroundBrush = Brushes.White;
 
-                    if(pperson.PairingState == PairingState.Paired)
+                    if (pperson.PairingState == PairingState.Paired)
                     {
                         backgroundBrush = createBrushWithTextAndBackground(pperson.HeldDeviceIdentifier, backgroundBrush);
                     }
 
 
                     // Draw a dot for each person seen by the tracker
-                    if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0) {
+                    if (person.Location.Value.X != 0.0 && person.Location.Value.Y != 0.0)
+                    {
                         dc.DrawEllipse(
                             backgroundBrush,
                             new Pen(penBrush, 2.0),
@@ -261,21 +347,7 @@ namespace RoomVisualizer
         }
 
 
-        /// <summary>
-        /// Converts a pairing state to a Brush. This is useful so that if we want to change the color scheme for different states, we only need to do it here.
-        /// </summary>
-        /// <param name="state"></param>
-        /// <returns></returns>
-        public Brush getBrushFromPairingState(PairingState state)
-        {
-            switch (state)
-            {
-                case (PairingState.NotPaired): return Brushes.DarkRed;
-                case (PairingState.PairingAttempt): return Brushes.Orange;
-                case (PairingState.Paired): return Brushes.Green;
-                default: return Brushes.White;
-            }
-        }
+
 
         public void addDevicesFromDeviceList()
         {
@@ -322,6 +394,6 @@ namespace RoomVisualizer
             visualBrush.TileMode = TileMode.None;
 
             return visualBrush;
-        }
+        }*/
     }
 }

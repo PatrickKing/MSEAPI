@@ -1,73 +1,57 @@
 ﻿<Window x:Class="RoomVisualizer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MSE API Visualizer" Height="765" Width="1280" Loaded="Window_Loaded" Closing="WindowClosing" ResizeMode="NoResize" 
-        Left="0" Top="0" Icon="/RoomVisualizer;component/Images/Icon-110.png">
-    <Grid>
-
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="640"/>
-            <ColumnDefinition Width="640"/>
-        </Grid.ColumnDefinitions>
+        Title="MSE API Visualizer" Height="800" Width="1280" Loaded="Window_Loaded" Closing="WindowClosing"  
+        Left="0" Top="0" Icon="/RoomVisualizer;component/Images/Icon-110.png" ResizeMode="NoResize">
+    <Canvas>
+        <Canvas Name="canvas" Width="812" Height="756" ClipToBounds="True" Canvas.Left="5" Canvas.Top="5">
+            <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Canvas.Left="0" Canvas.Top="0" Height="756" CornerRadius="5" Panel.ZIndex="9999"></Border>
+            <Grid Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" Name="GridLines"></Grid>
+        </Canvas>
 
         
-        
-        <Viewbox VerticalAlignment="Top" Grid.Column="0">
-            <Image Name="Image" Width="640" Height="640" />
-        </Viewbox>
-        <StackPanel Margin="0,630,0,0" Name="stackPanel1" Width="618" Orientation="Vertical" Grid.Column="0">
-            <TextBlock Name="textBlock1" Text="Unpaired Devices" Padding="0" Margin="0,10,0,5" FontFamily="Arial" FontWeight="ExtraBlack" />
-            <StackPanel Name="unpairedDeviceStackPanel" Orientation="Horizontal"></StackPanel>
+        <StackPanel Canvas.Left="823" Canvas.Top="5" Height="756" Name="stackPanel1" Width="435">
+
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+                <Expander Header="Skeleton Tracker" Name="expander1" IsExpanded="True" Margin="5,0,0,0">
+                    <Image Name="SkeletonBasicsImage" Margin="0,5,5,5"/>
+                </Expander>
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+                <Expander Header="Unpaired Devices" Name="expander2" IsExpanded="True" Margin="5,0,0,0">
+                    <WrapPanel Name="unpairedDeviceStackPanel" Margin="0,5,0,0"></WrapPanel>
+                </Expander>
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+                <Expander Header="Options" Name="expander3" IsExpanded="True" Margin="5,0,0,0">
+                    <StackPanel Margin="0,5,0,0">
+                        <CheckBox Margin="5" IsChecked="True" Content="Show Gridlines" Name="GridLinesCheckBox"></CheckBox>
+
+                        <StackPanel Margin="5,10,5,0" Orientation="Horizontal" Name="GridLinesScaleStackPanel">
+                            <TextBlock Text="Gridline Scale = "></TextBlock>
+                            <TextBlock Text="{Binding ElementName=GridLinesScaleSlider, Path=Value}" FontWeight="Bold"></TextBlock>
+                            <TextBlock Text=" meters"></TextBlock>
+                        </StackPanel>
+                        
+                        <Slider Margin="5" Name="GridLinesScaleSlider" Value="1" IsSnapToTickEnabled="True" TickFrequency="0.1" Maximum="5" Minimum="0.1"></Slider>
+                    </StackPanel>
+                    
+                    
+                </Expander>
+            </Border>
+
+
         </StackPanel>
-
-        <Viewbox Grid.Column="1" Stretch="Uniform" HorizontalAlignment="Center">
-            <Image Name="SkeletonBasicsImage" Width="640" Height="480"/>
-        </Viewbox>
-
-    </Grid>
+        
+    </Canvas>
 
 
     <!-- Window.Resources for SkeletonBasics visualizer -->
     <Window.Resources>
-        <SolidColorBrush x:Key="MediumGreyBrush" Color="#ff6e6e6e"/>
-        <SolidColorBrush x:Key="KinectPurpleBrush" Color="#ff52318f"/>
-        <SolidColorBrush x:Key="KinectBlueBrush" Color="#ff00BCF2"/>
         <Style TargetType="{x:Type Image}">
             <Setter Property="SnapsToDevicePixels" Value="True"/>
-        </Style>
-        <Style TargetType="{x:Type CheckBox}" x:Key="SquareCheckBox" >
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <Grid>
-                            <StackPanel Orientation="Horizontal" Background="Transparent">
-                                <Grid x:Name="SquareCheckBoxChecked">
-                                    <Image x:Name="CheckedNormal" Source="Images\CheckedNormal.png" Stretch="None" HorizontalAlignment="Center"/>
-                                    <Image x:Name="CheckedHover" Source="Images\CheckedHover.png" Stretch="None" HorizontalAlignment="Center" Visibility="Collapsed"/>
-                                </Grid>
-                                <Grid x:Name="SquareCheckBoxUnchecked" Visibility="Collapsed">
-                                    <Image x:Name="UncheckedNormal" Source="Images\UncheckedNormal.png" Stretch="None" HorizontalAlignment="Center"/>
-                                    <Image x:Name="UncheckedHover" Source="Images\UncheckedHover.png" Stretch="None" HorizontalAlignment="Center" Visibility="Collapsed"/>
-                                </Grid>
-                                <TextBlock x:Name="SquareCheckBoxText" Text="{TemplateBinding Content}" TextAlignment="Left"  VerticalAlignment="Center" Foreground="{StaticResource KinectPurpleBrush}" FontSize="15"  Margin="9,0,0,0"/>
-                            </StackPanel>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="false">
-                                <Setter Property="Visibility" Value="Collapsed" TargetName="SquareCheckBoxChecked"/>
-                                <Setter Property="Visibility" Value="Visible" TargetName="SquareCheckBoxUnchecked"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Visibility" Value="Collapsed" TargetName="CheckedNormal"/>
-                                <Setter Property="Visibility" Value="Collapsed" TargetName="UncheckedNormal"/>
-                                <Setter Property="Visibility" Value="Visible" TargetName="CheckedHover"/>
-                                <Setter Property="Visibility" Value="Visible" TargetName="UncheckedHover"/>
-                                <Setter Property="Foreground" Value="{StaticResource KinectBlueBrush}" TargetName="SquareCheckBoxText"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
     </Window.Resources>
 
