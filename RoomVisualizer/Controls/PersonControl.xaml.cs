@@ -51,6 +51,13 @@ namespace RoomVisualizer
             Canvas.SetTop(IdentifierLabel, -5);
             Canvas.SetLeft(IdentifierLabel, -50);
 
+            //Setup the person's identifier
+            CoordinatesLabel.Content = pairablePerson.Identifier;
+            CoordinatesLabel.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
+            CoordinatesLabel.Width = 50;
+            Canvas.SetTop(CoordinatesLabel, 15);
+            Canvas.SetLeft(CoordinatesLabel, -50);
+
         }
 
 
@@ -65,7 +72,9 @@ namespace RoomVisualizer
             {
                 Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(person.Location.Value, MainWindow.SharedCanvas);
                 Canvas.SetLeft(this, newPoint.X);
-                Canvas.SetTop(this, newPoint.Y);           
+                Canvas.SetTop(this, newPoint.Y);       
+    
+                CoordinatesLabel.Content = string.Format("({0:0.0},{1:0.0})", person.Location.Value.X, person.Location.Value.Y);
             }
         }
 
