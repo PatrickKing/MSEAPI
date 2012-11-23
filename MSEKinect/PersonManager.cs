@@ -23,7 +23,7 @@ namespace MSEKinect
         KinectSensor ks;
         GestureController gestureController;
         LocatorInterface locator;
-
+        IAIntAirAct intAirAct;
         
         Tracker tracker;
         public Tracker Tracker 
@@ -41,6 +41,7 @@ namespace MSEKinect
         #endregion
 
         #region Events
+
         public delegate void PersonChangedEventSignature(PersonManager sender, PairablePerson person);
         public event PersonChangedEventSignature PersonAdded;
         public event PersonChangedEventSignature PersonRemoved;
@@ -50,13 +51,13 @@ namespace MSEKinect
 
         #endregion
 
-
         #region Constructor, Start and Stop
 
-        public PersonManager(LocatorInterface locator, GestureController gc)
+        public PersonManager(LocatorInterface locator, GestureController gc, IAIntAirAct intAirAct)
         {
             this.gestureController = gc;
             this.locator = locator;
+            this.intAirAct = intAirAct;
 
             tracker = new Tracker() { Location = new Point(0, 0), Orientation = 0, Identifier = "MSEKinect" };
             locator.Trackers.Add(tracker);
@@ -198,7 +199,13 @@ namespace MSEKinect
                         device.HeldByPersonIdentifier = null;
                         device.PairingState = PairingState.NotPaired;
 
-                        //TODO, Dispatch a message to the device
+                        // Dispatch a message to the device
+                        IARequest request = new IARequest(IARoute.Put("/device/becameUnpaired"));
+                        // Find the IntAirAct device matching the current device.
+                        IADevice iaDevice = intAirAct.Devices.Find( d => d.Name == device.Identifier);
+                        intAirAct.SendRequest(request, iaDevice);
+                        System.Diagnostics.Debug.WriteLine(iaDevice.Name + " " + iaDevice.Host);
+
                     }
 
                     //Remove Held-Device Identifier

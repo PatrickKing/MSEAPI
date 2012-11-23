@@ -27,7 +27,6 @@ namespace MSEKinect
 		public event DeviceChangedEventSignature DeviceRemoved;
 		#endregion
 
-
 		#region Constructor, Start and Stop
 
 		public DeviceManager(LocatorInterface locator, IAIntAirAct intAirAct)
@@ -62,7 +61,6 @@ namespace MSEKinect
 				PairingState = PairingState.NotPaired
 			};
 			locator.Devices.Add(pairableDevice);
-			//TODO New device event notification goes here
 			
 			if (DeviceAdded != null)
 				DeviceAdded(this, pairableDevice);
@@ -92,10 +90,8 @@ namespace MSEKinect
 			if (pairableDevice == null)
 			{
 				System.Diagnostics.Debug.WriteLine("ERROR: tried to remove nonexistent pairable device.");
-
 			}
 
-			//TODO Device removed event notfication goes here
 			if (DeviceRemoved != null)
 				DeviceRemoved(this, pairableDevice);
 		}

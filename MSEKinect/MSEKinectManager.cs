@@ -44,7 +44,7 @@ namespace MSEKinect
             pairingRecognizer = new PairingRecognizer(locator, intAirAct);
 
             gestureController = new GestureController();
-            personManager = new PersonManager(locator, gestureController);
+            personManager = new PersonManager(locator, gestureController, intAirAct);
             deviceManager = new DeviceManager(locator, intAirAct);
 
 
