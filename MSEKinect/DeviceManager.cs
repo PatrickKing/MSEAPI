@@ -21,7 +21,6 @@ namespace MSEKinect
 		#endregion
 
 		#region Events
-		event ServiceUpdateEventHandler deviceUpdateEventHandler;
 		
 		public delegate void DeviceChangedEventSignature(DeviceManager sender, PairableDevice device);
 		public event DeviceChangedEventSignature DeviceAdded;
@@ -57,12 +56,12 @@ namespace MSEKinect
 
 		public void DeviceFound(IADevice iaDevice, bool ownDevice)
 		{
-			PairableDevice pairabledevice = new PairableDevice
+			PairableDevice pairableDevice = new PairableDevice
 			{
 				Identifier = iaDevice.Name,
 				PairingState = PairingState.NotPaired
 			};
-			locator.Devices.Add(pairabledevice);
+			locator.Devices.Add(pairableDevice);
 			//TODO New device event notification goes here
 			
 			if (DeviceAdded != null)
