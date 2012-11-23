@@ -6,7 +6,7 @@
     <Canvas>
         <Canvas Name="canvas" Width="812" Height="756" ClipToBounds="True" Canvas.Left="5" Canvas.Top="5">
             <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Canvas.Left="0" Canvas.Top="0" Height="756" CornerRadius="5" Panel.ZIndex="9999"></Border>
-            <Grid ShowGridLines="True" Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" Name="GridLines"></Grid>
+            <Grid Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" Name="GridLines"></Grid>
         </Canvas>
 
         
@@ -18,12 +18,31 @@
                 </Expander>
             </Border>
 
-            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5">
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
                 <Expander Header="Unpaired Devices" Name="expander2" IsExpanded="True" Margin="5,0,0,0">
                     <WrapPanel Name="unpairedDeviceStackPanel" Margin="0,5,0,0"></WrapPanel>
                 </Expander>
             </Border>
-            
+
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+                <Expander Header="Options" Name="expander3" IsExpanded="True" Margin="5,0,0,0">
+                    <StackPanel Margin="0,5,0,0">
+                        <CheckBox Margin="5" IsChecked="True" Content="Show Gridlines" Name="GridLinesCheckBox"></CheckBox>
+
+                        <StackPanel Margin="5,10,5,0" Orientation="Horizontal" Name="GridLinesScaleStackPanel">
+                            <TextBlock Text="Gridline Scale = "></TextBlock>
+                            <TextBlock Text="{Binding ElementName=GridLinesScaleSlider, Path=Value}" FontWeight="Bold"></TextBlock>
+                            <TextBlock Text=" meters"></TextBlock>
+                        </StackPanel>
+                        
+                        <Slider Margin="5" Name="GridLinesScaleSlider" Value="1" IsSnapToTickEnabled="True" TickFrequency="0.1" Maximum="5" Minimum="0.1"></Slider>
+                    </StackPanel>
+                    
+                    
+                </Expander>
+            </Border>
+
+
         </StackPanel>
         
     </Canvas>

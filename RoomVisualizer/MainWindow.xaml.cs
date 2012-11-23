@@ -89,7 +89,13 @@ namespace RoomVisualizer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            DrawingResources.GenerateGridLines(canvas, GridLines);
+            DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
+            GridLines.ShowGridLines = true;
+
+            // When we do the event handling through XAML, an event fires before the Window is loaded, and it freezes the program, so we do event binding after Window is loaded
+            GridLinesScaleSlider.ValueChanged += UpdateGridlines;
+            GridLinesCheckBox.Checked += ChangeGridlineVisibility;
+            GridLinesCheckBox.Unchecked += ChangeGridlineVisibility;
                    
             //Create Dictionaries for DeviceControl, PersonControl
             DeviceControlDictionary = new Dictionary<string, DeviceControl>();
@@ -174,6 +180,32 @@ namespace RoomVisualizer
         }
 
         #endregion
+
+        // Updates the scale of the Gridlines
+        private void UpdateGridlines(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
+        }
+
+        // Hides/Shows the Gridlines and Slider based on the Checkbox's state
+        private void ChangeGridlineVisibility(object sender, RoutedEventArgs e)
+        {
+            if (GridLinesCheckBox.IsChecked.HasValue && GridLinesCheckBox.IsChecked.Value == true)
+            {
+                // Show Gridlines
+                GridLines.ShowGridLines = true;
+                GridLinesScaleSlider.Visibility = System.Windows.Visibility.Visible;
+                GridLinesScaleStackPanel.Visibility = System.Windows.Visibility.Visible;
+
+            }
+            else if (GridLinesCheckBox.IsChecked.HasValue && GridLinesCheckBox.IsChecked.Value == false)
+            {
+                // Hide Gridlines
+                GridLines.ShowGridLines = false;
+                GridLinesScaleSlider.Visibility = System.Windows.Visibility.Collapsed;
+                GridLinesScaleStackPanel.Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
 
 
 
