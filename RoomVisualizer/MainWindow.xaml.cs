@@ -159,10 +159,13 @@ namespace RoomVisualizer
 
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
-                canvas.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
-                unpairedDeviceStackPanel.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
+                if (DeviceControlDictionary.ContainsKey(pairableDevice.Identifier))
+                {
+                    canvas.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
+                    unpairedDeviceStackPanel.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
 
-                DeviceControlDictionary.Remove(pairableDevice.Identifier);
+                    DeviceControlDictionary.Remove(pairableDevice.Identifier);
+                }
             }));
 
         }
@@ -175,8 +178,11 @@ namespace RoomVisualizer
 
         void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
         {
-            canvas.Children.Remove(PersonControlDictionary[pairablePerson.Identifier]);
-            PersonControlDictionary.Remove(pairablePerson.Identifier);
+            if (PersonControlDictionary.ContainsKey(pairablePerson.Identifier))
+            {
+                canvas.Children.Remove(PersonControlDictionary[pairablePerson.Identifier]);
+                PersonControlDictionary.Remove(pairablePerson.Identifier);
+            }
         }
 
         void trackerChanged(PersonManager sender, Tracker tracker)
@@ -193,6 +199,11 @@ namespace RoomVisualizer
         // Updates the scale of the Gridlines
         private void UpdateGridlines(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (GridLinesScaleSlider.Value == 1)
+                MetersTextBlock.Text = " meter";
+            else
+                MetersTextBlock.Text = " meters";
+
             DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
         }
 

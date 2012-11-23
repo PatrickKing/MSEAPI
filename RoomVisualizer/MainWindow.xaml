@@ -3,28 +3,30 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MSE API Visualizer" Height="800" Width="1280" Loaded="Window_Loaded" Closing="WindowClosing"  
         Left="0" Top="0" Icon="/RoomVisualizer;component/Images/Icon-110.png" ResizeMode="NoResize">
-    <Canvas>
-        <Canvas Name="canvas" Width="812" Height="756" ClipToBounds="True" Canvas.Left="5" Canvas.Top="5">
-            <Border BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Canvas.Left="0" Canvas.Top="0" Height="756" CornerRadius="5" Panel.ZIndex="9999"></Border>
-            <Grid Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" Name="GridLines"></Grid>
-        </Canvas>
+    <Canvas Background="Gainsboro">
+
+        <Border ClipToBounds="True" Canvas.Left="5" Canvas.Top="5" Background="White" BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" CornerRadius="5" Panel.ZIndex="9999">
+            <Canvas Name="canvas" Width="812" Height="756" ClipToBounds="True">
+                <Grid  Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" Name="GridLines"></Grid>
+            </Canvas>
+        </Border>
 
         
         <StackPanel Canvas.Left="823" Canvas.Top="5" Height="756" Name="stackPanel1" Width="435">
 
-            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5" Background="White">
                 <Expander Header="Skeleton Tracker" Name="expander1" IsExpanded="True" Margin="5,0,0,0">
                     <Image Name="SkeletonBasicsImage" Margin="0,5,5,5"/>
                 </Expander>
             </Border>
 
-            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5" Background="White">
                 <Expander Header="Unpaired Devices" Name="expander2" IsExpanded="True" Margin="5,0,0,0">
                     <WrapPanel Name="unpairedDeviceStackPanel" Margin="0,5,0,0"></WrapPanel>
                 </Expander>
             </Border>
 
-            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5">
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5" Background="White">
                 <Expander Header="Options" Name="expander3" IsExpanded="True" Margin="5,0,0,0">
                     <StackPanel Margin="0,5,0,0">
                         <CheckBox Margin="5" IsChecked="True" Content="Show Gridlines" Name="GridLinesCheckBox"></CheckBox>
@@ -32,7 +34,7 @@
                         <StackPanel Margin="5,10,5,0" Orientation="Horizontal" Name="GridLinesScaleStackPanel">
                             <TextBlock Text="Gridline Scale = "></TextBlock>
                             <TextBlock Text="{Binding ElementName=GridLinesScaleSlider, Path=Value}" FontWeight="Bold"></TextBlock>
-                            <TextBlock Text=" meters"></TextBlock>
+                            <TextBlock Text=" meter" Name="MetersTextBlock"></TextBlock>
                         </StackPanel>
                         
                         <Slider Margin="5" Name="GridLinesScaleSlider" Value="1" IsSnapToTickEnabled="True" TickFrequency="0.1" Maximum="5" Minimum="0.1"></Slider>
@@ -44,7 +46,6 @@
 
 
         </StackPanel>
-        
     </Canvas>
 
 

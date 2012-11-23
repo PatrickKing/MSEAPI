@@ -9,6 +9,7 @@
     <Canvas>
         <Ellipse Name="PersonEllipse"></Ellipse>
         <Label Name="IdentifierLabel" Content="###"></Label>
+        <Label Name="CoordinatesLabel" Content="(##,##)" Canvas.Top="20"></Label>
     </Canvas>
     
 </UserControl>
