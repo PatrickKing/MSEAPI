@@ -83,18 +83,11 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IntAirActCS\IntAirAct\IntAirAct.csproj">
       <Project>{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}</Project>
       <Name>IntAirAct</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\IntAirActCS\ZeroConf\ZeroConf.csproj">
-      <Project>{F585073E-EB3C-41DB-B8BE-2335029780D7}</Project>
-      <Name>ZeroConf</Name>
     </ProjectReference>
     <ProjectReference Include="..\MSEGestureRecognizer\MSEGestureRecognizer.csproj">
       <Project>{A243FD29-4572-4351-8CC8-498488EF67C4}</Project>

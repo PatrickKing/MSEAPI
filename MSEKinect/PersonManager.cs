@@ -5,7 +5,6 @@ using System.Text;
 using Microsoft.Kinect;
 using System.Diagnostics;
 using IntAirAct;
-using ZeroConf;
 using MSEGestureRecognizer;
 using MSELocator;
 

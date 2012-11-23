@@ -15,8 +15,9 @@ namespace MSEKinect
         GestureController gestureController; 
         PairingRecognizer pairingRecognizer;
         IAIntAirAct intAirAct;
-        private LocatorInterface locator;
+        CommunicationManager communicationManager;
 
+        private LocatorInterface locator;
         public LocatorInterface Locator
         {
             get{ return locator; }
@@ -25,14 +26,7 @@ namespace MSEKinect
 
         public void Start()
         {
-            intAirAct = new IAIntAirAct();
-            intAirAct.client = false;
-            intAirAct.capabilities.Add(new IACapability("PUT action/pairWith"));
-            intAirAct.capabilities.Add(new IACapability("PUT action/orientationUpdate"));
-            intAirAct.capabilities.Add(new IACapability("PUT /device/:identifier"));
-            intAirAct.capabilities.Add(new IACapability("GET /device/:identifier/intersections"));
-
-            intAirAct.AddMappingForClass(typeof(Device), "mse-device");
+            intAirAct = IAIntAirAct.New();
 
             locator = new Locator();
 
@@ -43,14 +37,15 @@ namespace MSEKinect
             personManager = new PersonManager(locator, gestureController);
             deviceManager = new DeviceManager(locator, intAirAct);
 
-            intAirAct.Start();
 
             personManager.StartPersonManager();
             deviceManager.StartDeviceManager();
 
+            intAirAct.Start();
+
             gestureController.GestureRecognized += pairingRecognizer.PersonPairAttempt;
 
-            TinyIoC.TinyIoCContainer.Current.Register<LocatorInterface>(locator);
+            communicationManager = new CommunicationManager(intAirAct, pairingRecognizer, gestureController, locator);
             
         }
 
