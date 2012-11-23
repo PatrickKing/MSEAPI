@@ -193,6 +193,11 @@ namespace RoomVisualizer
         // Updates the scale of the Gridlines
         private void UpdateGridlines(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (GridLinesScaleSlider.Value == 1)
+                MetersTextBlock.Text = " meter";
+            else
+                MetersTextBlock.Text = " meters";
+
             DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
         }
 

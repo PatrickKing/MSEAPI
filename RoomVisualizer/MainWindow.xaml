@@ -32,7 +32,7 @@
                         <StackPanel Margin="5,10,5,0" Orientation="Horizontal" Name="GridLinesScaleStackPanel">
                             <TextBlock Text="Gridline Scale = "></TextBlock>
                             <TextBlock Text="{Binding ElementName=GridLinesScaleSlider, Path=Value}" FontWeight="Bold"></TextBlock>
-                            <TextBlock Text=" meters"></TextBlock>
+                            <TextBlock Text=" meter" Name="MetersTextBlock"></TextBlock>
                         </StackPanel>
                         
                         <Slider Margin="5" Name="GridLinesScaleSlider" Value="1" IsSnapToTickEnabled="True" TickFrequency="0.1" Maximum="5" Minimum="0.1"></Slider>
