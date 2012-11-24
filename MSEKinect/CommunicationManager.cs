@@ -20,17 +20,18 @@ namespace MSEKinect
         private PairingRecognizer pairingRecognizer;
         private MSEGestureRecognizer.GestureController gestureController;
         private MSELocator.LocatorInterface locator;
-
+        private PersonManager personManager;
 
         #endregion
 
 
-        public CommunicationManager(IntAirAct.IAIntAirAct intAirAct, PairingRecognizer pairingRecognizer, MSEGestureRecognizer.GestureController gestureController, MSELocator.LocatorInterface locator)
+        public CommunicationManager(IntAirAct.IAIntAirAct intAirAct, PairingRecognizer pairingRecognizer, MSEGestureRecognizer.GestureController gestureController, MSELocator.LocatorInterface locator, PersonManager personManager)
         {
             this.intAirAct = intAirAct;
             this.pairingRecognizer = pairingRecognizer;
             this.gestureController = gestureController;
             this.locator = locator;
+            this.personManager = personManager;
 
             // Routes to hook up
             intAirAct.Route(IARoute.Get("/device/{identifier}"), new Action<IARequest, IAResponse>(GetDeviceInformation));

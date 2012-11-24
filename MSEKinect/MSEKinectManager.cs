@@ -55,7 +55,7 @@ namespace MSEKinect
 
             gestureController.GestureRecognized += pairingRecognizer.PersonPairAttempt;
 
-            communicationManager = new CommunicationManager(intAirAct, pairingRecognizer, gestureController, locator);
+            communicationManager = new CommunicationManager(intAirAct, pairingRecognizer, gestureController, locator, personManager);
             
         }
 
