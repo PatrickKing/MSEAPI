@@ -12,6 +12,9 @@ namespace MSELocator
     {
         public const double DEFAULT_FIELD_OF_VIEW = 25.0; // degrees
 
+        public const double RADIANS_TO_DEGREES = Math.PI / 180;
+        public const double DEGREES_TO_RADIANS = 180 / Math.PI;
+        
         /// <summary>
         /// Clamps angles so that they are in 0 &lt;= angle &lt; 360 degrees.
         /// </summary>
