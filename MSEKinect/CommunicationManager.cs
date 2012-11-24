@@ -38,6 +38,8 @@ namespace MSEKinect
             intAirAct.Route(IARoute.Put("/device/pairWith"), new Action<IARequest, IAResponse>(UpdateDevicePairingState));
             intAirAct.Route(IARoute.Get("/device/{identifier}/intersections"), new Action<IARequest, IAResponse>(GetDevicesInView));
 
+            intAirAct.Route(IARoute.Get("/device/{identifier}/offsetAngle"), new Action<IARequest, IAResponse>(GetOffsetAngle));
+
              
         }
 
@@ -110,6 +112,31 @@ namespace MSEKinect
                 List<Device> intersectingDevices = locator.GetDevicesInView(observingDevice);
                 response.SetBodyWith(intersectingDevices);
             }
+
+        }
+
+        void GetOffsetAngle(IARequest request, IAResponse response)
+        {
+
+            // Find the observing device
+            String deviceIdentifier = request.Parameters["identifier"];
+            Device observingDevice = locator.Devices.Find(d => d.Identifier == deviceIdentifier);
+
+            // Device Does Not Exist
+            if (observingDevice == null)
+            {
+                response.StatusCode = 404; // not found
+                return;
+            }
+            // Device Exists
+            else
+            {
+
+
+                response.SetBodyWith(90.0f);
+            }
+
+
 
         }
 
