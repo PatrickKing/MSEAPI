@@ -76,5 +76,16 @@ namespace MSELocator
             return Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
         }
 
+        /// <summary>
+        /// Finds the angle (in degrees) formed by two points and the x axis.
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns>Angle in degrees.</returns>
+        public static double AngleBetweenPoints(Point start, Point end)
+        {
+            return Math.Atan2(start.Y - end.Y, start.X - end.X) * RADIANS_TO_DEGREES;
+        }
+
     }
 }

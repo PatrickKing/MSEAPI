@@ -43,5 +43,14 @@ namespace MSELocatorTests
             //Confirm that notObserved is NOT contained in the list of observed devices
             Assert.IsFalse(actualIntersectingDevices.Exists(d => d.Identifier == notObserved.Identifier), "Not Observed is Present"); 
         }
+
+        [TestMethod()]
+        public void AngleBetweenPointsTest()
+        {
+            double result = Util.AngleBetweenPoints(new Point(0, 0), new Point(1, 1));
+
+            Assert.AreEqual(45.0, result, 0.001);
+        }
+
     }
 }
