@@ -6,6 +6,8 @@ using System.Text;
 using IntAirAct;
 using MSEKinect;
 using MSELocator;
+using System.Windows;
+
 
 namespace MSEKinect
 {
@@ -121,10 +123,10 @@ namespace MSEKinect
 
             // Find the observing device
             String deviceIdentifier = request.Parameters["identifier"];
-            Device observingDevice = locator.Devices.Find(d => d.Identifier == deviceIdentifier);
+            Device requestingDevice = locator.Devices.Find(d => d.Identifier == deviceIdentifier);
 
             // Device Does Not Exist
-            if (observingDevice == null)
+            if (requestingDevice == null)
             {
                 response.StatusCode = 404; // not found
                 return;
@@ -132,8 +134,21 @@ namespace MSEKinect
             // Device Exists
             else
             {
+                if (requestingDevice.Location.HasValue && personManager.Tracker.Location.HasValue)
+                {
+                    Point requestingDeviceLocation = requestingDevice.Location.Value;
+                    Point offsetLocation = personManager.Tracker.Location.Value;
 
+                    double angle = Util.NormalizeAngle(Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation));
+                    response.SetBodyWith(angle);
+                }
+                else
+                {
+                    // Device doesn't have location 
+                    response.StatusCode = 400; 
+                }
 
+                
                 response.SetBodyWith(90.0f);
             }
 
