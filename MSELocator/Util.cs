@@ -84,7 +84,8 @@ namespace MSELocator
         /// <returns>Angle in degrees.</returns>
         public static double AngleBetweenPoints(Point start, Point end)
         {
-            return Math.Atan2(start.Y - end.Y, start.X - end.X) * RADIANS_TO_DEGREES;
+            double unnormalizedDegrees = Math.Atan2(end.Y - start.Y, end.X - start.X) * RADIANS_TO_DEGREES;
+            return NormalizeAngle(unnormalizedDegrees);
         }
 
     }
