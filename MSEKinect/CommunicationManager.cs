@@ -139,7 +139,7 @@ namespace MSEKinect
                     Point requestingDeviceLocation = requestingDevice.Location.Value;
                     Point offsetLocation = personManager.Tracker.Location.Value;
 
-                    double angle = Util.NormalizeAngle(Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation));
+                    double angle = Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation);
                     response.SetBodyWith(angle);
                 }
                 else
