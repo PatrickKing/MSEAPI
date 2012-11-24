@@ -45,11 +45,31 @@ namespace MSELocatorTests
         }
 
         [TestMethod()]
-        public void AngleBetweenPointsTest()
+        public void Angle45DegreesBetweenPointsTest()
         {
             double result = Util.AngleBetweenPoints(new Point(0, 0), new Point(1, 1));
-
             Assert.AreEqual(45.0, result, 0.001);
+        }
+
+        [TestMethod()]
+        public void Angle135DegreesBetweenPointsTest()
+        {
+            double result = Util.AngleBetweenPoints(new Point(0, 0), new Point(-1, 1));
+            Assert.AreEqual(135.0, result, 0.001);
+        }
+
+        [TestMethod()]
+        public void Angle225DegreesBetweenPointsTest()
+        {
+            double result = Util.AngleBetweenPoints(new Point(0, 0), new Point(-1, -1));
+            Assert.AreEqual(225.0, result, 0.001);
+        }
+
+        [TestMethod()]
+        public void Angle315DegreesBetweenPointsTest()
+        {
+            double result = Util.AngleBetweenPoints(new Point(0, 0), new Point(1, -1));
+            Assert.AreEqual(315.0, result, 0.001);
         }
 
     }
