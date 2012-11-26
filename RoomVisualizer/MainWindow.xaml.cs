@@ -96,6 +96,8 @@ namespace RoomVisualizer
             GridLinesScaleSlider.ValueChanged += UpdateGridlines;
             GridLinesCheckBox.Checked += ChangeGridlineVisibility;
             GridLinesCheckBox.Unchecked += ChangeGridlineVisibility;
+            RangeCheckBox.Checked += ChangeRangeVisibility;
+            RangeCheckBox.Unchecked += ChangeRangeVisibility;
                    
             //Create Dictionaries for DeviceControl, PersonControl
             DeviceControlDictionary = new Dictionary<string, DeviceControl>();
@@ -127,15 +129,15 @@ namespace RoomVisualizer
             TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
             canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-            tracker.FieldOfView = 57;
-            tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-            tracker.Orientation = 270;
-
             // Values retrieved from:
             // http://blogs.msdn.com/b/kinectforwindows/archive/2012/01/20/near-mode-what-it-is-and-isn-t.aspx
+            // http://msdn.microsoft.com/en-us/library/jj131033.aspx
             tracker.MinRange = 0.8;
             tracker.MaxRange = 4;
+            tracker.FieldOfView = 57;
 
+            tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
+            tracker.Orientation = 270;
         }
 
         //Window Close (End the Kinect Manager) 
@@ -209,6 +211,26 @@ namespace RoomVisualizer
                 MetersTextBlock.Text = " meters";
 
             DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
+        }
+
+        private void ChangeRangeVisibility(object sender, RoutedEventArgs e)
+        {
+            if (RangeCheckBox.IsChecked.HasValue && RangeCheckBox.IsChecked.Value == true)
+            {
+                // Show Range
+                foreach (KeyValuePair<string,TrackerControl> pair in TrackerControlDictionary)
+                {
+                    pair.Value.showRange();
+                }
+            }
+            else if (RangeCheckBox.IsChecked.HasValue && RangeCheckBox.IsChecked.Value == false)
+            {
+                // Hide Range
+                foreach (KeyValuePair<string, TrackerControl> pair in TrackerControlDictionary)
+                {
+                    pair.Value.hideRange();
+                }
+            }
         }
 
         // Hides/Shows the Gridlines and Slider based on the Checkbox's state
