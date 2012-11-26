@@ -16,6 +16,40 @@ namespace MSELocator
     public class Tracker : Device
     {
 
+        private double? _MinRange;
+
+        /// <summary>
+        /// A distance in meters where the tracker cannot accurately track closer to that point. The distance of 0 - MinRange is a dead zone for tracking
+        /// </summary>
+        public double? MinRange
+        {
+            get { return _MinRange; }
+            set
+            {
+                _MinRange = value;
+            }
+        }
+
+
+        private double? _MaxRange;
+        /// <summary>
+        /// A distance in meters where the tracker cannot accurately track past that point. The distance of MaxRange - infinity is a dead zone for tracking
+        /// </summary>
+        public double? MaxRange
+        {
+            get { return _MaxRange; }
+            set
+            {
+                _MaxRange = value;
+            }
+        }
+
+
+
+
+
+
+
         // To use data received from the Kinect, or other tracker, the coordinates need to be translated from the Kinect's coordinate space, to the tracker's coordinate space, to the locator's coordinate space. 
 
         // In the Locator's coordinate space, the tracker is at the position and orientation stored in the tracker's instance variables

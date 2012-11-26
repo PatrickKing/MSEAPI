@@ -42,14 +42,14 @@ namespace RoomVisualizer
             Tracker tracker = (Tracker)device;
             
             // Draw two lines to serve as field of view indicators
-            double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + tracker.FieldOfView.Value);
+            double topAngle = Util.NormalizeAngle(tracker.Orientation.Value + tracker.FieldOfView.Value/2);
             double topX = Math.Cos(topAngle * Math.PI / 180);
             double topY = Math.Sin(topAngle * Math.PI / 180);
             Point newLeft = DrawingResources.ConvertPointToProperLength(new Point(topX, topY), DrawingResources.TRACKER_FOV_LENGTH);
             LeftLine.X2 = newLeft.X;
             LeftLine.Y2 = -newLeft.Y;
 
-            double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - tracker.FieldOfView.Value);
+            double bottomAngle = Util.NormalizeAngle(tracker.Orientation.Value - tracker.FieldOfView.Value/2);
             double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
             double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
             Point newRight = DrawingResources.ConvertPointToProperLength(new Point(bottomX, bottomY), DrawingResources.TRACKER_FOV_LENGTH);

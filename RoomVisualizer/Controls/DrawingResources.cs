@@ -25,7 +25,7 @@ namespace RoomVisualizer
         public const int TRACKER_FOV_WIDTH = 2;
 
         public const double DEVICE_FOV_LENGTH = 100;
-        public const double TRACKER_FOV_LENGTH = 300;
+        public const double TRACKER_FOV_LENGTH = 500;
 
 
         public const double ROOM_WIDTH = 4.5;

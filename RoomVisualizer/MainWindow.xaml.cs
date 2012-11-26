@@ -127,10 +127,14 @@ namespace RoomVisualizer
             TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
             canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-            tracker.FieldOfView = 45;
+            tracker.FieldOfView = 57;
             tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
             tracker.Orientation = 270;
-            
+
+            // Values retrieved from:
+            // http://blogs.msdn.com/b/kinectforwindows/archive/2012/01/20/near-mode-what-it-is-and-isn-t.aspx
+            tracker.MinRange = 0.8;
+            tracker.MaxRange = 4;
 
         }
 
