@@ -16,6 +16,9 @@ namespace MSELocator
     public class Tracker : Device
     {
 
+        public delegate void TrackerEventSignature(Tracker sender);
+        public event TrackerEventSignature RangeChanged;
+
         private double? _MinRange;
 
         /// <summary>
@@ -27,6 +30,9 @@ namespace MSELocator
             set
             {
                 _MinRange = value;
+
+                if (RangeChanged != null)
+                    RangeChanged(this);
             }
         }
 
@@ -41,6 +47,9 @@ namespace MSELocator
             set
             {
                 _MaxRange = value;
+
+                if (RangeChanged != null)
+                    RangeChanged(this);
             }
         }
 

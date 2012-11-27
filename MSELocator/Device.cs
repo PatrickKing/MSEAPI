@@ -43,7 +43,10 @@ namespace MSELocator
                 else
                 {
                     _FieldOfView = null;
-                }  
+                }
+
+                if (FOVChanged != null)
+                    FOVChanged(this);
             
             }
 
@@ -87,6 +90,7 @@ namespace MSELocator
         public delegate void DeviceEventSignature(Device sender);
         public event DeviceEventSignature LocationChanged;
         public event DeviceEventSignature OrientationChanged;
+        public event DeviceEventSignature FOVChanged;
 
 
         public override bool Equals(System.Object obj)
