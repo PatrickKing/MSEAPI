@@ -57,7 +57,6 @@ namespace RoomVisualizer
             CoordinatesLabel.Width = 50;
             Canvas.SetTop(CoordinatesLabel, 15);
             Canvas.SetLeft(CoordinatesLabel, -50);
-
         }
 
 
@@ -71,8 +70,10 @@ namespace RoomVisualizer
             if(person.Location.HasValue)
             {
                 Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(person.Location.Value, MainWindow.SharedCanvas);
-                Canvas.SetLeft(this, newPoint.X);
-                Canvas.SetTop(this, newPoint.Y);       
+
+                // PersonEllipse.Width / 2 is to make it so that the point that the PersonControl is drawn at is actually the center of the Ellipse
+                Canvas.SetLeft(this, newPoint.X - (PersonEllipse.Width/2));
+                Canvas.SetTop(this, newPoint.Y - (PersonEllipse.Height/2));       
     
                 CoordinatesLabel.Content = string.Format("({0:0.0},{1:0.0})", person.Location.Value.X, person.Location.Value.Y);
             }
