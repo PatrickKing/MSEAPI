@@ -13,7 +13,6 @@ using System.Windows.Forms;
 
 namespace MSEKinect
 {
-    //TODO Refactor into seperate classes for device-detection and person-detection
     public class PersonManager
     {
 
@@ -200,7 +199,7 @@ namespace MSEKinect
                         device.PairingState = PairingState.NotPaired;
 
                         // Dispatch a message to the device
-                        IARequest request = new IARequest(IARoute.Put("/device/becameUnpaired"));
+                        IARequest request = new IARequest(IARoute.Put("/pairingState/notpaired"));
                         // Find the IntAirAct device matching the current device.
                         IADevice iaDevice = intAirAct.Devices.Find( d => d.Name == device.Identifier);
                         intAirAct.SendRequest(request, iaDevice);

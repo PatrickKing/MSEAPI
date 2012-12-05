@@ -13,7 +13,6 @@ namespace MSEKinect
 	{
 
 		#region Instance Variables
-		private int dictionaryResets;
 		private static TraceSource logger = new TraceSource("MSEKinect");
 
 		IAIntAirAct ia;
@@ -33,7 +32,6 @@ namespace MSEKinect
 		{
 			this.locator = locator;
 			this.ia = intAirAct;
-			dictionaryResets = 0;
 		}
 
 		public void StartDeviceManager()

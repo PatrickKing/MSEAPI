@@ -6,6 +6,7 @@ using System.Windows;
 
 namespace MSELocator
 { 
+    
     public class Device
     {
 
@@ -130,5 +131,12 @@ namespace MSELocator
             this.FieldOfView = Util.DEFAULT_FIELD_OF_VIEW;
         }
 
+
+
+
+
+
+
+            
     }
 }
