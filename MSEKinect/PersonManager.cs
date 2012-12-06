@@ -11,6 +11,8 @@ using MSELocator;
 using System.Windows;
 using System.Windows.Forms;
 
+using MSEAPI_CS_Routes;
+
 namespace MSEKinect
 {
     public class PersonManager
@@ -199,7 +201,7 @@ namespace MSEKinect
                         device.PairingState = PairingState.NotPaired;
 
                         // Dispatch a message to the device
-                        IARequest request = new IARequest(IARoute.Put("/pairingState/notpaired"));
+                        IARequest request = new IARequest(Routes.BecomeUnpairedRoute);
                         // Find the IntAirAct device matching the current device.
                         IADevice iaDevice = intAirAct.Devices.Find( d => d.Name == device.Identifier);
                         intAirAct.SendRequest(request, iaDevice);
