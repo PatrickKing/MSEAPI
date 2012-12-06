@@ -48,7 +48,7 @@ namespace MSEAPI_CS
             this.intAirAct = IAIntAirAct.New();
 
 #if DEBUG
-            this.intAirAct.Port = 12345;
+            this.IntAirAct.Port = 12345;
 #endif
 
             //Setup Pairing Recognizer
@@ -174,6 +174,12 @@ namespace MSEAPI_CS
                     {
                         MSEDevice returnDevice = new MSEDevice();
                         IntermediateDevice intermediateDevice = response.BodyAs<IntermediateDevice>();
+
+                        if (intermediateDevice == null)
+                        {
+                            success(null);
+                            return;
+                        }
 
                         returnDevice.Location = intermediateDevice.location;
                         returnDevice.Identifier = intermediateDevice.identifier;

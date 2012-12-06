@@ -47,7 +47,22 @@ namespace MSEAPI_CS_Client
                 
               //  mseMultiSurface.IntAirAct.Devices[0]
             mseMultiSurface.locate(mseDevice, new MSEMultiSurface.MSESingleDeviceHandler(delegate(MSEDevice device) {
-                OutputTextBlock.Text = device.Identifier + " " + device.Location + " " + device.Orientation;
+                if (device != null)
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        OutputTextBlock.Text = device.Identifier + " " + device.Location + " " + device.Orientation;
+                    }));
+                    
+                }
+                else
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        OutputTextBlock.Text = "No Device Found";
+                    }));
+
+                }
 
             }), new MSEMultiSurface.MSEErrorHandler(delegate(Exception exception) {
                 OutputTextBlock.Text = exception.ToString();
