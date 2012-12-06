@@ -10,7 +10,7 @@ using IntAirAct;
 
 namespace MSEAPI_CS
 {
-    class MSEMultiSurface
+    public class MSEMultiSurface
     {
         public ArrayList recievedImageHandlers;
         public ArrayList recievedDataHandlers;
@@ -56,13 +56,16 @@ namespace MSEAPI_CS
 
         }
 
-        public bool start()
+        public void start()
         {
             if (this.isRunning)
             {
-                return true;
-            } else {
-                return false;
+                return;
+            }
+            else
+            {
+                this.intAirAct.Start();
+                this.isRunning = true;
             }
 
         }
@@ -72,7 +75,11 @@ namespace MSEAPI_CS
         /// </summary>
         public void stop()
         {
-            this.intAirAct.Stop();
+            if (this.isRunning)
+            {
+                this.isRunning = false;
+                this.intAirAct.Stop();
+            }
         }
 
         public void setupRoutes()

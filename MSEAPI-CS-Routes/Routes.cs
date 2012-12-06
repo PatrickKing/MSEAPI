@@ -32,9 +32,6 @@ namespace MSEAPI_CS_Routes
         public static IARoute GetNearestDeviceInRangeRoute = IARoute.Get("/device/range/{identifier}/{range}");
         public static IARoute GetAllDevicesInRangeRoute = IARoute.Get("/devices/range/{identifier}/{range}");
 
-        // Old
-        public static IARoute OldDeviceIntersectionRoute = IARoute.Get("/device/{identifier}/intersections");
-
 
         #endregion
 
