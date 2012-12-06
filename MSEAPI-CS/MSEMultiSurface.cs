@@ -155,13 +155,23 @@ namespace MSEAPI_CS
                     }
                     else
                     {
+                        MSEDevice returnDevice = new MSEDevice();
+                        IntermediateDevice intermediateDevice = response.BodyAs<IntermediateDevice>();
 
-                        //MSEDevice returnDevice = new MSEDevice();
-                        //Dictionary<string,string> returnBody = 
+                        returnDevice.Location = intermediateDevice.location;
+                        returnDevice.Identifier = intermediateDevice.identifier;
+                        returnDevice.Orientation = intermediateDevice.orientation;
+                        returnDevice.NetworkDevice = this.intAirAct.Devices.Find(d => d.Name.Equals(returnDevice.Identifier));
+                        returnDevice.LastUpdated = DateTime.Now;
 
- //                       returnDevice.Identifier = returnBody["identifier"];
-
-                        success(response.BodyAs<IADevice>());
+                        if (returnDevice.NetworkDevice == null)
+                        {
+                            success(null);
+                        }
+                        else
+                        {
+                            success(returnDevice);
+                        }
                     }
                 });
             }

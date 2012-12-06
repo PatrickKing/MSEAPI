@@ -14,30 +14,7 @@ using Newtonsoft.Json;
 
 namespace MSEKinect
 {
-    /// <summary>
-    /// CommunicationManager handles all IntAirAct requests for MSEKinect
-    /// </summary>
-    /// 
-    public class IntermediateDevice
-    {
-        public String identifier;
-        public double? orientation;
-        public Point? location;
 
-        public IntermediateDevice(Device device)
-        {
-            if (device == null) {
-                return; 
-
-            }
-
-
-            this.identifier = device.Identifier;
-            this.orientation = device.Orientation;
-            this.location = device.Location;
-        }
-
-    }
 
     
 
@@ -271,12 +248,36 @@ namespace MSEKinect
         // For transmission, we create objects with an anonymous type where the instance variable names precisely match the ones on iOS.
         // ie, identifier instead of Identifier
         // This makes deserialization on the client easier.
-        List<IntermediateDevice> IntermediateDevicesForDevices(List<Device> devices)
+        List<IntermediateDevice> GetIntermediateDevicesList(List<Device> devices)
         {
-            List<IntermediateDevice> intermediateDevices = (from device in devices
-                                                            select new IntermediateDevice(device)
-                                                            ).ToList<IntermediateDevice>();
+            List<IntermediateDevice> intermediateDevices = new List<IntermediateDevice>();
+            foreach (Device device in devices)
+            {
+                IntermediateDevice intermediateDevice = new IntermediateDevice
+                {
+                    orientation = device.Orientation,
+                    identifier = device.Identifier,
+                    location = device.Location
+                };
+
+            }
+
             return intermediateDevices; 
+        }
+
+
+        public IntermediateDevice GetIntermediateDevice(Device device)
+        {
+            if (device == null)
+            {
+                return null;
+            }
+            IntermediateDevice intermediateDevice = new IntermediateDevice();
+
+            intermediateDevice.identifier = device.Identifier;
+            intermediateDevice.orientation = device.Orientation;
+            intermediateDevice.location = device.Location;
+            return intermediateDevice;
         }
 
 

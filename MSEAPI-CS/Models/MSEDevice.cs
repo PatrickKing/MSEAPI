@@ -16,13 +16,13 @@ namespace MSEAPI_CS.Models
             set;
         }
 
-        public double Orientation
+        public double? Orientation
         {
             get;
             set;
         }
 
-        public Point Location
+        public Point? Location
         {
             get;
             set;
