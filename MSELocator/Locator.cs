@@ -193,7 +193,7 @@ namespace MSELocator
                 //First, find a device with a location to compare against
                 foreach (Device device in deviceList)
                 {
-                    if (device.Location.HasValue)
+                    if (device != observer && device.Location.HasValue)
                     {
                         nearest = device;
                     }
@@ -204,7 +204,7 @@ namespace MSELocator
                 //Find the device with the least distance to the observer
                 foreach (Device device in deviceList)
                 {
-                    if (device.Location.HasValue &&
+                    if (device != observer && device.Location.HasValue &&
                         Util.DistanceBetweenPoints(device.Location.Value, observer.Location.Value) < Util.DistanceBetweenPoints(nearest.Location.Value, observer.Location.Value))
                     {
                         nearest = device;

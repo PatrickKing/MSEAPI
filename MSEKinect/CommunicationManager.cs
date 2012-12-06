@@ -8,7 +8,9 @@ using MSEKinect;
 using MSELocator;
 using System.Windows;
 using System.Collections;
+using MSEAPI_CS_Routes;
 
+using Newtonsoft.Json; 
 
 namespace MSEKinect
 {
@@ -18,18 +20,27 @@ namespace MSEKinect
     /// 
     public class IntermediateDevice
     {
-        private String identifer;
-        private double? orientation;
-        private Point? location;
+        public String identifier;
+        public double? orientation;
+        public Point? location;
 
         public IntermediateDevice(Device device)
         {
-            this.identifer = device.Identifier;
+            if (device == null) {
+                return; 
+
+            }
+
+
+            this.identifier = device.Identifier;
             this.orientation = device.Orientation;
             this.location = device.Location;
         }
 
     }
+
+    
+
     public class CommunicationManager
     {
 
@@ -54,9 +65,9 @@ namespace MSEKinect
 
             // Routes used only for the initial application
 
-            //to be deprecated ... 
-            intAirAct.Route(IARoute.Get("/device/{identifier}/intersections"), new Action<IARequest, IAResponse>(GetDevicesInViewOld));
-
+            //TODO: this route to be deprecated ... 
+            //intAirAct.Route(IARoute.Get("/device/{identifier}/intersections"), new Action<IARequest, IAResponse>(GetDevicesInViewOld));
+            intAirAct.Route(Routes.OldDeviceIntersectionRoute, new Action<IARequest, IAResponse>(GetDevicesInViewOld));
 
             intAirAct.Route(IARoute.Put("/devices/{identifier}/orientation"), new Action<IARequest, IAResponse>(UpdateDeviceOrientation));
             intAirAct.Route(IARoute.Put("/device/pairWith"), new Action<IARequest, IAResponse>(UpdateDevicePairingState));
@@ -91,6 +102,9 @@ namespace MSEKinect
             // Find the associated device in the Current Devices 
             Device device = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
 
+            if (device == null)
+                return;
+
             // Respond with the device
             response.SetBodyWith(new IntermediateDevice(device)); 
 
@@ -104,7 +118,9 @@ namespace MSEKinect
         /// <param name="response"></param>
         void UpdateDeviceOrientation(IARequest request, IAResponse response)
         {
-            float newOrientation = request.BodyAs<float>();
+            string result = request.BodyAsString();
+            float newOrientation = float.Parse(result);
+            Console.WriteLine(newOrientation);
 
             String name = request.Parameters["identifier"];
             Device localDevice = locator.Devices.Find(d => d.Identifier.Equals(name));
@@ -165,11 +181,12 @@ namespace MSEKinect
             {
                 if (requestingDevice.Location.HasValue && personManager.Tracker.Location.HasValue)
                 {
-                    Point requestingDeviceLocation = requestingDevice.Location.Value;
-                    Point offsetLocation = personManager.Tracker.Location.Value;
+                    // TODO use the paired person's location, and calculate the angle more precisely.
+                    //Point requestingDeviceLocation = requestingDevice.Location.Value;
+                    //Point offsetLocation = personManager.Tracker.Location.Value;
 
-                    double angle = Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation);
-                    response.SetBodyWith(angle);
+                    //double angle = Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation);
+                    //response.SetBodyWith(angle);
                 }
                 else
                 {
@@ -178,7 +195,6 @@ namespace MSEKinect
                 }
 
                 // When the device requests the offset angle, it is facing the tracker, so its orientation is approximately turned around by 180 degrees
-                // TODO use the paired person's location, and calculate the angle more precisely.
                 response.SetBodyWith(Util.NormalizeAngle(personManager.Tracker.Orientation.Value - 180));
             }
 
@@ -191,8 +207,8 @@ namespace MSEKinect
         //Return All Devices known to Locator 
         void GetDevices(IARequest request, IAResponse response)
         {
-
-            response.SetBodyWith(IntermediateDevicesForDevices(locator.Devices)); 
+            List<IntermediateDevice> intermediateDevices = IntermediateDevicesForDevices(locator.Devices);
+            response.SetBodyWith(intermediateDevices);
         }
 
 
@@ -206,6 +222,11 @@ namespace MSEKinect
             Device nearestDevice = locator.GetNearestDeviceInView(device);
 
             // Respond with the device
+
+            if (nearestDevice == null) 
+                return;
+        
+
             response.SetBodyWith(new IntermediateDevice(nearestDevice)); 
 
         }
@@ -218,8 +239,9 @@ namespace MSEKinect
             Device device = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
             List<Device> devicesInView = locator.GetDevicesInView(device);
 
+            List<IntermediateDevice> intDevices = IntermediateDevicesForDevices(devicesInView);
             // Respond with the device
-            response.SetBodyWith(IntermediateDevicesForDevices(devicesInView)); 
+            response.SetBodyWith(intDevices); 
 
         }
 
@@ -231,6 +253,9 @@ namespace MSEKinect
             // Find the associated device in the Current Devices 
             Device device = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
             Device nearestDevice = locator.GetNearestDeviceWithinRange(device, range);
+
+            if (nearestDevice == null)
+                return; 
 
             // Respond with the device
             response.SetBodyWith(new IntermediateDevice(nearestDevice)); 
