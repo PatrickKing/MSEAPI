@@ -28,7 +28,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceDiscovery", "IntAirA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroconfService", "IntAirActCS\Frameworks\ZeroConfigNetServices\ZeroconfService\ZeroconfService.csproj", "{AD5CF7A9-93C4-48DD-ACD8-38DD434F1491}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-CS-Routes", "MSEAPI-CS-Routes\MSEAPI-CS-Routes\MSEAPI-CS-Routes.csproj", "{09505CBD-76EE-43EE-9390-BB90EFF36E45}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-CS-Routes", "MSEAPI-CS-Routes\MSEAPI-CS-Routes.csproj", "{09505CBD-76EE-43EE-9390-BB90EFF36E45}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution

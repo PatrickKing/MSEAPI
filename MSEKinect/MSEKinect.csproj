@@ -71,7 +71,7 @@
       <Project>{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}</Project>
       <Name>IntAirAct</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MSEAPI-CS-Routes\MSEAPI-CS-Routes\MSEAPI-CS-Routes.csproj">
+    <ProjectReference Include="..\MSEAPI-CS-Routes\MSEAPI-CS-Routes.csproj">
       <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
       <Name>MSEAPI-CS-Routes</Name>
     </ProjectReference>
