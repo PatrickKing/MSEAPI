@@ -204,6 +204,11 @@ namespace MSEAPI_CS
             }
         }
 
+        public void locateAllDevices(MSEDeviceCollectionHandler success, MSEErrorHandler failure)
+        {
+
+        }
+
 
         #endregion
     }
