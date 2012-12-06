@@ -63,24 +63,17 @@ namespace MSEKinect
             this.locator = locator;
             this.personManager = personManager;
 
-            // Routes used only for the initial application
+            intAirAct.Route(Routes.RequestPairingRoute, new Action<IARequest, IAResponse>(UpdateDevicePairingState));
 
-            //TODO: this route to be deprecated ... 
-            //intAirAct.Route(IARoute.Get("/device/{identifier}/intersections"), new Action<IARequest, IAResponse>(GetDevicesInViewOld));
-            intAirAct.Route(Routes.OldDeviceIntersectionRoute, new Action<IARequest, IAResponse>(GetDevicesInViewOld));
+            intAirAct.Route(Routes.SetOrientationRoute, new Action<IARequest, IAResponse>(UpdateDeviceOrientation));
+            intAirAct.Route(Routes.GetOffsetAngleRoute, new Action<IARequest, IAResponse>(GetOffsetAngle));
 
-            intAirAct.Route(IARoute.Put("/devices/{identifier}/orientation"), new Action<IARequest, IAResponse>(UpdateDeviceOrientation));
-            intAirAct.Route(IARoute.Put("/device/pairWith"), new Action<IARequest, IAResponse>(UpdateDevicePairingState));
-            intAirAct.Route(IARoute.Get("/device/{identifier}/offsetAngle"), new Action<IARequest, IAResponse>(GetOffsetAngle));
-
-
-            // Routes used in the API proper
-            intAirAct.Route(IARoute.Get("/device/{identifier}"), new Action<IARequest, IAResponse>(GetDevice));
-            intAirAct.Route(IARoute.Get("/devices"), new Action<IARequest, IAResponse>(GetDevices));
-            intAirAct.Route(IARoute.Get("/device/view/{identifier}"), new Action<IARequest, IAResponse>(GetNearestDeviceInView));
-            intAirAct.Route(IARoute.Get("/devices/view/{identifier}"), new Action<IARequest, IAResponse>(GetDevicesInView));
-            intAirAct.Route(IARoute.Get("/device/range/{identifier}/{range}"), new Action<IARequest, IAResponse>(GetNearestDeviceInRange));
-            intAirAct.Route(IARoute.Get("/devices/range/{identifier}/{range}"), new Action<IARequest, IAResponse>(GetDevicesInRange));
+            intAirAct.Route(Routes.GetDeviceInfoRoute, new Action<IARequest, IAResponse>(GetDevice));
+            intAirAct.Route(Routes.GetAllDeviceInfoRoute, new Action<IARequest, IAResponse>(GetDevices));
+            intAirAct.Route(Routes.GetNearestDeviceInViewRoute, new Action<IARequest, IAResponse>(GetNearestDeviceInView));
+            intAirAct.Route(Routes.GetAllDevicesInViewRoute, new Action<IARequest, IAResponse>(GetDevicesInView));
+            intAirAct.Route(Routes.GetNearestDeviceInRangeRoute, new Action<IARequest, IAResponse>(GetNearestDeviceInRange));
+            intAirAct.Route(Routes.GetAllDevicesInRangeRoute, new Action<IARequest, IAResponse>(GetDevicesInRange));
 
 
 

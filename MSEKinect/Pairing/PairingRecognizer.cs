@@ -5,7 +5,9 @@ using System.Text;
 using MSEGestureRecognizer;
 using System.Diagnostics;
 using IntAirAct;
-using MSELocator; 
+using MSELocator;
+
+using MSEAPI_CS_Routes;
 
 namespace MSEKinect
 {
@@ -93,7 +95,7 @@ namespace MSEKinect
             if (device != null)
             {
                 //TODO: Verify that this works at all! 
-                IARequest request = new IARequest(IARoute.Put("/pairingState/paired")); 
+                IARequest request = new IARequest(Routes.BecomePairedRoute); 
                 intAirAct.SendRequest(request, device);
                 
             }
