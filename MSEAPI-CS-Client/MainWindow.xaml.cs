@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using MSEAPI_CS;
+using MSEAPI_CS.Models;
 
 namespace MSEAPI_CS_Client
 {
@@ -20,6 +21,12 @@ namespace MSEAPI_CS_Client
     /// </summary>
     public partial class MainWindow : Window
     {
+
+        #region Instance Variables
+        MSEMultiSurface mseMultiSurface;
+
+        #endregion
+
         public MainWindow()
         {
             InitializeComponent();
@@ -27,9 +34,26 @@ namespace MSEAPI_CS_Client
 
         private void WindowLoaded(object sender, RoutedEventArgs e)
         {
-            MSEMultiSurface mseMultiSurface = new MSEMultiSurface();
+            mseMultiSurface = new MSEMultiSurface();
 
+
+            mseMultiSurface.Start();
+        }
+
+        private void GetDeviceInfoClick(object sender, RoutedEventArgs e)
+        {
+            MSEDevice mseDevice = new MSEDevice();
+            mseDevice.Identifier = "ASE Lab iPad 3";
+                
+              //  mseMultiSurface.IntAirAct.Devices[0]
+            mseMultiSurface.locate(mseDevice, new MSEMultiSurface.MSESingleDeviceHandler(delegate(MSEDevice device) {
+                OutputTextBlock.Text = device.Identifier + " " + device.Location + " " + device.Orientation;
+
+            }), new MSEMultiSurface.MSEErrorHandler(delegate(Exception exception) {
+                OutputTextBlock.Text = exception.ToString();
+            }));
 
         }
+
     }
 }

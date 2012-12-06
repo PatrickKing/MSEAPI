@@ -12,14 +12,26 @@ namespace MSEAPI_CS
 {
     public class MSEMultiSurface
     {
+        #region Instance Variables
         public ArrayList recievedImageHandlers;
         public ArrayList recievedDataHandlers;
 
         public bool isRunning;
 
         private IAIntAirAct intAirAct;
+        public IAIntAirAct IntAirAct
+        {
+            get
+            {
+                return intAirAct;
+            }
+        }
+
         private static TraceSource logger;
-       
+
+        #endregion
+
+        #region Constructor, Start and Stop
 
         public MSEMultiSurface()
         {
@@ -56,7 +68,7 @@ namespace MSEAPI_CS
 
         }
 
-        public void start()
+        public void Start()
         {
             if (this.isRunning)
             {
@@ -73,7 +85,7 @@ namespace MSEAPI_CS
         /// <summary>
         /// Stops the Multi-surface Environment
         /// </summary>
-        public void stop()
+        public void Stop()
         {
             if (this.isRunning)
             {
@@ -81,6 +93,10 @@ namespace MSEAPI_CS
                 this.intAirAct.Stop();
             }
         }
+
+        #endregion
+
+        #region Data, Image and Object route handling
 
         public void setupRoutes()
         {
@@ -132,6 +148,7 @@ namespace MSEAPI_CS
 
             });
         }
+        #endregion
 
         #region Locator Methods
 
