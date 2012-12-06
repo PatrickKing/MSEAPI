@@ -219,14 +219,13 @@ namespace MSEKinect
 
             // Find the associated device in the Current Devices 
             Device device = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
+            if (device == null)
+                return; 
+
             Device nearestDevice = locator.GetNearestDeviceInView(device);
-
-            // Respond with the device
-
             if (nearestDevice == null) 
                 return;
-        
-
+       
             response.SetBodyWith(new IntermediateDevice(nearestDevice)); 
 
         }

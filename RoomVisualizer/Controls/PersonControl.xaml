@@ -7,9 +7,13 @@
              d:DesignHeight="300" d:DesignWidth="300">
     
     <Canvas>
-        <Ellipse Name="PersonEllipse"></Ellipse>
-        <Label Name="IdentifierLabel" Content="###"></Label>
-        <Label Name="CoordinatesLabel" Content="(##,##)" Canvas.Top="20"></Label>
+        <Label Name="IdentifierLabel" Content="###" FontSize="22"></Label>
+        <Label Name="CoordinatesLabel" Content="(##,##)" Canvas.Top="20" FontSize="22"></Label>
+        <Ellipse Name="PersonEllipse">
+            <Ellipse.Fill>
+                <ImageBrush ImageSource="http://c.dryicons.com/images/icon_sets/luna_blue_icons/png/128x128/user.png" />
+            </Ellipse.Fill>
+        </Ellipse>
     </Canvas>
     
 </UserControl>

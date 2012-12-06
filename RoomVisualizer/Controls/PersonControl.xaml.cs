@@ -45,18 +45,18 @@ namespace RoomVisualizer
 
             
             //Setup the person's identifier
-            IdentifierLabel.Content = pairablePerson.Identifier;
+            IdentifierLabel.Content = "ID: " + pairablePerson.Identifier;
             IdentifierLabel.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
-            IdentifierLabel.Width = 50;
-            Canvas.SetTop(IdentifierLabel, -5);
-            Canvas.SetLeft(IdentifierLabel, -50);
+            IdentifierLabel.Width = 100;
+            Canvas.SetTop(IdentifierLabel, 130);
+            Canvas.SetLeft(IdentifierLabel, -5);
 
             //Setup the person's identifier
             CoordinatesLabel.Content = pairablePerson.Identifier;
             CoordinatesLabel.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
-            CoordinatesLabel.Width = 50;
-            Canvas.SetTop(CoordinatesLabel, 15);
-            Canvas.SetLeft(CoordinatesLabel, -50);
+            CoordinatesLabel.Width = 300;
+            Canvas.SetTop(CoordinatesLabel, 150);
+            Canvas.SetLeft(CoordinatesLabel, -150);
         }
 
 
@@ -75,7 +75,7 @@ namespace RoomVisualizer
                 Canvas.SetLeft(this, newPoint.X - (PersonEllipse.Width/2));
                 Canvas.SetTop(this, newPoint.Y - (PersonEllipse.Height/2));       
     
-                CoordinatesLabel.Content = string.Format("({0:0.0},{1:0.0})", person.Location.Value.X, person.Location.Value.Y);
+                CoordinatesLabel.Content = string.Format("Location: ({0:0.0},{1:0.0})", person.Location.Value.X, person.Location.Value.Y);
             }
         }
 

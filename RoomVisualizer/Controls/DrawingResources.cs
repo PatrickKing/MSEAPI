@@ -94,8 +94,8 @@ namespace RoomVisualizer
             double gridWidth = DrawingResources.ConvertFromMetersToDisplayCoordinates(new Point(scale, scale), canvas).X;
 
             // Calculates the number of rows and columns to add
-            double numberOfLinesWide = canvas.Width / gridWidth;
-            double numberOfLinesHigh = canvas.Height / gridWidth;
+            double numberOfLinesWide = canvas.ActualWidth / gridWidth;
+            double numberOfLinesHigh = canvas.ActualHeight / gridWidth;
 
             // Generate Columns
             for (int i = 0; i < numberOfLinesWide; i++)

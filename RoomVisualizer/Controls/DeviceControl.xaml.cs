@@ -69,9 +69,13 @@ namespace RoomVisualizer
             InnerBorder.Height = Math.Ceiling(deviceSize);
 
 
-            Canvas.SetLeft(DeviceNameLabel, Canvas.GetLeft(DeviceNameLabel) - 10);
-            DeviceNameLabel.Width = deviceSize + 20;
+            Canvas.SetLeft(DeviceNameLabel, -35);
+            Canvas.SetTop(DeviceNameLabel, -65);
+
+            DeviceNameLabel.Width = 200;
+            DeviceNameLabel.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             DeviceNameLabel.Margin = new Thickness(0, 25, 0, 0);
+            DeviceNameLabel.FontSize = 22;
             InnerBorder.Margin = new Thickness(0);
 
             Canvas.SetLeft(LeftLine, InnerBorder.Width / 2);

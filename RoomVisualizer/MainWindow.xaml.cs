@@ -144,9 +144,7 @@ namespace RoomVisualizer
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             kinectManager.Stop();
-        }
-    
-
+        }  
 
         #region Handlers for Person and Device manager events
         
