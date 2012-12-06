@@ -43,9 +43,6 @@
     <Reference Include="Gate.Hosts.Firefly">
       <HintPath>..\packages\Gate.Hosts.Firefly.0.3.6\lib\net40\Gate.Hosts.Firefly.dll</HintPath>
     </Reference>
-    <Reference Include="IntAirAct">
-      <HintPath>..\packages\IntAirAct.1.0.1.0\lib\net40-Client\IntAirAct.dll</HintPath>
-    </Reference>
     <Reference Include="Nancy">
       <HintPath>..\packages\Nancy.0.11.0\lib\net40\Nancy.dll</HintPath>
     </Reference>
@@ -58,9 +55,6 @@
     <Reference Include="RestSharp">
       <HintPath>..\packages\RestSharp.104.1\lib\net4\RestSharp.dll</HintPath>
     </Reference>
-    <Reference Include="ServiceDiscovery">
-      <HintPath>..\packages\ServiceDiscovery.1.0.0.0\lib\net40\ServiceDiscovery.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -69,9 +63,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
-    <Reference Include="ZeroconfService">
-      <HintPath>..\packages\ZeroconfService.0.6.0.0\lib\net40\ZeroconfService.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Models\Gestures\MSEDropGesture.cs" />
@@ -85,9 +76,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\MSEAPI\MSEAPI-CS-Routes\MSEAPI-CS-Routes.csproj">
+    <ProjectReference Include="..\IntAirActCS\Frameworks\ZeroConfigNetServices\ZeroconfService\ZeroconfService.csproj">
+      <Project>{AD5CF7A9-93C4-48DD-ACD8-38DD434F1491}</Project>
+      <Name>ZeroconfService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IntAirActCS\IntAirAct\IntAirAct.csproj">
+      <Project>{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}</Project>
+      <Name>IntAirAct</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IntAirActCS\ServiceDiscovery\ServiceDiscovery.csproj">
+      <Project>{CD87E926-3CD6-4878-8EDE-9EB6600C75DF}</Project>
+      <Name>ServiceDiscovery</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MSEAPI-SharedNetworking\MSEAPI-SharedNetworking.csproj">
       <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
-      <Name>MSEAPI-CS-Routes</Name>
+      <Name>MSEAPI-SharedNetworking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

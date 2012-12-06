@@ -8,7 +8,7 @@ using MSEKinect;
 using MSELocator;
 using System.Windows;
 using System.Collections;
-using MSEAPI_CS_Routes;
+using MSEAPI_SharedNetworking;
 
 using Newtonsoft.Json; 
 
@@ -76,7 +76,7 @@ namespace MSEKinect
                 return;
 
             // Respond with the device
-            response.SetBodyWith(new IntermediateDevice(device)); 
+            response.SetBodyWith(GetIntermediateDevice(device)); 
 
         }
 
@@ -177,7 +177,7 @@ namespace MSEKinect
         //Return All Devices known to Locator 
         void GetDevices(IARequest request, IAResponse response)
         {
-            List<IntermediateDevice> intermediateDevices = IntermediateDevicesForDevices(locator.Devices);
+            List<IntermediateDevice> intermediateDevices = GetIntermediateDevicesList(locator.Devices);
             response.SetBodyWith(intermediateDevices);
         }
 
@@ -195,8 +195,8 @@ namespace MSEKinect
             Device nearestDevice = locator.GetNearestDeviceInView(device);
             if (nearestDevice == null) 
                 return;
-       
-            response.SetBodyWith(new IntermediateDevice(nearestDevice)); 
+
+            response.SetBodyWith(GetIntermediateDevice(nearestDevice)); 
 
         }
 
@@ -208,7 +208,7 @@ namespace MSEKinect
             Device device = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
             List<Device> devicesInView = locator.GetDevicesInView(device);
 
-            List<IntermediateDevice> intDevices = IntermediateDevicesForDevices(devicesInView);
+            List<IntermediateDevice> intDevices = GetIntermediateDevicesList(devicesInView);
             // Respond with the device
             response.SetBodyWith(intDevices); 
 
@@ -227,7 +227,7 @@ namespace MSEKinect
                 return; 
 
             // Respond with the device
-            response.SetBodyWith(new IntermediateDevice(nearestDevice)); 
+            response.SetBodyWith(GetIntermediateDevice(nearestDevice)); 
 
         }
 
@@ -241,7 +241,7 @@ namespace MSEKinect
             List<Device> devicesInView = locator.GetDevicesWithinRange(device, range);
 
             // Respond with the device
-            response.SetBodyWith(IntermediateDevicesForDevices(devicesInView)); 
+            response.SetBodyWith(GetIntermediateDevicesList(devicesInView)); 
         }
 
         #region Utility Functions

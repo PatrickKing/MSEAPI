@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.Collections;
-using MSEAPI_CS_Routes;
+using MSEAPI_SharedNetworking;
 using MSEAPI_CS.Models;
 using IntAirAct;
 
@@ -174,6 +174,10 @@ namespace MSEAPI_CS
                         }
                     }
                 });
+
+                // Break, so that we only send the query to one server
+                // How our system should function if there are multiple servers is undefined ... 
+                break;
             }
         }
 

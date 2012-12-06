@@ -7,7 +7,7 @@ using IntAirAct;
 
 namespace MSEAPI_CS.Models
 {
-    class MSEDevice
+    public class MSEDevice
     {
 
         public string Identifier

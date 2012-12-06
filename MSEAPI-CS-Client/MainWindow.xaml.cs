@@ -25,7 +25,7 @@ namespace MSEAPI_CS_Client
             InitializeComponent();
         }
 
-        private void Loaded(object sender, RoutedEventArgs e)
+        private void WindowLoaded(object sender, RoutedEventArgs e)
         {
             MSEMultiSurface mseMultiSurface = new MSEMultiSurface();
 
