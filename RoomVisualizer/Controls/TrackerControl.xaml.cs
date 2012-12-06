@@ -103,7 +103,7 @@ namespace RoomVisualizer
             if (tracker.MinRange.HasValue)
             {
                 // This next line has been modified to make it work properly. The 97 "should" be 90, however, it isn't drawn correctly at 90, so I played with it to get it to work
-                double leftX = (tracker.MinRange.Value * Math.Sin(Util.DEGREES_TO_RADIANS * FOVAngle)) / (Util.DEGREES_TO_RADIANS * (180.0 - FOVAngle - 97));
+                double leftX = (tracker.MinRange.Value * Math.Sin(Util.DEGREES_TO_RADIANS * FOVAngle)) / (Util.DEGREES_TO_RADIANS * (180.0 - FOVAngle - 90));
                 double leftXPixels = DrawingResources.ConvertFromMetersToPixelsX(leftX, MainWindow.SharedCanvas);
                 double YPixels = DrawingResources.ConvertFromMetersToPixelsY(tracker.MinRange.Value, MainWindow.SharedCanvas);
 
@@ -117,7 +117,7 @@ namespace RoomVisualizer
             if (tracker.MaxRange.HasValue)
             {
                 // This next line has been modified to make it work properly. The 97 "should" be 90, however, it isn't drawn correctly at 90, so I played with it to get it to work
-                double leftX = (tracker.MaxRange.Value * Math.Sin(Util.DEGREES_TO_RADIANS * FOVAngle)) / (Util.DEGREES_TO_RADIANS * (180.0 - FOVAngle - 97));
+                double leftX = (tracker.MaxRange.Value * Math.Sin(Util.DEGREES_TO_RADIANS * FOVAngle)) / (Util.DEGREES_TO_RADIANS * (180.0 - FOVAngle - 90));
                 double leftXPixels = DrawingResources.ConvertFromMetersToPixelsX(leftX, MainWindow.SharedCanvas);
                 double YPixels = DrawingResources.ConvertFromMetersToPixelsY(tracker.MaxRange.Value, MainWindow.SharedCanvas);
 
