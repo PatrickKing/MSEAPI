@@ -251,6 +251,14 @@ namespace RoomVisualizer
             }
         }
 
+        private void WindowKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                Environment.Exit(0);
+            }
+        }
+
 
     }
 }
