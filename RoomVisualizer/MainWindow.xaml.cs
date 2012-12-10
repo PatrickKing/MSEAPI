@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Timers;
 using System.Windows.Threading;
+using IntAirAct;
 
 using MSEKinect;
 using MSELocator;
@@ -150,12 +151,23 @@ namespace RoomVisualizer
         
         void deviceAdded(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                DeviceControlDictionary[pairableDevice.Identifier] = new DeviceControl(pairableDevice);
-                unpairedDeviceStackPanel.Children.Add(DeviceControlDictionary[pairableDevice.Identifier]);                
-            }));
+            // Finds the matching IADevice from the pairableDevice Identifier
+            IADevice iaDevice = deviceManager.IntAirAct.Devices.Find(d => d.Name.Equals(pairableDevice.Identifier));
 
+            // Iterate over all supported routes
+            foreach (IARoute route in iaDevice.SupportedRoutes)
+            {
+                // If the device has the route with resource "/pairingState/paired", then we know it is a device running the MSEAPI Client, so we'll add it to the unpaired device list
+                if (route.Resource.Equals("/pairingState/paired") && route.Action.Equals("PUT"))
+                {
+                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        DeviceControlDictionary[pairableDevice.Identifier] = new DeviceControl(pairableDevice);
+                        unpairedDeviceStackPanel.Children.Add(DeviceControlDictionary[pairableDevice.Identifier]);
+                    }));
+                    break;
+                }
+            }
         }
 
         void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
