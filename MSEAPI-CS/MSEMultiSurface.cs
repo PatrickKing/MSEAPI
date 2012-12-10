@@ -165,6 +165,9 @@ namespace MSEAPI_CS
             foreach (IADevice iaDevice in devicesSupportingRoutes)
             {
                 this.intAirAct.SendRequest(deviceRequest, iaDevice, delegate(IAResponse response, Exception exception) {
+
+                    String json = response.BodyAsString();
+
                     if (exception != null)
                     {
                         failure(exception);

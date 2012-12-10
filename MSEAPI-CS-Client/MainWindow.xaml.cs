@@ -51,7 +51,7 @@ namespace MSEAPI_CS_Client
                 {
                     Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        OutputTextBlock.Text = device.Identifier + " " + device.Location + " " + device.Orientation;
+                        OutputTextBlock.Text = device.Identifier + "\n" + device.Location + "\n" + device.Orientation;
                     }));
                     
                 }
