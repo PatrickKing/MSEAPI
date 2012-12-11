@@ -11,6 +11,10 @@ namespace MSEAPI_CS_Tests
     [TestClass]
     public class MSEAPI_CS_Tests
     {
+        const int SERVER_PORT = 3474;
+        const int CLIENT_PORT = 34789;
+
+
         IAIntAirAct client;
         IAIntAirAct server;
         bool clientConnected;
@@ -32,9 +36,9 @@ namespace MSEAPI_CS_Tests
             server.Start();
             client.Start();
 
-            while (!clientConnected && !serverConnected)
+            while (!(clientConnected && serverConnected))
             {
-                System.Threading.Thread.Sleep(100);
+                System.Threading.Thread.Sleep(10000);
             }
 
 
@@ -48,15 +52,18 @@ namespace MSEAPI_CS_Tests
             clientConnected = false;
             serverConnected = false;
 
+            client.Port = CLIENT_PORT;
+            server.Port = SERVER_PORT;
+
             client.DeviceFound += delegate(IADevice device, bool ownDevice)
             {
-                if (ownDevice)
+                if (device.Port == SERVER_PORT)
                     clientConnected = true;
             };
 
             server.DeviceFound += delegate(IADevice device, bool ownDevice)
             {
-                if (ownDevice)
+                if (device.Port == CLIENT_PORT)
                     serverConnected = true;
             };
 
