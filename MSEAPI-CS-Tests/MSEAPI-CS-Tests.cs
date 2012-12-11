@@ -36,10 +36,6 @@ namespace MSEAPI_CS_Tests
             server.Start();
             client.Start();
 
-            while (!(clientConnected && serverConnected))
-            {
-                System.Threading.Thread.Sleep(10000);
-            }
 
 
             teardown();
@@ -76,5 +72,17 @@ namespace MSEAPI_CS_Tests
             client = null;
             server = null;
         }
+
+        /// <summary>
+        /// Wait for both client and server to detect each other before proceeding
+        /// </summary>
+        public void WaitForConnections()
+        {
+            while (!(clientConnected && serverConnected))
+            {
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+
     }
 }
