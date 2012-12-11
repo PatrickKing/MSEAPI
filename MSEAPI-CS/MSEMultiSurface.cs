@@ -48,7 +48,7 @@ namespace MSEAPI_CS
             this.intAirAct = IAIntAirAct.New();
 
 #if DEBUG
-            this.intAirAct.Port = 12345;
+            this.IntAirAct.Port = 12345;
 #endif
 
             //Setup Pairing Recognizer
@@ -165,6 +165,9 @@ namespace MSEAPI_CS
             foreach (IADevice iaDevice in devicesSupportingRoutes)
             {
                 this.intAirAct.SendRequest(deviceRequest, iaDevice, delegate(IAResponse response, Exception exception) {
+
+                    String json = response.BodyAsString();
+
                     if (exception != null)
                     {
                         failure(exception);
@@ -174,6 +177,12 @@ namespace MSEAPI_CS
                     {
                         MSEDevice returnDevice = new MSEDevice();
                         IntermediateDevice intermediateDevice = response.BodyAs<IntermediateDevice>();
+
+                        if (intermediateDevice == null)
+                        {
+                            success(null);
+                            return;
+                        }
 
                         returnDevice.Location = intermediateDevice.location;
                         returnDevice.Identifier = intermediateDevice.identifier;
@@ -196,6 +205,11 @@ namespace MSEAPI_CS
                 // How our system should function if there are multiple servers is undefined ... 
                 break;
             }
+        }
+
+        public void locateAllDevices(MSEDeviceCollectionHandler success, MSEErrorHandler failure)
+        {
+
         }
 
 

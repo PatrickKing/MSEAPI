@@ -118,6 +118,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IntAirActCS\IntAirAct\IntAirAct.csproj">
+      <Project>{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}</Project>
+      <Name>IntAirAct</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MSEKinect\MSEKinect.csproj">
       <Project>{880AD678-2C20-423E-B5B8-55AB3933B192}</Project>
       <Name>MSEKinect</Name>

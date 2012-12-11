@@ -15,7 +15,12 @@ namespace MSEKinect
 		#region Instance Variables
 		private static TraceSource logger = new TraceSource("MSEKinect");
 
-		IAIntAirAct ia;
+		private IAIntAirAct ia;
+		public IAIntAirAct IntAirAct
+		{
+			get { return ia; }
+
+		}
 		LocatorInterface locator;
 		#endregion
 
