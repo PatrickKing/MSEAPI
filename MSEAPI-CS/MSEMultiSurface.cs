@@ -150,7 +150,7 @@ namespace MSEAPI_CS
         }
         #endregion
 
-        #region Locator Methods
+        #region Locator route handling
 
         public delegate void MSESingleDeviceHandler(MSEDevice device);
         public delegate void MSEDeviceCollectionHandler(List<MSEDevice> devices);
