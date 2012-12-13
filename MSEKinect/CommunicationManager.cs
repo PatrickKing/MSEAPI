@@ -31,7 +31,7 @@ namespace MSEKinect
 
         #endregion
 
-
+        #region Constructor 
         public CommunicationManager(IntAirAct.IAIntAirAct intAirAct, PairingRecognizer pairingRecognizer, MSEGestureRecognizer.GestureController gestureController, MSELocator.LocatorInterface locator, PersonManager personManager)
         {
             this.intAirAct = intAirAct;
@@ -56,6 +56,8 @@ namespace MSEKinect
 
 
         }
+        #endregion
+
 
 
         #region Route Handlers
@@ -89,6 +91,7 @@ namespace MSEKinect
         void UpdateDeviceOrientation(IARequest request, IAResponse response)
         {
             string result = request.BodyAsString();
+            //TODO: Handle parse failure gracefully 
             float newOrientation = float.Parse(result);
             Console.WriteLine(newOrientation);
 
@@ -171,7 +174,6 @@ namespace MSEKinect
 
 
         }
-        #endregion
 
 
         //Return All Devices known to Locator 
@@ -243,6 +245,9 @@ namespace MSEKinect
             // Respond with the device
             response.SetBodyWith(GetIntermediateDevicesList(devicesInView)); 
         }
+
+        #endregion
+
 
         #region Utility Functions
         // For transmission, we create objects with an anonymous type where the instance variable names precisely match the ones on iOS.

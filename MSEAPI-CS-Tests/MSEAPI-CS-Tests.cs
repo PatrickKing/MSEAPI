@@ -7,22 +7,22 @@ using IntAirAct;
 using MSEAPI_SharedNetworking;
 using MSEAPI_CS;
 using MSEAPI_CS.Models;
+using System.Windows;
 
 namespace MSEAPI_CS_Tests
 {
     [TestClass]
     public class MSEAPI_CS_Tests
     {
-
         #region Constants and Instance Variables
 
         // The test client and server IntAirAct instances use some fixed arbitrary ports, so that they can uniquely identify each other.
-        const int SERVER_PORT = 3474;
-        const int CLIENT_PORT = 34789;
+        static ushort ServerPort = 4000;
+        static ushort ClientPort = 5000;
 
         //IAIntAirAct client;
-        MSEMultiSurface client;
-        IAIntAirAct server;
+        MSEMultiSurface Client;
+        IAIntAirAct Server;
 
         bool clientConnected;
         bool serverConnected;
@@ -35,24 +35,30 @@ namespace MSEAPI_CS_Tests
         public void Setup()
         {
             //client = IAIntAirAct.New();
-            client = new MSEMultiSurface();
-            server = IAIntAirAct.New();
+            Client = new MSEMultiSurface();
+            Server = IAIntAirAct.New();
             clientConnected = false;
             serverConnected = false;
             doneWaitingForResponse = false;
 
-            client.IntAirAct.Port = CLIENT_PORT;
-            server.Port = SERVER_PORT;
+            Client.IntAirAct.Port = ClientPort;
+            Server.Port = ServerPort;
 
-            client.IntAirAct.DeviceFound += delegate(IADevice device, bool ownDevice)
+            // Increment the port numbers, so that if the current test run crashes, we don't try to use unreclaimed ports on the next test
+            ClientPort++;
+            ServerPort++;
+
+            // In the tests, we wait on clientConnected and serverConnected, to be certain that each IntAirAct instance has registered the other
+            // We use known ports to 'uniquely' identify instances during the test, since other IntAirAct devices may exist on the network during the test
+            Client.IntAirAct.DeviceFound += delegate(IADevice device, bool ownDevice)
             {
-                if (device.Port == SERVER_PORT)
+                if (device.Port == Server.Port)
                     clientConnected = true;
             };
 
-            server.DeviceFound += delegate(IADevice device, bool ownDevice)
+            Server.DeviceFound += delegate(IADevice device, bool ownDevice)
             {
-                if (device.Port == CLIENT_PORT)
+                if (device.Port == Client.IntAirAct.Port)
                     serverConnected = true;
             };
 
@@ -61,9 +67,11 @@ namespace MSEAPI_CS_Tests
 
         public void Teardown()
         {
+            Client.Stop();
+            Server.Stop();
 
-            client = null;
-            server = null;
+            Client = null;
+            Server = null;
         }
 
         // TODO: both of the 'wait' functions need an eventual timeout
@@ -73,8 +81,16 @@ namespace MSEAPI_CS_Tests
         /// </summary>
         public void WaitForConnections()
         {
+            int attempts = 0;
+
             while (!(clientConnected && serverConnected))
             {
+                attempts++;
+                if (attempts > 150)
+                {
+                    Assert.Fail();
+                    break;
+                }
                 System.Threading.Thread.Sleep(100);
             }
         }
@@ -85,8 +101,15 @@ namespace MSEAPI_CS_Tests
         /// </summary>
         public void WaitForResponse()
         {
+            int attempts = 0;
             while (!doneWaitingForResponse)
             {
+                attempts++;
+                if (attempts > 150)
+                {
+                    Assert.Fail();
+                    break;
+                }
                 System.Threading.Thread.Sleep(100);
             }
         }
@@ -94,25 +117,24 @@ namespace MSEAPI_CS_Tests
 
         #endregion
 
-
-#region Locator method tests
+        #region Locator method tests
 
         // TODO: The server side API will change, so that a 'no result' comes back as a 404 error and not a 200 with no message body.
-        // This test will be obsolete then.
+        // This test will need to be fixed up then.
         [TestMethod]
         public void GetDeviceInfoTestReturningNull()
         {
             Setup();
-            server.Route(Routes.GetDeviceInfoRoute, delegate(IARequest request, IAResponse response) 
+            Server.Route(Routes.GetDeviceInfoRoute, delegate(IARequest request, IAResponse response) 
             {
                 response.SetBodyWithString("");
             });
 
-            server.Start();
-            client.Start();
+            Server.Start();
+            Client.Start();
             WaitForConnections();
 
-            client.locate(new MSEDevice() { Identifier="foo"}, delegate(MSEDevice successDevice)
+            Client.locate(new MSEDevice() { Identifier="foo"}, delegate(MSEDevice successDevice)
             {
                 Assert.IsNull(successDevice);
                 doneWaitingForResponse = true;
@@ -132,20 +154,20 @@ namespace MSEAPI_CS_Tests
         public void GetDeviceInfoTest()
         {
             Setup();
-            server.Route(Routes.GetDeviceInfoRoute, delegate(IARequest request, IAResponse response) 
+            Server.Route(Routes.GetDeviceInfoRoute, delegate(IARequest request, IAResponse response) 
             {
-                if(request.Parameters["identifier"].Equals("foo"))
+                if(request.Parameters["identifier"].Equals(Client.OwnIdentifier))
                 {
-                    // This string obtained from the actual MSEAPI JSON serializer. Use real data for all tests! 
-                    response.SetBodyWithString("{\"identifier\":\"ASE Lab iPad 3\",\"orientation\":99.55555,\"location\":\"2.22716139629483,3.0686103105545\"}");
+                    // This string derived from the actual MSEAPI JSON serializer. Use real data for all tests! 
+                    response.SetBodyWithString("{\"identifier\":\"" + Client.OwnIdentifier + "\",\"orientation\":99.55555,\"location\":\"2.22716139629483,3.0686103105545\"}");
                 }
             });
 
-            server.Start();
-            client.Start();
+            Server.Start();
+            Client.Start();
             WaitForConnections();
 
-            client.locate(new MSEDevice() { Identifier="foo"}, delegate(MSEDevice successDevice)
+            Client.locate(new MSEDevice() { Identifier=Client.OwnIdentifier}, delegate(MSEDevice successDevice)
             {
                 Assert.AreEqual(successDevice.Orientation.Value, 99.55555, 0.001, "Orientation not equal");
                 doneWaitingForResponse = true;
@@ -162,13 +184,43 @@ namespace MSEAPI_CS_Tests
 #endregion
 
 
+        /// <summary>
+        /// A test of the client's function for sending device location updates
+        /// </summary>
         [TestMethod]
-        public void SetDeviceLocationAndOrientationTest()
+        public void SetDeviceLocationTest()
         {
             Setup();
+            Server.Route(Routes.SetLocationRoute, delegate(IARequest request, IAResponse response)
+            {
+                if (!request.Parameters["identifier"].Equals(Client.OwnIdentifier))
+                {
+                    response.StatusCode = 404;
+                }
+
+                IntermediatePoint updatePoint = request.BodyAs<IntermediatePoint>();
+                Assert.AreEqual(updatePoint.X, 10.0, 0.1);
+                Assert.AreEqual(updatePoint.Y, 5.0, 0.1);
+
+
+            });
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            Client.UpdateDeviceLocation(new MSEDevice() { Identifier = Client.OwnIdentifier, Location = new Point(10, 5) }, delegate()
+            {
+                doneWaitingForResponse = true;
+            },
+            delegate(Exception exception)
+            {
+                Assert.Fail();
+            });
+
+            WaitForResponse();
 
             Teardown();
-
         }
 
 

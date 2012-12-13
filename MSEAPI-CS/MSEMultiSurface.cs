@@ -31,6 +31,33 @@ namespace MSEAPI_CS
 
         #endregion
 
+        #region Properties
+
+        public string OwnIdentifier
+        {
+            get
+            {
+                if (intAirAct.OwnDevice == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return intAirAct.OwnDevice.Name;
+                }
+            }
+        }
+
+
+        #endregion
+
+        #region Delegates
+        public delegate void MSESingleDeviceHandler(MSEDevice device);
+        public delegate void MSEDeviceCollectionHandler(List<MSEDevice> devices);
+        public delegate void MSEErrorHandler(Exception error);
+        public delegate void MSESuccessHandler();
+        #endregion
+
         #region Constructor, Start and Stop
 
         public MSEMultiSurface()
@@ -150,11 +177,46 @@ namespace MSEAPI_CS
         }
         #endregion
 
+
+
+        /// <summary>
+        /// Notify the server of the device's current Location
+        /// </summary>
+        /// <param name="device">The Identifier and Location properties of this MSEDeice will be used for the update.</param>
+        /// <param name="success"></param>
+        /// <param name="failure"></param>
+        public void UpdateDeviceLocation(MSEDevice device, MSESuccessHandler success, MSEErrorHandler failure)
+        {
+            IARequest updateRequest = new IARequest(Routes.SetLocationRoute);
+            updateRequest.SetBodyWith(new IntermediatePoint(device.Location.Value));
+            updateRequest.Parameters["identifier"] = device.Identifier;
+
+            IEnumerable devicesSupportingRoutes = this.intAirAct.DevicesSupportingRoute(Routes.SetLocationRoute);
+            foreach (IADevice iaDevice in devicesSupportingRoutes)
+            {
+                this.intAirAct.SendRequest(updateRequest, iaDevice, delegate(IAResponse response, Exception exception)
+                {
+                    if (exception != null)
+                    {
+                        failure(exception);
+                        return;
+                    }
+                    else
+                    {
+                        success();
+                    }
+                });
+
+                // Break, so that we only send the update to one server
+                // How our system should function if there are multiple servers is undefined ... 
+                break;
+            }
+
+        }
+
+
         #region Locator route handling
 
-        public delegate void MSESingleDeviceHandler(MSEDevice device);
-        public delegate void MSEDeviceCollectionHandler(List<MSEDevice> devices);
-        public delegate void MSEErrorHandler(Exception error);
 
         public void locate(MSEDevice device, MSESingleDeviceHandler success, MSEErrorHandler failure) {
             IARequest deviceRequest = new IARequest(Routes.GetDeviceInfoRoute);
@@ -187,7 +249,15 @@ namespace MSEAPI_CS
                         returnDevice.Location = intermediateDevice.location;
                         returnDevice.Identifier = intermediateDevice.identifier;
                         returnDevice.Orientation = intermediateDevice.orientation;
-                        returnDevice.NetworkDevice = this.intAirAct.Devices.Find(d => d.Name.Equals(returnDevice.Identifier));
+
+                        if (returnDevice.Identifier == OwnIdentifier)
+                        {
+                            returnDevice.NetworkDevice = intAirAct.OwnDevice;
+                        }
+                        else
+                        {
+                            returnDevice.NetworkDevice = this.intAirAct.Devices.Find(d => d.Name.Equals(returnDevice.Identifier));
+                        }
                         returnDevice.LastUpdated = DateTime.Now;
 
                         if (returnDevice.NetworkDevice == null)

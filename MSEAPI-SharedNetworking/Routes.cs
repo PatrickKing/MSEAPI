@@ -7,13 +7,11 @@ using IntAirAct;
 
 namespace MSEAPI_SharedNetworking
 {
-    // static members for all of the routes used in MSEAPI
-
-    // Usage: include this solution as a git submodule in MSEAPI and MSEAPI CS Client. 
+    // Static members for all of the routes used in MSEAPI
 
     public class Routes
     {
-        //TODO: Test whether reusing routes this way is acceptable to intairact
+        //TODO: Test whether reusing routes this way is acceptable to intairact. seems to be fine. 
 
         #region Routes Hosted by MSEAPI Server
 
@@ -23,6 +21,9 @@ namespace MSEAPI_SharedNetworking
         // Orientation
         public static IARoute SetOrientationRoute = IARoute.Put("/devices/{identifier}/orientation");
         public static IARoute GetOffsetAngleRoute = IARoute.Get("/device/{identifier}/offsetAngle");
+
+        // Updates to Device
+        public static IARoute SetLocationRoute = IARoute.Put("/device/{identifier}/location");
 
         // Locator
         public static IARoute GetDeviceInfoRoute = IARoute.Get("/device/{identifier}");
