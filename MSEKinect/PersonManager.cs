@@ -9,7 +9,6 @@ using MSEGestureRecognizer;
 using MSELocator;
 
 using System.Windows;
-using System.Windows.Forms;
 
 using MSEAPI_SharedNetworking;
 
@@ -36,8 +35,6 @@ namespace MSEKinect
                 TrackerSet(this, tracker);
             }
         }
-        
-        int dictionaryResets;
 
         #endregion
 
@@ -67,18 +64,12 @@ namespace MSEKinect
 
         public void StartPersonManager()
         {
-            // Checks to see how many Kinects are connected to the system. If None then exit.
-            if (KinectSensor.KinectSensors.Count == 0)
-            {
-                logger.TraceEvent(TraceEventType.Error, 0, "There are no Kinects connected");
-                MessageBox.Show("No Kinect detected. Please plug in a Kinect and restart the program", "No Kinect Detected!");
-                Environment.Exit(0);
-            }
-
             // If there is a Kinect connected, get the Kinect
             ks = KinectSensor.KinectSensors[0];
             ks.Start();
-            //Sets the initial elevation angle of the connect to 0 degrees
+         
+            // Sets the initial elevation angle of the connect to 0 degrees
+            // This seemed to be causing the app to hang, in particular with the Kinect that was dropped
             //ks.ElevationAngle = 0;
 
             // Set smoothing parameters for when Kinect is tracking a skeleton
@@ -152,10 +143,6 @@ namespace MSEKinect
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);
-
-            dictionaryResets++;
-            //System.Diagnostics.Debug.WriteLine("Person Dictionary Resets: " + dictionaryResets);
-
         }
 
         private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)

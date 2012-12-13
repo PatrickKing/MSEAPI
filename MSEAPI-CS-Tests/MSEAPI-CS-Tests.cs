@@ -20,7 +20,6 @@ namespace MSEAPI_CS_Tests
         static ushort ServerPort = 4000;
         static ushort ClientPort = 5000;
 
-        //IAIntAirAct client;
         MSEMultiSurface Client;
         IAIntAirAct Server;
 
@@ -73,8 +72,6 @@ namespace MSEAPI_CS_Tests
             Client = null;
             Server = null;
         }
-
-        // TODO: both of the 'wait' functions need an eventual timeout
 
         /// <summary>
         /// Wait for both client and server to detect each other before proceeding
