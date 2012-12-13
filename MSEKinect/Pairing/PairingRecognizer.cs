@@ -94,7 +94,6 @@ namespace MSEKinect
             IADevice device = devices.Find(d => d.Name == pairingDevice.Identifier);
             if (device != null)
             {
-                //TODO: Verify that this works at all! 
                 IARequest request = new IARequest(Routes.BecomePairedRoute); 
                 intAirAct.SendRequest(request, device);
                 

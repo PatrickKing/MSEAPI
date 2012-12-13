@@ -73,7 +73,7 @@ namespace MSEKinectTests
                 HeldDeviceIdentifier = holdsId.ToString() ?? null,
                 Location = null,
                 Orientation = null,
-                PairingState = PairingState.NotPaired
+                PairingState = pairState ?? PairingState.NotPaired
             };
 
             return person;
