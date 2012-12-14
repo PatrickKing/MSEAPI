@@ -40,29 +40,30 @@ namespace MSEKinect
         }
 
 
-        public void Start()
+        public MSEKinectManager(bool RequireKinect = true)
         {
-            TestKinectAvailability();
-            
+            if (RequireKinect)
+                TestKinectAvailability();
+
+
+            //Instantiate Components
             intAirAct = IAIntAirAct.New();
-
             locator = new Locator();
-
-            //Instantiate Components 
             pairingRecognizer = new PairingRecognizer(locator, intAirAct);
-
             gestureController = new GestureController();
             personManager = new PersonManager(locator, gestureController, intAirAct);
             deviceManager = new DeviceManager(locator, intAirAct);
 
+        }
 
+
+        public void Start()
+        {
             personManager.StartPersonManager();
             deviceManager.StartDeviceManager();
-
             intAirAct.Start();
 
             gestureController.GestureRecognized += pairingRecognizer.PersonPairAttempt;
-
             communicationManager = new CommunicationManager(intAirAct, pairingRecognizer, locator, personManager);
             
         }
@@ -72,15 +73,19 @@ namespace MSEKinect
             personManager.StopPersonManager();
             deviceManager.StopDeviceManager();
             intAirAct.Stop();
+
+            communicationManager = null;
         }
 
 
         /// <summary>
-        /// For testing purposes, we don't want to exit the program if a Kinect sensor is not available. So, we do the test here, away from tested code paths.
+        /// Test whether a Kinect sensor is available, exit if none are.
+        /// For testing purposes, we don't want to exit the program if a Kinect sensor is not available.
+        /// So this function is only for use in the actual application... 
         /// </summary>
         private void TestKinectAvailability()
         {
-            // Checks to see how many Kinects are connected to the system. If None then exit.
+            // Checks to see how many Kinects are connected to the system. If none then exit.
             if (KinectSensor.KinectSensors.Count == 0)
             {
                 System.Windows.Forms.MessageBox.Show("No Kinect detected. Please plug in a Kinect and restart the program", "No Kinect Detected!");

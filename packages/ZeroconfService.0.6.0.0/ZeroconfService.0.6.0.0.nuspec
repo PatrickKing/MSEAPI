@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ZeroconfService</id>
+    <version>0.6.0.0</version>
+    <title>ZeroconfService</title>
+    <authors>David Hammerton,  Deusty Designs and the .NET Community</authors>
+    <owners>David Hammerton,  Deusty Designs and the .NET Community</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Bringing Bonjour technology to .Net developers.</description>
+    <tags>Bonjour Service Discovery</tags>
+  </metadata>
+</package>

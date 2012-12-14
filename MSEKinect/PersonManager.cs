@@ -65,8 +65,13 @@ namespace MSEKinect
         public void StartPersonManager()
         {
             // If there is a Kinect connected, get the Kinect
-            ks = KinectSensor.KinectSensors[0];
-            ks.Start();
+
+            if (KinectSensor.KinectSensors.Count > 0)
+            {
+                ks = KinectSensor.KinectSensors[0];
+                ks.Start();
+
+            }
          
             // Sets the initial elevation angle of the connect to 0 degrees
             // This seemed to be causing the app to hang, in particular with the Kinect that was dropped

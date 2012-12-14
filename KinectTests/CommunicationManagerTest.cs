@@ -11,6 +11,9 @@ namespace MSEKinectTests
 {
     //TODO: Find a way to factor out what's in common between this class and the MSEAPI-CS-Tests main class
 
+    /// <summary>
+    /// NB: Run these tests without a Kinect attached! 
+    /// </summary>
     [TestClass]
     public class CommunicationManagerTest
     {
@@ -35,7 +38,7 @@ namespace MSEKinectTests
         {
             //client = IAIntAirAct.New();
             Client = IAIntAirAct.New();
-            Server = new MSEKinectManager(RequireKinect: false); 
+            Server = new MSEKinectManager(); 
             clientConnected = false;
             serverConnected = false;
             doneWaitingForResponse = false;

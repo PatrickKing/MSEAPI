@@ -164,16 +164,23 @@ namespace MSEKinect
 
             // Find the associated device in the Current Devices 
             Device device = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
-
             if (device == null)
             {
                 response.StatusCode = 404;
+                return;
             }
-            else
+
+            // Get the intermediateDevice for serialization
+            IntermediateDevice intermediateDevice = GetCompleteIntermediateDevice(device);
+            if (intermediateDevice == null)
             {
-                // Respond with the device
-                response.SetBodyWith(GetIntermediateDevice(device));
+                //TODO: Should this status code be different, to reflect that the device exists but couldn't be returned due to incompleteness?
+                response.StatusCode = 404;
+                return;
             }
+
+            // Respond with the device
+            response.SetBodyWith(intermediateDevice);
         }
 
         /// <summary>
@@ -183,7 +190,7 @@ namespace MSEKinect
         /// <param name="response"></param>
         void GetDevices(IARequest request, IAResponse response)
         {
-            List<IntermediateDevice> intermediateDevices = GetIntermediateDevicesList(locator.Devices);
+            List<IntermediateDevice> intermediateDevices = GetCompleteIntermediateDevicesList(locator.Devices);
 
             if (intermediateDevices.Count == 0)
             {
@@ -195,8 +202,6 @@ namespace MSEKinect
             }
 
         }
-
-
 
         void GetNearestDeviceInView(IARequest request, IAResponse response)
         {
@@ -211,15 +216,24 @@ namespace MSEKinect
                 return;
             }
 
+            // Find the nearest device that we observe
             Device nearestDevice = locator.GetNearestDeviceInView(observer);
             if (nearestDevice == null)
             {
                 response.StatusCode = 404;
+                return;
             }
-            else
+
+            // Prepare the device for serialization
+            IntermediateDevice intermediateDevice = GetCompleteIntermediateDevice(nearestDevice);
+            if (intermediateDevice == null)
             {
-                response.SetBodyWith(GetIntermediateDevice(nearestDevice));
+                response.StatusCode = 404;
+                return;
             }
+
+            response.SetBodyWith(intermediateDevice);
+
         }
 
         void GetDevicesInView(IARequest request, IAResponse response)
@@ -234,16 +248,16 @@ namespace MSEKinect
                 return;
             }        
 
+            // Get the devices in view, and convert them for serialization
             List<Device> devicesInView = locator.GetDevicesInView(observer);
-            if (devicesInView.Count == 0)
+            List<IntermediateDevice> intDevices = GetCompleteIntermediateDevicesList(devicesInView);
+            if (intDevices.Count == 0)
             {
                 response.StatusCode = 404;
+                return;
             }
-            else
-            {
-                List<IntermediateDevice> intDevices = GetIntermediateDevicesList(devicesInView);
-                response.SetBodyWith(intDevices);
-            }
+
+            response.SetBodyWith(intDevices);
         }
 
         void GetNearestDeviceInRange(IARequest request, IAResponse response)
@@ -263,12 +277,18 @@ namespace MSEKinect
             if (nearestDevice == null)
             {
                 response.StatusCode = 404;
+                return;
             }
-            else
+
+            IntermediateDevice intermediateDevice = GetCompleteIntermediateDevice(nearestDevice);
+            if (intermediateDevice == null)
             {
-                // Respond with the device
-                response.SetBodyWith(GetIntermediateDevice(nearestDevice));
+                response.StatusCode = 404;
+                return;
             }
+
+            // Respond with the device
+            response.SetBodyWith(intermediateDevice);
         }
 
         void GetDevicesInRange(IARequest request, IAResponse response)
@@ -285,15 +305,15 @@ namespace MSEKinect
             }
 
             List<Device> devicesInView = locator.GetDevicesWithinRange(device, range);
-            if (devicesInView.Count == 0)
+            List<IntermediateDevice> intermediateDevices = GetCompleteIntermediateDevicesList(devicesInView);
+            if (intermediateDevices.Count == 0)
             {
                 response.StatusCode = 404;
+                return;
             }
-            else
-            {
-                // Respond with the device
-                response.SetBodyWith(GetIntermediateDevicesList(devicesInView));
-            }
+
+            // Respond with the device
+            response.SetBodyWith(intermediateDevices);
 
         }
 
@@ -307,7 +327,7 @@ namespace MSEKinect
         // For transmission, we create objects with an anonymous type where the instance variable names precisely match the ones on iOS.
         // ie, identifier instead of Identifier
         // This makes deserialization on the client easier.
-        List<IntermediateDevice> GetIntermediateDevicesList(List<Device> devices)
+        List<IntermediateDevice> GetCompleteIntermediateDevicesList(List<Device> devices)
         {
             List<IntermediateDevice> intermediateDevices = new List<IntermediateDevice>();
             foreach (Device device in devices)
@@ -319,13 +339,18 @@ namespace MSEKinect
                     location = device.Location
                 };
 
+                if (intermediateDevice.isComplete)
+                {
+                    intermediateDevices.Add(intermediateDevice);
+                }
+
             }
 
             return intermediateDevices; 
         }
 
 
-        public IntermediateDevice GetIntermediateDevice(Device device)
+        public IntermediateDevice GetCompleteIntermediateDevice(Device device)
         {
             if (device == null)
             {
@@ -336,8 +361,15 @@ namespace MSEKinect
             intermediateDevice.identifier = device.Identifier;
             intermediateDevice.orientation = device.Orientation;
             intermediateDevice.location = device.Location;
-            return intermediateDevice;
+
+            // We only want to return devices for which all of the properties are known
+            if (intermediateDevice.isComplete)
+                return intermediateDevice;
+            else
+                return null;
         }
+
+        
 
         #endregion
 

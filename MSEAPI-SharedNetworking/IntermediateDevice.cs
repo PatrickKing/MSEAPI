@@ -19,7 +19,25 @@ namespace MSEAPI_SharedNetworking
         public double? orientation;
         public Point? location;
 
+        public bool isComplete
+        {
+            get
+            {
+                if (identifier != null &&
+                    orientation.HasValue &&
+                    location.HasValue)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }  
+
 
 
     }
+
 }
