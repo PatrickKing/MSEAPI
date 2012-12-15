@@ -95,7 +95,10 @@ namespace MSEKinect
             if (device != null)
             {
                 IARequest request = new IARequest(Routes.BecomePairedRoute); 
-                intAirAct.SendRequest(request, device);
+                intAirAct.SendRequest(request, device, delegate(IAResponse response, Exception exception)
+                {
+                    logger.TraceEvent(TraceEventType.Information, 0, "Error notifying Device {0} that it became paired.", pairingDevice.Identifier, pairingPerson.Identifier); 
+                });
                 
             }
 

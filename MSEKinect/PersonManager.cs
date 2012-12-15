@@ -71,24 +71,25 @@ namespace MSEKinect
                 ks = KinectSensor.KinectSensors[0];
                 ks.Start();
 
+
+
+                // Sets the initial elevation angle of the connect to 0 degrees
+                // This seemed to be causing the app to hang, in particular with the Kinect that was dropped
+                //ks.ElevationAngle = 0;
+
+                // Set smoothing parameters for when Kinect is tracking a skeleton
+                TransformSmoothParameters parameters = new TransformSmoothParameters()
+                {
+                    Smoothing = 0.7f,
+                    Correction = 0.3f,
+                    Prediction = 0.4f,
+                    JitterRadius = 1.0f,
+                    MaxDeviationRadius = 0.5f,
+                };
+
+                ks.SkeletonStream.Enable(parameters);
+                ks.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(ks_SkeletonFrameReady);
             }
-         
-            // Sets the initial elevation angle of the connect to 0 degrees
-            // This seemed to be causing the app to hang, in particular with the Kinect that was dropped
-            //ks.ElevationAngle = 0;
-
-            // Set smoothing parameters for when Kinect is tracking a skeleton
-            TransformSmoothParameters parameters = new TransformSmoothParameters()
-            {
-                Smoothing = 0.7f,
-                Correction = 0.3f,
-                Prediction = 0.4f,
-                JitterRadius = 1.0f,
-                MaxDeviationRadius = 0.5f,
-            };
-
-            ks.SkeletonStream.Enable(parameters);
-            ks.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(ks_SkeletonFrameReady);
         }
 
         public void StopPersonManager()

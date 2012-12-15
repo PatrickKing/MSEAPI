@@ -83,6 +83,7 @@ namespace MSEAPI_CS_Tests
             while (!(clientConnected && serverConnected))
             {
                 attempts++;
+                //TODO: A test will occasionally fail due to this timeout. Might need to be bumped up. 
                 if (attempts > 150)
                 {
                     Assert.Fail();

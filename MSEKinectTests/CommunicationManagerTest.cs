@@ -33,9 +33,8 @@ namespace MSEKinectTests
 
         public void Setup()
         {
-            //client = IAIntAirAct.New();
+            Server = new MSEKinectManager(RequireKinect: false);
             Client = IAIntAirAct.New();
-            Server = new MSEKinectManager(RequireKinect: false); 
             clientConnected = false;
             serverConnected = false;
             doneWaitingForResponse = false;
@@ -126,6 +125,12 @@ namespace MSEKinectTests
         #region Pairing Route Tests
 
 
+
+
+        /// <summary>
+        /// So, as written, this test can never succeed.
+        /// IntAirAct
+        /// </summary>
         [TestMethod]
         public void SuccessfulPairingTest()
         {
@@ -166,7 +171,15 @@ namespace MSEKinectTests
             });
 
             // Notify the server that the client wants to be paired
-            Client.SendRequest(new IARequest(Routes.RequestPairingRoute), Server.IntAirAct.OwnDevice);
+            IARequest pairingRequest = new IARequest(Routes.RequestPairingRoute);
+            pairingRequest.Origin = Client.OwnDevice;
+            Client.SendRequest(pairingRequest, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
+            {
+                if (exception != null)
+                {
+                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                }
+            });
 
             WaitForResponse();
             Teardown();
