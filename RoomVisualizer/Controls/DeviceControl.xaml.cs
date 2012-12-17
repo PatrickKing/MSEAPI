@@ -68,7 +68,6 @@ namespace RoomVisualizer
             InnerBorder.Width = Math.Ceiling(deviceSize);
             InnerBorder.Height = Math.Ceiling(deviceSize);
 
-
             Canvas.SetLeft(DeviceNameLabel, -35);
             Canvas.SetTop(DeviceNameLabel, -65);
 
@@ -93,7 +92,11 @@ namespace RoomVisualizer
 
             DeviceNameLabel.Width = this.Width;
             DeviceNameLabel.Margin = new Thickness(0);
+
+            Canvas.SetTop(DeviceNameLabel, 70);
             Canvas.SetLeft(DeviceNameLabel, 0);
+
+            DeviceNameLabel.FontSize = 12;
             InnerBorder.Margin = new Thickness(18,0,0,0);
 
             LeftLine.Visibility = System.Windows.Visibility.Hidden;
