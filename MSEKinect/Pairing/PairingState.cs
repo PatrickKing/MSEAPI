@@ -9,6 +9,7 @@ namespace MSEKinect
     {
         NotPaired,
         PairingAttempt,
-        Paired
+        Paired,
+        PairedButOccluded
     }
 }

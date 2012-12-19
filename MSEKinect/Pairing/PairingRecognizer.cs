@@ -126,7 +126,9 @@ namespace MSEKinect
         internal void PersonPairAttempt(String SkeletonId, List<PairablePerson> Persons)
         {
             //Set the Person involved to the AttemptingPair state 
-            PairablePerson p = Persons.Find(person => person.Identifier.Equals(SkeletonId));
+            //PairablePerson p = Persons.Find(person => person.Identifier.Equals(SkeletonId));
+            PairablePerson p = Persons.Find(person => SkeletonId.Equals(person.Identifier));
+
 
             //Because the pairing can overlap, we do not want to reset a paired state 
             if (p != null && p.PairingState != PairingState.Paired)

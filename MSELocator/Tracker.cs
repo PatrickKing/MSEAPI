@@ -90,6 +90,12 @@ namespace MSELocator
             person.Location = new Point(updatedPosition.X, updatedPosition.Y);
         }
 
+        public Point ConvertSkeletonToRoomSpace(Vector skeletonPosition)
+        {
+            Vector v = Util.TranslateFromCoordinateSpace(skeletonPosition, Orientation, new Vector(Location.Value.X, Location.Value.Y));
+            return new Point(v.X,v.Y);
+        }
+
 
         /// <summary>
         /// Returns the device's orientation in the locator's coordinate space, under the assumption that the device is pointed toward the tracker.

@@ -12,6 +12,9 @@ namespace MSEKinect
     {
         private const int TIMEOUT_TIME = 3000; // miliseconds
 
+        // Time in milliseconds that the device will remain in the devicesBeingRemoved dictionary
+        private const double SAVINGTIME = 5000;
+
 
         public delegate void PairablePersonEventSignature(PairablePerson sender);
 
@@ -32,6 +35,13 @@ namespace MSEKinect
                     pairingTimeoutTimer.AutoReset = false;
                     pairingTimeoutTimer.Start();
                 }
+                else if (value == PairingState.PairedButOccluded)
+                {
+                    occludedTimeoutTimer = new Timer(SAVINGTIME);
+                    occludedTimeoutTimer.Elapsed += occludedTimeout;
+                    occludedTimeoutTimer.AutoReset = false;
+                    occludedTimeoutTimer.Start();
+                }
 
                 //Update the Pairing State Value
                 _pairingState = value;
@@ -47,6 +57,7 @@ namespace MSEKinect
 
 
         private Timer pairingTimeoutTimer;
+        private Timer occludedTimeoutTimer;
 
         public override string ToString()
         {
@@ -69,6 +80,15 @@ namespace MSEKinect
             {
                 this.PairingState = PairingState.NotPaired;
                 pairingTimeoutTimer = null;
+            }
+        }
+
+        private void occludedTimeout(Object sender, ElapsedEventArgs e)
+        {
+            if (_pairingState == PairingState.PairedButOccluded && sender == occludedTimeoutTimer)
+            {
+                this.PairingState = PairingState.NotPaired;
+                occludedTimeoutTimer = null;
             }
         }
 

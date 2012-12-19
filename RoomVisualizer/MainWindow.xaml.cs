@@ -52,7 +52,7 @@ namespace RoomVisualizer
         /// </summary>
         private SkeletonRenderer skeletonRenderer;
 
-        private Dictionary<string, PersonControl> PersonControlDictionary;
+        private Dictionary<PairablePerson, PersonControl> PersonControlDictionary;
         private Dictionary<string, DeviceControl> DeviceControlDictionary;
         private Dictionary<string, TrackerControl> TrackerControlDictionary;
         //private DrawnTracker drawnTracker;
@@ -102,7 +102,7 @@ namespace RoomVisualizer
                    
             //Create Dictionaries for DeviceControl, PersonControl
             DeviceControlDictionary = new Dictionary<string, DeviceControl>();
-            PersonControlDictionary = new Dictionary<string, PersonControl>();
+            PersonControlDictionary = new Dictionary<PairablePerson, PersonControl>();
             TrackerControlDictionary = new Dictionary<string, TrackerControl>();
 
 
@@ -188,16 +188,16 @@ namespace RoomVisualizer
 
         void personAdded(PersonManager personManager, PairablePerson pairablePerson)
         {
-            PersonControlDictionary[pairablePerson.Identifier] = new PersonControl(pairablePerson);
-            canvas.Children.Add(PersonControlDictionary[pairablePerson.Identifier]);
+            PersonControlDictionary[pairablePerson] = new PersonControl(pairablePerson);
+            canvas.Children.Add(PersonControlDictionary[pairablePerson]);
         }
 
         void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
         {
-            if (PersonControlDictionary.ContainsKey(pairablePerson.Identifier))
+            if (PersonControlDictionary.ContainsKey(pairablePerson))
             {
-                canvas.Children.Remove(PersonControlDictionary[pairablePerson.Identifier]);
-                PersonControlDictionary.Remove(pairablePerson.Identifier);
+                canvas.Children.Remove(PersonControlDictionary[pairablePerson]);
+                PersonControlDictionary.Remove(pairablePerson);
             }
         }
 
