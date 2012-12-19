@@ -13,6 +13,7 @@ namespace MSEAPI_CS
     public class MSEMultiSurface
     {
         #region Instance Variables
+
         public ArrayList recievedImageHandlers;
         public ArrayList recievedDataHandlers;
 

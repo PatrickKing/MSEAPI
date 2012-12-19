@@ -7,6 +7,7 @@ using IntAirAct;
 
 
 
+
 namespace MSEAPI_SharedNetworking
 {
     /// <summary>
@@ -15,6 +16,8 @@ namespace MSEAPI_SharedNetworking
     /// 
     public class IntermediateDevice
     {
+
+        //TODO: Since we are now returning only completed devices, we can save ourselves some headaches and make orientation, location not nullable
         public String identifier;
         public double? orientation;
         public Point? location;
@@ -35,6 +38,8 @@ namespace MSEAPI_SharedNetworking
                 }
             }
         }  
+
+
 
 
 

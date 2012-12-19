@@ -326,9 +326,6 @@ namespace MSEKinectTests
 
         #region Locator Route Tests
 
-
-
-
         [TestMethod]
         public void GetDeviceInfoTest()
         {
@@ -423,6 +420,14 @@ namespace MSEKinectTests
                 List<IntermediateDevice> ids = response.BodyAs<IntermediateDevice>();
 
 
+                IntermediateDevice intDevice = ids.Find(x => x.identifier.Equals("deviceOne"));
+                Assert.AreEqual(deviceOne.Location, intDevice.location);
+                Assert.AreEqual(deviceOne.Orientation, intDevice.orientation.Value);
+                intDevice = ids.Find(x => x.identifier.Equals("deviceTwo"));
+                Assert.AreEqual(deviceTwo.Location, intDevice.location);
+                Assert.AreEqual(deviceTwo.Orientation, intDevice.orientation.Value);
+
+
                 doneWaitingForResponse = true;
             });
 
@@ -437,10 +442,49 @@ namespace MSEKinectTests
         {
             Setup();
 
+            PairableDevice observer = new PairableDevice
+            {
+                Location = new Point(0, 0),
+                Orientation = 225,
+                Identifier = "observer",
+            };
+
+            PairableDevice nearest = new PairableDevice
+            {
+                Location = new Point(-1, -1),
+                Identifier = "nearest",
+                Orientation = 20,
+            };
+
+            PairableDevice furthest = new PairableDevice
+            {
+                Location = new Point(-2, -2),
+                Identifier = "furthest",
+                Orientation = 20,
+            };
+
+            Server.Locator.Devices.Add(observer);
+            Server.Locator.Devices.Add(furthest);
+            Server.Locator.Devices.Add(nearest);
+
             Server.Start();
             Client.Start();
             WaitForConnections();
 
+            IARequest request = new IARequest(Routes.GetNearestDeviceInViewRoute);
+            request.Parameters["identifier"] = observer.Identifier;
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
+            {
+                IntermediateDevice intDevice = response.BodyAs<IntermediateDevice>();
+                Assert.AreEqual(nearest.Identifier, intDevice.identifier);
+                Assert.AreEqual(nearest.Location, intDevice.location);
+                Assert.AreEqual(nearest.Orientation, intDevice.orientation);
+
+                doneWaitingForResponse = true;
+            });
+
+            WaitForResponse();
             Teardown();
         }
 
@@ -449,11 +493,54 @@ namespace MSEKinectTests
         public void AllDevicesInViewTest()
         {
             Setup();
+            PairableDevice observer = new PairableDevice
+            {
+                Location = new Point(0, 0),
+                Orientation = 225,
+                Identifier = "observer",
+            };
+
+            PairableDevice nearest = new PairableDevice
+            {
+                Location = new Point(-1, -1),
+                Identifier = "nearest",
+                Orientation = 20,
+            };
+
+            PairableDevice furthest = new PairableDevice
+            {
+                Location = new Point(-2, -2),
+                Identifier = "furthest",
+                Orientation = 20,
+            };
+
+            Server.Locator.Devices.Add(observer);
+            Server.Locator.Devices.Add(furthest);
+            Server.Locator.Devices.Add(nearest);
 
             Server.Start();
             Client.Start();
             WaitForConnections();
 
+            IARequest request = new IARequest(Routes.GetAllDevicesInViewRoute);
+            request.Parameters["identifier"] = observer.Identifier;
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
+            {
+                List<IntermediateDevice> intDevices = response.BodyAs<IntermediateDevice>();
+
+                IntermediateDevice intDevice = intDevices.Find(x => x.identifier == nearest.Identifier);
+                Assert.AreEqual(nearest.Location, intDevice.location);
+                Assert.AreEqual(nearest.Orientation, intDevice.orientation);
+
+                intDevice = intDevices.Find(x => x.identifier == furthest.Identifier);
+                Assert.AreEqual(furthest.Location, intDevice.location);
+                Assert.AreEqual(furthest.Orientation, intDevice.orientation);
+
+                doneWaitingForResponse = true;
+            });
+
+            WaitForResponse();
             Teardown();
         }
 
@@ -463,10 +550,50 @@ namespace MSEKinectTests
         {
             Setup();
 
+            PairableDevice observer = new PairableDevice
+            {
+                Location = new Point(10, 10),
+                Orientation = 0,
+                Identifier = "observer",
+            };
+
+            PairableDevice nearest = new PairableDevice
+            {
+                Location = new Point(0, 5),
+                Identifier = "nearest",
+                Orientation = 0,
+            };
+
+            PairableDevice furthest = new PairableDevice
+            {
+                Location = new Point(-5, 0),
+                Identifier = "furthest",
+                Orientation = 0,
+            };
+
+            Server.Locator.Devices.Add(observer);
+            Server.Locator.Devices.Add(furthest);
+            Server.Locator.Devices.Add(nearest);
+
             Server.Start();
             Client.Start();
             WaitForConnections();
 
+            IARequest request = new IARequest(Routes.GetNearestDeviceInRangeRoute);
+            request.Parameters["identifier"] = observer.Identifier;
+            request.Parameters["range"] = "100.0";
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
+            {
+                IntermediateDevice intDevice = response.BodyAs<IntermediateDevice>();
+                Assert.AreEqual(nearest.Identifier, intDevice.identifier);
+                Assert.AreEqual(nearest.Location, intDevice.location);
+                Assert.AreEqual(nearest.Orientation, intDevice.orientation);
+
+                doneWaitingForResponse = true;
+            });
+
+            WaitForResponse();
             Teardown();
         }
 
@@ -476,10 +603,67 @@ namespace MSEKinectTests
         {
             Setup();
 
+            PairableDevice observer = new PairableDevice
+            {
+                Location = new Point(10, 10),
+                Orientation = 0,
+                Identifier = "observer",
+            };
+
+            PairableDevice nearest = new PairableDevice
+            {
+                Location = new Point(0, 5),
+                Identifier = "nearest",
+                Orientation = 0,
+            };
+
+            PairableDevice furthest = new PairableDevice
+            {
+                Location = new Point(-5, 0),
+                Identifier = "furthest",
+                Orientation = 0,
+            };
+
+            PairableDevice tooFar = new PairableDevice
+            {
+                Location = new Point(100,100),
+                Identifier = "tooFar",
+                Orientation = 50,
+            };
+
+            Server.Locator.Devices.Add(observer);
+            Server.Locator.Devices.Add(furthest);
+            Server.Locator.Devices.Add(nearest);
+            Server.Locator.Devices.Add(tooFar);
+
             Server.Start();
             Client.Start();
             WaitForConnections();
 
+            IARequest request = new IARequest(Routes.GetAllDevicesInRangeRoute);
+            request.Parameters["identifier"] = observer.Identifier;
+            request.Parameters["range"] = "50.0";
+
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
+            {
+                List<IntermediateDevice> intDevices = response.BodyAs<IntermediateDevice>();
+
+                IntermediateDevice intDevice = intDevices.Find(x => x.identifier == nearest.Identifier);
+                Assert.AreEqual(nearest.Location, intDevice.location);
+                Assert.AreEqual(nearest.Orientation, intDevice.orientation);
+
+                intDevice = intDevices.Find(x => x.identifier == furthest.Identifier);
+                Assert.AreEqual(furthest.Location, intDevice.location);
+                Assert.AreEqual(furthest.Orientation, intDevice.orientation);
+
+                // The 'tooFar' device should not be returned
+                Assert.AreEqual(2, intDevices.Count);
+
+                doneWaitingForResponse = true;
+            });
+
+            WaitForResponse();
             Teardown();
         }
 

@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Windows;
 using IntAirAct;
+using MSEAPI_SharedNetworking;
 
 namespace MSEAPI_CS.Models
 {
     public class MSEDevice
     {
+        #region Properties
 
         public string Identifier
         {
@@ -40,8 +42,33 @@ namespace MSEAPI_CS.Models
             set;
         }
 
+                #endregion
+
+        #region Constructors and Converters
+
+        public MSEDevice()
+        {
+        }
+
+        public MSEDevice(IntermediateDevice intermediateDevice)
+        {
+            this.Identifier = intermediateDevice.identifier;
+            this.Orientation = intermediateDevice.orientation;
+            this.Location = intermediateDevice.location;
+        }
+
+        public static List<MSEDevice> MseDevicesFromIntermediateDevices(List<IntermediateDevice> intermediateDevices)
+        {
+            List<MSEDevice> devices = new List<MSEDevice>();
+            foreach (IntermediateDevice intermediateDevice in intermediateDevices)
+            {
+                devices.Add(new MSEDevice(intermediateDevice));
+            }
+            return devices;
+        }
 
 
+        #endregion
 
     }
 }
