@@ -6,11 +6,20 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MSEKinect;
 using IntAirAct;
 using MSEAPI_SharedNetworking;
+using System.Windows;
 
 namespace MSEKinectTests
 {
     //TODO: Find a way to factor out what's in common between this class and the MSEAPI-CS-Tests main class
 
+
+    /// <summary>
+    /// Integration tests for the network communications on MSEKinect. 
+    /// NB: Run these tests WITHOUT a Kinect attached! 
+    /// 
+    /// NB: These tests depend on the networking libraries, running them in a row can cause failures due to being set up and shut down repeatedly, apparently. 
+    /// I don't know of any good fix for this, except for re-running tests that fail until it is obivous that the failure is not timing or networking cleanup related.
+    /// </summary>
     [TestClass]
     public class CommunicationManagerTest
     {
@@ -33,8 +42,8 @@ namespace MSEKinectTests
 
         public void Setup()
         {
-            Server = new MSEKinectManager(RequireKinect: false);
             Client = IAIntAirAct.New();
+            Server = new MSEKinectManager(RequireKinect: false);
             clientConnected = false;
             serverConnected = false;
             doneWaitingForResponse = false;
@@ -68,6 +77,9 @@ namespace MSEKinectTests
 
             Client = null;
             Server = null;
+
+            // Wait a few seconds at the end of each test, to allow networking dependencies to clean up
+            System.Threading.Thread.Sleep(2000);
         }
 
         /// <summary>
@@ -80,7 +92,7 @@ namespace MSEKinectTests
             while (!(clientConnected && serverConnected))
             {
                 attempts++;
-                if (attempts > 150)
+                if (attempts > 250)
                 {
                     Assert.Fail();
                     break;
@@ -122,27 +134,58 @@ namespace MSEKinectTests
         //    Teardown();
         //}
 
+
+
+
+
         #region Pairing Route Tests
 
-
-
-
-        /// <summary>
-        /// So, as written, this test can never succeed.
-        /// IntAirAct
-        /// </summary>
         [TestMethod]
         public void SuccessfulPairingTest()
         {
             Setup();
 
-            // Setup the 'became paired' route on the client.
-            Client.Route(Routes.BecomePairedRoute, delegate(IARequest request, IAResponse response)
-            {
-                // In response to receiving 'became paired', we test some properties on the server
+            // We would like to be able to test the round trip communication, sending 'request pairing' on the client to the server, to sending
+            // 'become paired' from server to client. 
+            // But internally, tinyIOC registers things by type, so only the first instance of intairact's server adapter gets retrieved. 
+            // All routes are handled by the same IAA instance, which is obviously a problem when we have two in the system that we would like to have talk to each other.
 
+            // So, at present this part of the test cannot work
+            //Client.Route(Routes.BecomePairedRoute, delegate(IARequest request, IAResponse response)
+            //{
+            //    doneWaitingForResponse = true;
+            //});
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            // Create a person on the server, who is attempting to pair their device
+            // NB: Setting PairingAttempt on a Person begins a 3 second timer, after which their pairing state resets to NotPaired
+            // The test should always complete before then, but if mysterious failures start appearing, it could be time related
+            Server.Locator.Persons.Add(new PairablePerson()
+            {
+                Identifier = "Bob",
+                Location = new System.Windows.Point(1, 1),
+                PairingState = PairingState.PairingAttempt
+            });
+
+            // Notify the server that the client wants to be paired
+            IARequest pairingRequest = new IARequest(Routes.RequestPairingRoute);
+            pairingRequest.Origin = Client.OwnDevice;
+            pairingRequest.Parameters["identifier"] = Client.OwnDevice.Name; 
+            Client.SendRequest(pairingRequest, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
+            {
+                if (exception != null)
+                {
+                    System.Diagnostics.Debug.WriteLine(exception.Message);
+                    Assert.Fail();
+                }
+
+                // In response to the return of the request, we test some properties on the server
+                
                 // Find the mock pairable person we created, test their pairing state
-                PairablePerson person = (PairablePerson) Server.Locator.Persons.Find(x => x.Identifier.Equals("Bob"));
+                PairablePerson person = (PairablePerson)Server.Locator.Persons.Find(x => x.Identifier.Equals("Bob"));
                 Assert.AreEqual(PairingState.Paired, person.PairingState);
 
                 // Find the Client's IADevice on the server, test its pariing state
@@ -156,43 +199,291 @@ namespace MSEKinectTests
                 doneWaitingForResponse = true;
             });
 
+            WaitForResponse();
+            Teardown();
+        }
+
+        #endregion
+
+        #region Device Property Route Tests
+
+        [TestMethod]
+        public void GetOffsetAngleTest()
+        {
+            Setup();
+
+            // Create a person and device, paired and positioned
+            PairablePerson person = new PairablePerson
+            {
+                PairingState = PairingState.Paired,
+                Identifier = "Bob",
+                Location = new Point(1, 1),
+                HeldDeviceIdentifier = "myPad"
+            };
+
+            PairableDevice device = new PairableDevice
+            {
+                HeldByPersonIdentifier = "Bob",
+                Identifier = "myPad",
+                Location = new Point(1, 1),
+                PairingState = PairingState.Paired
+            };
+
+            // Position the tracker
+            Server.PersonManager.Tracker.Location = new Point(0, 2);
+            Server.PersonManager.Tracker.Orientation = 270;
+            Server.Locator.Devices.Add(device);
+            Server.Locator.Persons.Add(person);
+
             Server.Start();
             Client.Start();
             WaitForConnections();
 
-            // Create a person on the server, who is attempting to pair their device
-            // NB: Setting PairingAttempt on a person begins a 3 second timer, after which it resets to NotPaired
-            // The test should always complete before then, though
-            Server.Locator.Persons.Add(new PairablePerson()
+            IARequest request = new IARequest(Routes.GetOffsetAngleRoute);
+            request.Parameters["identifier"] = "myPad";
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
             {
-                Identifier = "Bob",
-                Location = new System.Windows.Point(1, 1),
-                PairingState = PairingState.PairingAttempt
+                double offsetOrientation = double.Parse(response.BodyAsString());
+                // The angle between the device and the tracker should be 135 degrees
+                Assert.AreEqual(135, offsetOrientation, 0.01);
             });
 
-            // Notify the server that the client wants to be paired
-            IARequest pairingRequest = new IARequest(Routes.RequestPairingRoute);
-            pairingRequest.Origin = Client.OwnDevice;
-            Client.SendRequest(pairingRequest, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
+
+            Teardown();
+        }
+
+        [TestMethod]
+        public void SetOrientationTest()
+        {
+            Setup();
+
+            // Set up a device
+            PairableDevice device = new PairableDevice
             {
-                if (exception != null)
-                {
-                    System.Diagnostics.Debug.WriteLine(exception.Message);
-                }
+                Identifier = "myPad",
+                Orientation = 20.0
+            };
+            Server.Locator.Devices.Add(device);
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            // Build a request to set the device's orientation
+            IARequest request = new IARequest(Routes.SetOrientationRoute);
+            request.Parameters["identifier"] = "myPad";
+            double newOrientation = 240.0;
+            request.SetBodyWithString(newOrientation.ToString());
+
+            // Send the request, and test
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
+            {
+                Assert.AreEqual(240.0, device.Orientation.Value, 0.01);
             });
 
-            WaitForResponse();
+
             Teardown();
         }
 
 
 
-        #endregion
 
-        #region Device Property Route Tests
+        [TestMethod]
+        public void SetLocationTest()
+        {
+            Setup();
+
+            // Set up a device
+            PairableDevice device = new PairableDevice
+            {
+                Identifier = "myPad",
+                Location = new Point(1,1)
+            };
+            Server.Locator.Devices.Add(device);
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            // Build a request to set the device's orientation
+            IARequest request = new IARequest(Routes.SetOrientationRoute);
+            request.Parameters["identifier"] = "myPad";
+            Point newLocation = new Point(2,2);
+            request.SetBodyWith(new IntermediatePoint(newLocation));
+
+            // Send the request, and test
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
+            {
+                Assert.AreEqual(newLocation, device.Location.Value);
+            });
+
+            Teardown();
+        }
+
+
         #endregion
 
         #region Locator Route Tests
+
+
+
+
+        [TestMethod]
+        public void GetDeviceInfoTest()
+        {
+            Setup();
+
+            PairableDevice deviceOne = new PairableDevice
+            {
+                Location = new Point(1,0),
+                Orientation = 90,
+                Identifier = "deviceOne",
+            };
+
+            PairableDevice deviceTwo = new PairableDevice
+            {
+                Location = new Point(-1,0),
+                Identifier = "deviceTwo",
+            };
+
+            Server.Locator.Devices.Add(deviceOne);
+            Server.Locator.Devices.Add(deviceTwo);
+
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            // Successful get device info test
+            IARequest request = new IARequest(Routes.GetDeviceInfoRoute);
+            request.Parameters["identifier"] = deviceOne.Identifier;
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
+            {
+                IntermediateDevice id = response.BodyAs<IntermediateDevice>();
+
+                Assert.AreEqual("deviceOne", id.identifier);
+                Assert.AreEqual(new Point(1, 0), id.location.Value);
+                Assert.AreEqual(90.0, id.orientation.Value, 0.01);
+
+                doneWaitingForResponse = true;
+            });
+
+            WaitForResponse();
+            doneWaitingForResponse = false;
+
+            // Unsuccessful get device info test
+            // Device two is incomplete, missing orientation, the correct server behaviour is to return http status 404
+            request = new IARequest(Routes.GetDeviceInfoRoute);
+            request.Parameters["identifier"] = deviceTwo.Identifier;
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
+            {
+                Assert.AreEqual(404, response.StatusCode);
+                doneWaitingForResponse = true;
+            });
+
+            WaitForResponse();
+
+            Teardown();
+        }
+
+
+        [TestMethod]
+        public void GetAllDeviceInfoTest()
+        {
+            Setup();
+
+            PairableDevice deviceOne = new PairableDevice
+            {
+                Location = new Point(1, 0),
+                Orientation = 90,
+                Identifier = "deviceOne",
+            };
+
+            PairableDevice deviceTwo = new PairableDevice
+            {
+                Location = new Point(-1, 0),
+                Identifier = "deviceTwo",
+                Orientation = 20,
+            };
+
+            Server.Locator.Devices.Add(deviceOne);
+            Server.Locator.Devices.Add(deviceTwo);
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            IARequest request = new IARequest(Routes.GetAllDeviceInfoRoute);
+
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
+            {
+                List<IntermediateDevice> ids = response.BodyAs<IntermediateDevice>();
+
+
+                doneWaitingForResponse = true;
+            });
+
+            WaitForResponse();
+
+            Teardown();
+        }
+
+
+        [TestMethod]
+        public void NearestDeviceInViewTest()
+        {
+            Setup();
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            Teardown();
+        }
+
+
+        [TestMethod]
+        public void AllDevicesInViewTest()
+        {
+            Setup();
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            Teardown();
+        }
+
+
+        [TestMethod]
+        public void NearestDeviceInRangeTest()
+        {
+            Setup();
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            Teardown();
+        }
+
+
+        [TestMethod]
+        public void AllDevicesWithinRangeTest()
+        {
+            Setup();
+
+            Server.Start();
+            Client.Start();
+            WaitForConnections();
+
+            Teardown();
+        }
+
+
         #endregion
 
     }

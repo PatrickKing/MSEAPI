@@ -26,7 +26,7 @@ namespace MSEKinect
             get { return _pairingState; }
             set 
             {   
-                //Pairing State is set to attempt, start timer to remove attempt after timeout
+                //Pairing State is set to attempt, start timer to remove attempt after timeou
                 if (value == PairingState.PairingAttempt)
                 {
                     pairingTimeoutTimer = new Timer(TIMEOUT_TIME);

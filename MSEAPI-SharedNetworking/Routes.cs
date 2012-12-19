@@ -11,18 +11,16 @@ namespace MSEAPI_SharedNetworking
 
     public class Routes
     {
-        //TODO: Test whether reusing routes this way is acceptable to intairact. seems to be fine. 
+        //TODO: Test whether reusing routes this way is acceptable to intairact. Seems to be fine...
 
         #region Routes Hosted by MSEAPI Server
 
         // Pairing
-        public static IARoute RequestPairingRoute = IARoute.Put("/device/pairWith");
+        public static IARoute RequestPairingRoute = IARoute.Put("/device/{identifier}/pairWith");
 
-        // Orientation
+        // Orientation and Location
         public static IARoute SetOrientationRoute = IARoute.Put("/devices/{identifier}/orientation");
         public static IARoute GetOffsetAngleRoute = IARoute.Get("/device/{identifier}/offsetAngle");
-
-        // Updates to Device
         public static IARoute SetLocationRoute = IARoute.Put("/device/{identifier}/location");
 
         // Locator
@@ -32,7 +30,6 @@ namespace MSEAPI_SharedNetworking
         public static IARoute GetAllDevicesInViewRoute = IARoute.Get("/devices/view/{identifier}");
         public static IARoute GetNearestDeviceInRangeRoute = IARoute.Get("/device/range/{identifier}/{range}");
         public static IARoute GetAllDevicesInRangeRoute = IARoute.Get("/devices/range/{identifier}/{range}");
-
 
         #endregion
 

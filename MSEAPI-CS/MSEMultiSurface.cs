@@ -74,9 +74,7 @@ namespace MSEAPI_CS
             //Setup IntAirAct
             this.intAirAct = IAIntAirAct.New();
 
-#if DEBUG
             this.IntAirAct.Port = 12345;
-#endif
 
             //Setup Pairing Recognizer
 

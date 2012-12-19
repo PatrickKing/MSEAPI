@@ -61,7 +61,7 @@ namespace MSEKinect
         #region Pairing
         void UpdateDevicePairingState(IARequest request, IAResponse response)
         {
-            pairingRecognizer.DevicePairAttempt(request.Origin.Name);
+            pairingRecognizer.DevicePairAttempt(request.Parameters["identifier"]);
         }
         #endregion
 
@@ -69,7 +69,7 @@ namespace MSEKinect
 
         void GetOffsetAngle(IARequest request, IAResponse response)
         {
-            // Find the observing device
+            // Find the device
             String deviceIdentifier = request.Parameters["identifier"];
             Device requestingDevice = locator.Devices.Find(d => d.Identifier == deviceIdentifier);
 
@@ -79,27 +79,22 @@ namespace MSEKinect
                 response.StatusCode = 404; // not found
                 return;
             }
-            // Device Exists
+
+            if (requestingDevice.Location.HasValue && personManager.Tracker.Location.HasValue)
+            {
+                Point requestingDeviceLocation = requestingDevice.Location.Value;
+                Point offsetLocation = personManager.Tracker.Location.Value;
+
+                double angle = Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation);
+                response.SetBodyWith(angle);
+            }
             else
             {
-                if (requestingDevice.Location.HasValue && personManager.Tracker.Location.HasValue)
-                {
-                    // TODO use the paired person's location, and calculate the angle more precisely.
-                    //Point requestingDeviceLocation = requestingDevice.Location.Value;
-                    //Point offsetLocation = personManager.Tracker.Location.Value;
-
-                    //double angle = Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation);
-                    //response.SetBodyWith(angle);
-                }
-                else
-                {
-                    // Device doesn't have location 
-                    response.StatusCode = 400;
-                }
-
-                // When the device requests the offset angle, it is facing the tracker, so its orientation is approximately turned around by 180 degrees
-                response.SetBodyWith(Util.NormalizeAngle(personManager.Tracker.Orientation.Value - 180));
+                // Device doesn't have location 
+                response.StatusCode = 400;
             }
+
+        
         }
 
 
@@ -114,7 +109,6 @@ namespace MSEKinect
             string result = request.BodyAsString();
             //TODO: Handle parse failure gracefully 
             float newOrientation = float.Parse(result);
-            Console.WriteLine(newOrientation);
 
             String name = request.Parameters["identifier"];
             Device localDevice = locator.Devices.Find(d => d.Identifier.Equals(name));
