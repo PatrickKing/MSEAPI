@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Kinect;
 using System.Diagnostics;
+using System.Timers;
 using IntAirAct;
 using MSEGestureRecognizer;
 using MSELocator;
@@ -17,6 +18,16 @@ namespace MSEKinect
     public class PersonManager
     {
 
+        #region Constants
+        // Distance in meters on either side on both axis that if a new skeleton appears in this area and a device has been unpaired within the timer, it'll automatically pair this skeleton/device
+        const double SAVINGDISTANCE = 0.25;
+
+
+
+        #endregion
+
+
+
         #region Instance Variables
 
         private static TraceSource logger = new TraceSource("MSEKinect");
@@ -24,7 +35,7 @@ namespace MSEKinect
         GestureController gestureController;
         LocatorInterface locator;
         IAIntAirAct intAirAct;
-        
+
         Tracker tracker;
         public Tracker Tracker 
         { 
@@ -153,11 +164,17 @@ namespace MSEKinect
 
         private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
         {
-            // PairablePersons and Skeletons now contain only corresponding elements.
+            // PairablePersons and Skeletons now contain only corresponding elements, except for people who are occluded, they don't have a matching skeleton
             // Update each Person
-            foreach (Skeleton skeleton in skeletons)
+            foreach (PairablePerson person in pairablePersons)
             {
-                PairablePerson person = pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString()));
+                // If the person is occluded, we don't have a skeleton to use for position updates right now
+                if (person.PairingState == PairingState.PairedButOccluded)
+                {
+                    continue;
+                }
+
+                Skeleton skeleton = skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier));
 
                 // The Kinect looks down the Z axis in its coordinate space, left right movement happens on the X axis, and vertical movement on the Y axis
                 // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
@@ -188,27 +205,41 @@ namespace MSEKinect
                     //Remove Held-By-Person Identifier
                     PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
 
-                    if (device != null)
+                    // If the person was not paired to a device, we can remove them immediately
+                    if (device == null)
                     {
-                        device.HeldByPersonIdentifier = null;
-                        device.PairingState = PairingState.NotPaired;
+                        RemovePerson(vanishedPersons, person);
 
-                        // Dispatch a message to the device
-                        IARequest request = new IARequest(Routes.BecomeUnpairedRoute);
-                        // Find the IntAirAct device matching the current device.
-                        IADevice iaDevice = intAirAct.Devices.Find( d => d.Name == device.Identifier);
-                        intAirAct.SendRequest(request, iaDevice);
-                        System.Diagnostics.Debug.WriteLine(iaDevice.Name + " " + iaDevice.Host);
+                    }
+                    // If the person was paired, then we allow a grace period for them to reappear, to avoid immediately unpairing them
+                    else
+                    {
+
+
+                        if (person.PairingState == PairingState.Paired)
+                        {
+                            person.PairingState = PairingState.PairedButOccluded;
+                            person.Identifier = null;
+                        }
+                        // The person will remain with PairingState == PairedButOccluded for a few seconds, after which it will mark itself NotPaired
+                        // If this happens, we remove the person for good, and unpair their device
+                        else if (person.PairingState == PairingState.NotPaired)
+                        {
+                            device.HeldByPersonIdentifier = null;
+                            device.PairingState = PairingState.NotPaired;
+
+                            // Dispatch a message to the device
+                            IARequest request = new IARequest(Routes.BecomeUnpairedRoute);
+                            // Find the IntAirAct device matching the current device.
+                            IADevice iaDevice = intAirAct.Devices.Find(d => d.Name == device.Identifier);
+                            intAirAct.SendRequest(request, iaDevice);
+                            System.Diagnostics.Debug.WriteLine(iaDevice.Name + " " + iaDevice.Host);
+
+                            RemovePerson(vanishedPersons, person);
+                        }
 
                     }
 
-                    //Remove Held-Device Identifier
-                    person.HeldDeviceIdentifier = null;
-
-                    vanishedPersons.Add(person);
-
-                    if (PersonRemoved != null)
-                        PersonRemoved(this, person);
                 }
             }
             foreach (PairablePerson person in vanishedPersons)
@@ -217,13 +248,54 @@ namespace MSEKinect
             }
         }
 
+        private void RemovePerson(List<PairablePerson> vanishedPersons, PairablePerson person)
+        {
+            //Remove Held-Device Identifier
+            person.HeldDeviceIdentifier = null;
+            vanishedPersons.Add(person);
+            if (PersonRemoved != null)
+                PersonRemoved(this, person);
+        }
+
+
         private void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons)
         {
-            // For any skeletons that have just appeared, create a new PairablePerson
+            // First, test each new skeleton to see if it matches an occluded person
             foreach (Skeleton skeleton in skeletons)
             {
                 //New Skeleton Found
-                if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
+                //if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
+                if (pairablePersons.Find(x => skeleton.TrackingId.ToString().Equals(x.Identifier)) == null)
+                {
+                    foreach (PairablePerson pairablePerson in pairablePersons)
+                    {
+                        if (pairablePerson.PairingState == PairingState.PairedButOccluded)
+                        {
+                            Point skeletonInRoomSpace = Tracker.ConvertSkeletonToRoomSpace(new Vector(skeleton.Position.Z, skeleton.Position.X));
+
+                            if (skeletonInRoomSpace.X < (pairablePerson.Location.Value.X + SAVINGDISTANCE) &&
+                                skeletonInRoomSpace.X > (pairablePerson.Location.Value.X - SAVINGDISTANCE) &&
+                                skeletonInRoomSpace.Y < (pairablePerson.Location.Value.Y + SAVINGDISTANCE) &&
+                                skeletonInRoomSpace.Y > (pairablePerson.Location.Value.Y - SAVINGDISTANCE))
+                            {
+                                // "Repair them"
+                                pairablePerson.Identifier = skeleton.TrackingId.ToString();
+                                pairablePerson.PairingState = PairingState.Paired;
+
+                                PairableDevice device = (PairableDevice)locator.Devices.Find(x => x.Identifier == pairablePerson.HeldDeviceIdentifier);
+                                device.HeldByPersonIdentifier = pairablePerson.Identifier;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // For any skeletons that weren't matched to an occluded person, we create a new PairablePerson
+            foreach (Skeleton skeleton in skeletons)
+            {
+                //New Skeleton Found
+                //if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
+                if (pairablePersons.Find(x => skeleton.TrackingId.ToString().Equals(x.Identifier)) == null)
                 {
                     PairablePerson person = new PairablePerson
                     {
