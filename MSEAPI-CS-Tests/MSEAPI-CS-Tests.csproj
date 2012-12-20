@@ -64,6 +64,14 @@
       <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
       <Name>MSEAPI-SharedNetworking</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MSEKinect\MSEKinect.csproj">
+      <Project>{880AD678-2C20-423E-B5B8-55AB3933B192}</Project>
+      <Name>MSEKinect</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MSELocator\MSELocator.csproj">
+      <Project>{6D59A7FD-6F0C-484F-A4F0-3B81DEA34024}</Project>
+      <Name>MSELocator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

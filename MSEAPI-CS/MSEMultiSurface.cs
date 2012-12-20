@@ -53,10 +53,12 @@ namespace MSEAPI_CS
         #endregion
 
         #region Delegates
+
         public delegate void MSESingleDeviceHandler(MSEDevice device);
         public delegate void MSEDeviceCollectionHandler(List<MSEDevice> devices);
         public delegate void MSEErrorHandler(Exception error);
         public delegate void MSESuccessHandler();
+        
         #endregion
 
         #region Constructor, Start and Stop
@@ -75,37 +77,19 @@ namespace MSEAPI_CS
             //Setup IntAirAct
             this.intAirAct = IAIntAirAct.New();
 
-            this.IntAirAct.Port = 12345;
-
-            //Setup Pairing Recognizer
-
-
-
-
-            //Setup Locator
-
-
-
-
 
             //Setup MSE Standard Routes
             //this.setupRoutes();
-            //this.setupGestureHandlers();
-
+            
         }
 
         public void Start()
         {
-            if (this.isRunning)
-            {
-                return;
-            }
-            else
+            if (!this.isRunning)
             {
                 this.intAirAct.Start();
                 this.isRunning = true;
             }
-
         }
 
         /// <summary>
@@ -122,7 +106,7 @@ namespace MSEAPI_CS
 
         #endregion
 
-        #region Data, Image and Object route handling
+        #region Data, Image and Dictionary route handling
 
         public void setupRoutes()
         {
@@ -176,10 +160,12 @@ namespace MSEAPI_CS
         }
         #endregion
 
+        #region Server Updates
 
-
+        
         /// <summary>
-        /// Notify the server of the device's current Location
+        /// Notify the server of the device's current Location. Intended for use with stationary devices, since mobile devices can't
+        /// determine their own location in the room.
         /// </summary>
         /// <param name="device">The Identifier and Location properties of this MSEDeice will be used for the update.</param>
         /// <param name="success"></param>
@@ -213,6 +199,36 @@ namespace MSEAPI_CS
 
         }
 
+        public void UpdateDeviceOrientation(MSEDevice device, MSESuccessHandler success, MSEErrorHandler failure)
+        {
+            IARequest request = new IARequest(Routes.SetOrientationRoute);
+            request.SetBodyWithString(device.Orientation.Value.ToString());
+            request.Parameters["identifier"] = device.Identifier;
+
+            IEnumerable devicesSupportingRoutes = this.intAirAct.DevicesSupportingRoute(Routes.SetOrientationRoute);
+            foreach (IADevice iaDevice in devicesSupportingRoutes)
+            {
+                this.intAirAct.SendRequest(request, iaDevice, delegate(IAResponse response, Exception exception)
+                {
+                    if (exception != null)
+                    {
+                        failure(exception);
+                        return;
+                    }
+                    else
+                    {
+                        success();
+                    }
+                });
+
+                break;
+            }
+        }
+
+
+
+        #endregion
+
 
         #region Locator route handling
 
@@ -221,9 +237,9 @@ namespace MSEAPI_CS
             IARequest deviceRequest = new IARequest(Routes.GetDeviceInfoRoute);
             deviceRequest.Parameters["identifier"] = device.Identifier;
 
-            IEnumerable devicesSupportingRoutes = this.intAirAct.DevicesSupportingRoute(Routes.GetDeviceInfoRoute);
+            IEnumerable devicesSupportingRoute = this.intAirAct.DevicesSupportingRoute(Routes.GetDeviceInfoRoute);
 
-            foreach (IADevice iaDevice in devicesSupportingRoutes)
+            foreach (IADevice iaDevice in devicesSupportingRoute)
             {
                 this.intAirAct.SendRequest(deviceRequest, iaDevice, delegate(IAResponse response, Exception exception) {
 
