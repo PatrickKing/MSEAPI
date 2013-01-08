@@ -42,6 +42,8 @@ namespace MSEAPI_SharedNetworking
         // Inter-device communication
         public static IARoute ImageRoute = IARoute.Post("/image/{imagename}");
         public static IARoute DataRoute = IARoute.Post("/data");
+        public static IARoute DictionaryRoute = IARoute.Post("/dictionary/{dictionarytype}");
+
 
         //NB: For each object type, we define a unique route using this string as the base
         //ie: IARoute.Post(ObjectRouteString + "mytype");

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics;
+using System.Drawing;
 using System.Collections;
 using MSEAPI_SharedNetworking;
 using MSEAPI_CS.Models;
@@ -14,8 +15,9 @@ namespace MSEAPI_CS
     {
         #region Instance Variables
 
-        public ArrayList recievedImageHandlers;
-        public ArrayList recievedDataHandlers;
+        public List<MSEReceivedImageHandler> receivedImageHandlers;
+        //public List<MSEReceivedDataHandler> receivedDataHandlers;
+        public List<MSEReceivedDictionaryHandler> receivedDictionaryHandlers;
 
         public bool isRunning;
 
@@ -58,6 +60,10 @@ namespace MSEAPI_CS
         public delegate void MSEDeviceCollectionHandler(List<MSEDevice> devices);
         public delegate void MSEErrorHandler(Exception error);
         public delegate void MSESuccessHandler();
+
+        public delegate void MSEReceivedImageHandler(Image image, String imageName, MSEDevice originDevice, MSEGesture originGesture);
+        //public delegate void MSEReceivedDataHandler(Data data, MSEDevice originDevice, MSEGesture originGesture);
+        public delegate void MSEReceivedDictionaryHandler(Dictionary<string, string> dictionary, String dictionaryType, MSEDevice originDevice, MSEGesture originGesture);
         
         #endregion
 
@@ -71,7 +77,9 @@ namespace MSEAPI_CS
             this.isRunning = false;
 
             //Initialize Our Arrays of Handlers
-            //this.recievedImageHandlers
+            this.receivedImageHandlers = new List<MSEReceivedImageHandler>();
+            //this.receivedDataHandlers = new List<MSEReceivedDataHandler>();
+            this.receivedDictionaryHandlers = new List<MSEReceivedDictionaryHandler>();
 
 
             //Setup IntAirAct
@@ -113,6 +121,7 @@ namespace MSEAPI_CS
             //Setup Received Data Handlers
             this.setupDataRoute();
             this.setupImageRoute();
+            this.setupDictionaryRoute();
         }
 
 
@@ -158,11 +167,66 @@ namespace MSEAPI_CS
 
             });
         }
+
+        public void setupDictionaryRoute()
+        {
+            this.IntAirAct.Route(Routes.DictionaryRoute, delegate(IARequest request, IAResponse response)
+            {
+                //Retrieve the dictionary data
+                String dictionaryType = request.Parameters["dictionarytype"];
+                Dictionary<string, string> dictionary = request.BodyAs<Dictionary<string, string>>();
+
+                //Retrieve Device from Request
+                MSEDevice originDevice = new MSEDevice();
+                originDevice.Identifier = request.Origin.Name;
+                originDevice.setupNetworkDevice(this.IntAirAct);
+
+                //It's possible for a device to post a message and then immediately become disconnected, if this happens we warn and do not provide the device to the handlers
+                if (originDevice.NetworkDevice == null)
+                {
+                    logger.TraceEvent(TraceEventType.Error, 0, "MSE Error - A device (" + request.Origin.Name +") has sent a dictionary but is not now visible to MSE");
+                    originDevice = null;
+                }
+
+                //Run Handlers
+                foreach (MSEReceivedDictionaryHandler handler in receivedDictionaryHandlers)
+                {
+                    handler(dictionary, dictionaryType, originDevice, null);
+                }
+
+            });
+
+        }
         #endregion
+
+        #region Add Handler Methods
+
+        public void addReceivedImageHandler(MSEReceivedImageHandler handler)
+        {
+            this.receivedImageHandlers.Add(handler);
+        }
+
+ /*       public void addReceivedDataHandler(MSEReceivedDataHandler handler)
+        {
+            this.receivedDataHandlers.Add(handler);
+        }*/
+
+        public void addReceivedDictionaryHandler(MSEReceivedDictionaryHandler handler)
+        {
+            this.receivedDictionaryHandlers.Add(handler);
+        }
+
+        #endregion
+
+        #region Sending Messages
+      //  public void sendImage(Image image, String name, MSEDevice targetDevice,
+
+        #endregion
+
 
         #region Server Updates
 
-        
+
         /// <summary>
         /// Notify the server of the device's current Location. Intended for use with stationary devices, since mobile devices can't
         /// determine their own location in the room.

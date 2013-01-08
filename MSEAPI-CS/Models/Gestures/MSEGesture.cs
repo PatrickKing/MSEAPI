@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MSEAPI_CS
 {
-    class MSEGesture
+    public class MSEGesture
     {
     }
 }

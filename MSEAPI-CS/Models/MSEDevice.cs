@@ -70,5 +70,15 @@ namespace MSEAPI_CS.Models
 
         #endregion
 
+        public bool setupNetworkDevice(IAIntAirAct ia)
+        {
+            IADevice potentialNetworkDevice = ia.DeviceWithName(this.Identifier);
+
+            if (potentialNetworkDevice == null)
+                return false;
+
+            this.NetworkDevice = potentialNetworkDevice;
+            return true;
+        }
     }
 }
