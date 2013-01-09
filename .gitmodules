@@ -1,3 +1,6 @@
 [submodule "IntAirActCS"]
 	path = IntAirActCS
 	url = https://github.com/ase-lab/IntAirActCS.git
+[submodule "MSEAPI-CS-SharedNetworking"]
+	path = MSEAPI-CS-SharedNetworking
+	url = https://github.com/ase-lab/MSEAPI-CS-SharedNetworking.git
