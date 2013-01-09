@@ -51,6 +51,12 @@
     <Compile Include="Tracker.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MSEAPI-CS-SharedNetworking\MSEAPI-SharedNetworking\MSEAPI-SharedNetworking.csproj">
+      <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
+      <Name>MSEAPI-SharedNetworking</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

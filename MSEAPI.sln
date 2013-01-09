@@ -31,9 +31,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-CS", "MSEAPI-CS\MSEA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-CS-Client", "MSEAPI-CS-Client\MSEAPI-CS-Client.csproj", "{97D8AB71-E9C6-4D82-8C7E-420BEF9CF3EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-SharedNetworking", "MSEAPI-SharedNetworking\MSEAPI-SharedNetworking.csproj", "{09505CBD-76EE-43EE-9390-BB90EFF36E45}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-CS-Tests", "MSEAPI-CS-Tests\MSEAPI-CS-Tests.csproj", "{1154C77B-24C0-458E-9FEA-C5B86428CE0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-SharedNetworking", "MSEAPI-CS-SharedNetworking\MSEAPI-SharedNetworking\MSEAPI-SharedNetworking.csproj", "{09505CBD-76EE-43EE-9390-BB90EFF36E45}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
@@ -168,16 +168,6 @@ Global
 		{97D8AB71-E9C6-4D82-8C7E-420BEF9CF3EB}.Release|Mixed Platforms.Build.0 = Release|x86
 		{97D8AB71-E9C6-4D82-8C7E-420BEF9CF3EB}.Release|x86.ActiveCfg = Release|x86
 		{97D8AB71-E9C6-4D82-8C7E-420BEF9CF3EB}.Release|x86.Build.0 = Release|x86
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Any CPU.Build.0 = Release|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|x86.ActiveCfg = Release|Any CPU
 		{1154C77B-24C0-458E-9FEA-C5B86428CE0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1154C77B-24C0-458E-9FEA-C5B86428CE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1154C77B-24C0-458E-9FEA-C5B86428CE0E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -188,6 +178,16 @@ Global
 		{1154C77B-24C0-458E-9FEA-C5B86428CE0E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{1154C77B-24C0-458E-9FEA-C5B86428CE0E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{1154C77B-24C0-458E-9FEA-C5B86428CE0E}.Release|x86.ActiveCfg = Release|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
