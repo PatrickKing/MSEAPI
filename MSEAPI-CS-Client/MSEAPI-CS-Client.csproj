@@ -101,10 +101,6 @@
       <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
       <Name>MSEAPI-SharedNetworking</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MSEAPI-CS\MSEAPI-CS.csproj">
-      <Project>{E5292769-7735-41E5-81B2-FC1389BC6BCF}</Project>
-      <Name>MSEAPI-CS</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

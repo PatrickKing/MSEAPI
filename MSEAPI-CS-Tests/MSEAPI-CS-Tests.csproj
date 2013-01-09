@@ -60,10 +60,6 @@
       <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
       <Name>MSEAPI-SharedNetworking</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MSEAPI-CS\MSEAPI-CS.csproj">
-      <Project>{E5292769-7735-41E5-81B2-FC1389BC6BCF}</Project>
-      <Name>MSEAPI-CS</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MSEKinect\MSEKinect.csproj">
       <Project>{880AD678-2C20-423E-B5B8-55AB3933B192}</Project>
       <Name>MSEKinect</Name>
