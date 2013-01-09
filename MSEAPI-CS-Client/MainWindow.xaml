@@ -1,9 +1,0 @@
-﻿<Window x:Class="MSEAPI_CS_Client.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525" Loaded="WindowLoaded">
-    <Canvas>
-        <Button Content="Get Device Info" Click="GetDeviceInfoClick" Canvas.Left="12" Canvas.Top="12"></Button>
-        <TextBlock Canvas.Left="241" Canvas.Top="15" Height="284" Width="250" Name="OutputTextBlock"></TextBlock>     
-    </Canvas>
-</Window>
