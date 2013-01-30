@@ -126,7 +126,8 @@ namespace MSEKinect
 
         public void UpdateDeviceLocation(IARequest request, IAResponse response)
         {
-            Point result = request.BodyAs<IntermediatePoint>();
+            IntermediatePoint intermediatePoint = request.BodyAs<IntermediatePoint>();
+            Point result = intermediatePoint.ToPoint();
 
             String name = request.Parameters["identifier"];
             Device localDevice = locator.Devices.Find(d => d.Identifier.Equals(name));

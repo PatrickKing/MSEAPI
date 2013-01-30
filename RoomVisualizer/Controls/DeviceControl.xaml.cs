@@ -164,21 +164,23 @@ namespace RoomVisualizer
         public void onLocationChanged(Device device)
         {
             PairableDevice pairableDevice = (PairableDevice)device;
-            if (pairableDevice.PairingState == PairingState.Paired)
+
+            //Dispatch UI Changes to Main Thread
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (pairableDevice.Location.HasValue)
                 {
                     Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(pairableDevice.Location.Value, MainWindow.SharedCanvas);
 
+                    MainWindow.SharedDeviceStackPanel.Children.Remove(this);
+                    formatForCanvas();
+                    MainWindow.SharedCanvas.Children.Add(this);
+
                     // InnerBorder.Width / 2 is to make it so that the point that the DeviceControl is drawn at is actually the center of the Border
                     Canvas.SetLeft(this, newPoint.X - (InnerBorder.Width / 2));
                     Canvas.SetTop(this, newPoint.Y - (InnerBorder.Height / 2));
                 }
-            }
-            else 
-            {
- 
-            }
+            }));
 
         }
 
