@@ -172,9 +172,12 @@ namespace RoomVisualizer
                 {
                     Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(pairableDevice.Location.Value, MainWindow.SharedCanvas);
 
-                    MainWindow.SharedDeviceStackPanel.Children.Remove(this);
-                    formatForCanvas();
-                    MainWindow.SharedCanvas.Children.Add(this);
+                    if (!(pairableDevice.PairingState == PairingState.Paired))
+                    {
+                        MainWindow.SharedDeviceStackPanel.Children.Remove(this);
+                        formatForCanvas();
+                        MainWindow.SharedCanvas.Children.Add(this);
+                    }
 
                     // InnerBorder.Width / 2 is to make it so that the point that the DeviceControl is drawn at is actually the center of the Border
                     Canvas.SetLeft(this, newPoint.X - (InnerBorder.Width / 2));
