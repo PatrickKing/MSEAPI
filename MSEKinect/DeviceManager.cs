@@ -5,7 +5,8 @@ using System.Text;
 using IntAirAct;
 using System.Diagnostics;
 using MSELocator;
-
+using System.Windows;
+using MSEAPI_SharedNetworking;
 
 namespace MSEKinect
 {
@@ -63,6 +64,38 @@ namespace MSEKinect
 				Identifier = iaDevice.Name,
 				PairingState = PairingState.NotPaired
 			};
+
+            if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            {
+                IARequest request = new IARequest(Routes.GetLocationRoute);
+                IntAirAct.SendRequest(request, iaDevice, delegate(IAResponse response, Exception error)
+                {
+                    if (response.StatusCode == 404)
+                    {
+                        // Device has no location
+
+                    }
+                    else if (response.StatusCode == 200)
+                    {
+                        IntermediatePoint intermediatePoint = response.BodyAs<IntermediatePoint>();
+                        Point result = intermediatePoint.ToPoint();
+
+                        Device localDevice = locator.Devices.Find(d => d.Identifier.Equals(iaDevice.Name));
+
+                        if (localDevice != null)
+                        {
+                            localDevice.Location = result;
+                            response.StatusCode = 201; // created
+                        }
+                        else
+                        {
+                            response.StatusCode = 404; // not found
+                        }
+
+                    }
+                });
+            }
+
 			locator.Devices.Add(pairableDevice);
 			
 			if (DeviceAdded != null)

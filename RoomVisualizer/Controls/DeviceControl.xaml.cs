@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 
 using MSEKinect;
 using MSELocator;
+using MSEAPI_SharedNetworking;
+using IntAirAct;
 
 namespace RoomVisualizer
 {
@@ -26,7 +28,11 @@ namespace RoomVisualizer
         {
             UnpairedAndOnStackPanel,
             PairedAndOnCanvas,
+            UnlocatedAndOnStackPanel,
+            LocatedAndOnStackPanel
         }
+
+        private IADevice iaDevice;
 
         // DeviceControl can be displayed on the room visualizer canvas, or the stack panel of unpaired devices.
         private DisplayState myDisplayState;
@@ -42,9 +48,7 @@ namespace RoomVisualizer
                 {
                     //Handle transition to display on Canvas
                     MainWindow.SharedDeviceStackPanel.Children.Remove(this);
-
                     formatForCanvas();
-
                     MainWindow.SharedCanvas.Children.Add(this);
 
                 }
@@ -52,10 +56,23 @@ namespace RoomVisualizer
                 {
                     //Handle transition to display on StackPanel
                     MainWindow.SharedCanvas.Children.Remove(this);
-
                     formatForStackPanel();
-
                     MainWindow.SharedDeviceStackPanel.Children.Add(this);
+                }
+                else if (value == DisplayState.UnlocatedAndOnStackPanel && myDisplayState == DisplayState.LocatedAndOnStackPanel)
+                {
+                    //Handle transition to display on StackPanel
+                    MainWindow.SharedCanvas.Children.Remove(this);
+                    formatForStackPanel();
+                    MainWindow.SurfaceWrapPanel.Children.Add(this);
+
+                }
+                else if (value == DisplayState.LocatedAndOnStackPanel && myDisplayState == DisplayState.UnlocatedAndOnStackPanel)
+                {
+                    //Handle transition to display on Canvas
+                    MainWindow.SurfaceWrapPanel.Children.Remove(this);
+                    formatForCanvas();
+                    MainWindow.SharedCanvas.Children.Add(this);
                 }
 
                 myDisplayState = value;
@@ -67,6 +84,8 @@ namespace RoomVisualizer
             double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
             InnerBorder.Width = Math.Ceiling(deviceSize);
             InnerBorder.Height = Math.Ceiling(deviceSize);
+
+            InnerBorder.BorderBrush = DrawingResources.pairedBrush;
 
             Canvas.SetLeft(DeviceNameLabel, -35);
             Canvas.SetTop(DeviceNameLabel, -65);
@@ -103,9 +122,11 @@ namespace RoomVisualizer
             RightLine.Visibility = System.Windows.Visibility.Hidden;
         }
 
-        public DeviceControl(PairableDevice pairableDevice)
+        public DeviceControl(PairableDevice pairableDevice, IADevice iaDevice)
         {
             InitializeComponent();
+
+            this.iaDevice = iaDevice;
 
             //Setup Events
             pairableDevice.LocationChanged += onLocationChanged;
@@ -115,12 +136,20 @@ namespace RoomVisualizer
             LeftLine.StrokeThickness = DrawingResources.DEVICE_FOV_WIDTH;
             RightLine.StrokeThickness = DrawingResources.DEVICE_FOV_WIDTH;
 
-
-
             //Setup Display
             DeviceNameLabel.Text = pairableDevice.Identifier;
             InnerBorder.BorderBrush = DrawingResources.unpairedBrush;
-            MyDisplayState = DisplayState.UnpairedAndOnStackPanel;
+
+            // If it supports this route, then we know it's a surface
+            if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            {
+                MyDisplayState = DisplayState.UnlocatedAndOnStackPanel;
+            }
+            // Likewise, if it supports this route, we know it's a pairable device
+            else if (iaDevice.SupportedRoutes.Contains(Routes.BecomePairedRoute))
+            {
+                MyDisplayState = DisplayState.UnpairedAndOnStackPanel;
+            }
 
             formatForStackPanel();
 
@@ -170,14 +199,12 @@ namespace RoomVisualizer
             {
                 if (pairableDevice.Location.HasValue)
                 {
-                    Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(pairableDevice.Location.Value, MainWindow.SharedCanvas);
-
-                    if (!(pairableDevice.PairingState == PairingState.Paired))
+                    if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
                     {
-                        MainWindow.SharedDeviceStackPanel.Children.Remove(this);
-                        formatForCanvas();
-                        MainWindow.SharedCanvas.Children.Add(this);
+                        MyDisplayState = DisplayState.LocatedAndOnStackPanel;
                     }
+
+                    Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(pairableDevice.Location.Value, MainWindow.SharedCanvas);
 
                     // InnerBorder.Width / 2 is to make it so that the point that the DeviceControl is drawn at is actually the center of the Border
                     Canvas.SetLeft(this, newPoint.X - (InnerBorder.Width / 2));

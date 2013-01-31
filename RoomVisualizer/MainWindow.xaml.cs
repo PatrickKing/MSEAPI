@@ -14,7 +14,7 @@ using System.Windows.Shapes;
 using System.Timers;
 using System.Windows.Threading;
 using IntAirAct;
-
+using MSEAPI_SharedNetworking;
 using MSEKinect;
 using MSELocator;
 
@@ -35,12 +35,17 @@ namespace RoomVisualizer
         }
         private static Canvas sharedCanvas;
 
-
         public static WrapPanel SharedDeviceStackPanel
         {
             get { return sharedWrapPanel; }
         }
         private static WrapPanel sharedWrapPanel;
+
+        public static WrapPanel SurfaceWrapPanel
+        {
+            get { return surfaceWrapPanel; }
+        }
+        private static WrapPanel surfaceWrapPanel;
 
         #region Instance Variables
 
@@ -86,6 +91,7 @@ namespace RoomVisualizer
             InitializeComponent();
             sharedCanvas = canvas;
             sharedWrapPanel = unpairedDeviceStackPanel;
+            surfaceWrapPanel = surfaceStackPanel;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -154,31 +160,33 @@ namespace RoomVisualizer
             // Finds the matching IADevice from the pairableDevice Identifier
             IADevice iaDevice = deviceManager.IntAirAct.Devices.Find(d => d.Name.Equals(pairableDevice.Identifier));
 
-            // Iterate over all supported routes
-            foreach (IARoute route in iaDevice.SupportedRoutes)
+            if (iaDevice.SupportedRoutes.Contains(Routes.BecomePairedRoute))
             {
-                // If the device has the route with resource "/pairingState/paired", then we know it is a device running the MSEAPI Client, so we'll add it to the unpaired device list
-                if (route.Resource.Equals("/pairingState/paired") && route.Action.Equals("PUT"))
+                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        DeviceControlDictionary[pairableDevice.Identifier] = new DeviceControl(pairableDevice);
-                        unpairedDeviceStackPanel.Children.Add(DeviceControlDictionary[pairableDevice.Identifier]);
-                    }));
-                    break;
-                }
+                    DeviceControlDictionary[pairableDevice.Identifier] = new DeviceControl(pairableDevice, iaDevice);
+                    unpairedDeviceStackPanel.Children.Add(DeviceControlDictionary[pairableDevice.Identifier]);
+                }));
+            }
+            else if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            {
+                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    DeviceControlDictionary[pairableDevice.Identifier] = new DeviceControl(pairableDevice, iaDevice);
+                    surfaceStackPanel.Children.Add(DeviceControlDictionary[pairableDevice.Identifier]);
+                }));
             }
         }
 
         void deviceRemoved(DeviceManager deviceManager, PairableDevice pairableDevice)
         {
-
             Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             {
                 if (DeviceControlDictionary.ContainsKey(pairableDevice.Identifier))
                 {
                     canvas.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
                     unpairedDeviceStackPanel.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
+                    surfaceStackPanel.Children.Remove(DeviceControlDictionary[pairableDevice.Identifier]);
 
                     DeviceControlDictionary.Remove(pairableDevice.Identifier);
                 }
