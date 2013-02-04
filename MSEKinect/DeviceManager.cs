@@ -70,7 +70,7 @@ namespace MSEKinect
                 IARequest request = new IARequest(Routes.GetLocationRoute);
                 IntAirAct.SendRequest(request, iaDevice, delegate(IAResponse response, Exception error)
                 {
-                    if (response.StatusCode == 404)
+                    if (response == null || response.StatusCode == 404)
                     {
                         // Device has no location
 
