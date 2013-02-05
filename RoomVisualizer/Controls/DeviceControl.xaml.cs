@@ -33,7 +33,17 @@ namespace RoomVisualizer
         }
 
         private IADevice iaDevice;
+        public IADevice IADevice
+        {
+            get { return iaDevice; }
+        }
+
         private PairableDevice pairableDevice;
+        public PairableDevice PairableDevice
+        {
+            get { return pairableDevice; }
+        }
+
 
         // DeviceControl can be displayed on the room visualizer canvas, or the stack panel of unpaired devices.
         private DisplayState myDisplayState;
@@ -194,8 +204,7 @@ namespace RoomVisualizer
             {
                 // Drag event started on a device supporting setting location
                 DataObject data = new DataObject();
-                data.SetData("pairableDevice", this.pairableDevice);
-                data.SetData("iaDevice", this.iaDevice);
+                data.SetData("deviceControl", this);
 
                 DragDrop.DoDragDrop(this, data, DragDropEffects.Move);            
             }

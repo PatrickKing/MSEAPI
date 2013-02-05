@@ -60,7 +60,7 @@ namespace RoomVisualizer
         private Dictionary<PairablePerson, PersonControl> PersonControlDictionary;
         private Dictionary<string, DeviceControl> DeviceControlDictionary;
         private Dictionary<string, TrackerControl> TrackerControlDictionary;
-        //private DrawnTracker drawnTracker;
+        
 
         #endregion
 
@@ -96,12 +96,23 @@ namespace RoomVisualizer
         }
 
         #region Drag and Drop
+
+        protected override void OnDragOver(DragEventArgs e)
+        {
+            base.OnDragOver(e);
+
+
+
+        }
+
         protected override void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
             Point mouseLocation = e.GetPosition(sharedCanvas);
-            PairableDevice device = (PairableDevice)e.Data.GetData("pairableDevice");
-            IADevice iaDevice = (IADevice)e.Data.GetData("iaDevice");
+            DeviceControl deviceControl = (DeviceControl)e.Data.GetData("deviceControl");
+
+            PairableDevice device = deviceControl.PairableDevice;
+            IADevice iaDevice = deviceControl.IADevice;
 
             IARequest request = new IARequest(Routes.SetLocationRoute);
             request.Parameters["identifier"] = iaDevice.Name;

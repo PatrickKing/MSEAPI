@@ -7,6 +7,7 @@
              d:DesignHeight="300" d:DesignWidth="300" Height="100" Width="100" >
 
     <Canvas>
+        <Border x:Name="GhostBorder" Height="64" Width="64" BorderThickness="4" Canvas.Left="0" Canvas.Top="0"></Border>
         <Border x:Name="InnerBorder" Height="64" Width="64" BorderThickness="4" Canvas.Left="0" Canvas.Top="0"></Border>
         <TextBlock x:Name="DeviceNameLabel" Text="Device Name" Height="30" Width="100" Canvas.Left="0" Canvas.Top="70" TextAlignment="Center" TextTrimming="CharacterEllipsis"></TextBlock>
         <Line Name="LeftLine" X1="0" Y1="0" X2="200" Y2="200" Stroke="Black" StrokeThickness="2"></Line>
