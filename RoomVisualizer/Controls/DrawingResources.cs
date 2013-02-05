@@ -37,6 +37,11 @@ namespace RoomVisualizer
             return new Point(myPoint.X * canvas.ActualWidth / ROOM_WIDTH, canvas.ActualHeight - (myPoint.Y * canvas.ActualHeight / ROOM_HEIGHT));
         }
 
+        public static Point ConvertFromDisplayCoordinatesToMeters(Point myPoint, Canvas canvas)
+        {
+            return new Point( (myPoint.X * ROOM_WIDTH) / canvas.ActualWidth, ((canvas.ActualHeight - myPoint.Y) * ROOM_WIDTH / canvas.ActualHeight));
+        }
+
         /// <summary>
         /// Converts from meters on the X axis to pixels
         /// </summary>

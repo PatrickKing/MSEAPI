@@ -33,6 +33,7 @@ namespace RoomVisualizer
         }
 
         private IADevice iaDevice;
+        private PairableDevice pairableDevice;
 
         // DeviceControl can be displayed on the room visualizer canvas, or the stack panel of unpaired devices.
         private DisplayState myDisplayState;
@@ -117,6 +118,7 @@ namespace RoomVisualizer
 
             DeviceNameLabel.FontSize = 12;
             InnerBorder.Margin = new Thickness(18,0,0,0);
+            InnerBorder.BorderBrush = DrawingResources.unpairedBrush;
 
             LeftLine.Visibility = System.Windows.Visibility.Hidden;
             RightLine.Visibility = System.Windows.Visibility.Hidden;
@@ -127,6 +129,7 @@ namespace RoomVisualizer
             InitializeComponent();
 
             this.iaDevice = iaDevice;
+            this.pairableDevice = pairableDevice;
 
             //Setup Events
             pairableDevice.LocationChanged += onLocationChanged;
@@ -154,6 +157,44 @@ namespace RoomVisualizer
             formatForStackPanel();
 
         }
+
+        #region Drag and Drop
+        /// <summary>
+        /// For the Drag Event for the Unlocated Surfaces
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if (e.LeftButton == MouseButtonState.Pressed && this.iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            {
+                // Drag event started on a device supporting setting location
+                DataObject data = new DataObject();
+                data.SetData("pairableDevice", this.pairableDevice);
+                data.SetData("iaDevice", this.iaDevice);
+
+                DragDrop.DoDragDrop(this, data, DragDropEffects.Move);            
+            }
+        }
+
+
+        protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
+        {
+            base.OnGiveFeedback(e);
+
+            if (e.Effects.HasFlag(DragDropEffects.Move))
+            {
+                Mouse.SetCursor(Cursors.Pen);
+            }
+            else
+            {
+                Mouse.SetCursor(Cursors.No);
+            }
+
+            e.Handled = true;
+        }
+        #endregion
+
 
         public void onOrientationChanged(Device device)
         {
@@ -209,6 +250,10 @@ namespace RoomVisualizer
                     // InnerBorder.Width / 2 is to make it so that the point that the DeviceControl is drawn at is actually the center of the Border
                     Canvas.SetLeft(this, newPoint.X - (InnerBorder.Width / 2));
                     Canvas.SetTop(this, newPoint.Y - (InnerBorder.Height / 2));
+                }
+                else if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+                {
+                    MyDisplayState = DisplayState.UnlocatedAndOnStackPanel;
                 }
             }));
 

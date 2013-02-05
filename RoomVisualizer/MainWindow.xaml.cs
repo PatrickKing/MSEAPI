@@ -92,7 +92,38 @@ namespace RoomVisualizer
             sharedCanvas = canvas;
             sharedWrapPanel = unpairedDeviceStackPanel;
             surfaceWrapPanel = surfaceStackPanel;
+
         }
+
+        #region Drag and Drop
+        protected override void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+            Point mouseLocation = e.GetPosition(sharedCanvas);
+            PairableDevice device = (PairableDevice)e.Data.GetData("pairableDevice");
+            IADevice iaDevice = (IADevice)e.Data.GetData("iaDevice");
+
+            IARequest request = new IARequest(Routes.SetLocationRoute);
+            request.Parameters["identifier"] = iaDevice.Name;
+
+            Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));
+
+            if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
+            {
+                // Dropped within Canvas, so we want to place it on the canvas
+                device.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+                request.SetBodyWith(new IntermediatePoint(device.Location.Value));
+            }
+            else
+            {
+                // Not dropped within Canvas, so we want to put it back on the stack panel
+                device.Location = null;
+                request.SetBodyWith(null);
+            }
+
+            kinectManager.IntAirAct.SendRequest(request, iaDevice);
+        }
+        #endregion
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
