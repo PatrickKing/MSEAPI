@@ -72,12 +72,36 @@ namespace RoomVisualizer
                 {
                     //Handle transition to display on Canvas
                     MainWindow.SurfaceWrapPanel.Children.Remove(this);
-                    formatForCanvas();
+                    formatSurfaceForCanvas();
                     MainWindow.SharedCanvas.Children.Add(this);
                 }
 
                 myDisplayState = value;
             }
+        }
+
+        public void formatSurfaceForCanvas()
+        {
+            double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
+            InnerBorder.Width = Math.Ceiling(deviceSize * 0.67);
+            InnerBorder.Height = Math.Ceiling(deviceSize * 0.67);
+
+            InnerBorder.BorderBrush = DrawingResources.pairedBrush;
+
+            Canvas.SetLeft(DeviceNameLabel, -45);
+            Canvas.SetTop(DeviceNameLabel, -55);
+
+            DeviceNameLabel.Width = 200;
+            DeviceNameLabel.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+            DeviceNameLabel.Margin = new Thickness(0, 25, 0, 0);
+            DeviceNameLabel.FontSize = 18;
+            InnerBorder.Margin = new Thickness(0);
+
+            Canvas.SetLeft(LeftLine, InnerBorder.Width / 2);
+            Canvas.SetTop(LeftLine, InnerBorder.Height / 2);
+
+            Canvas.SetLeft(RightLine, InnerBorder.Width / 2);
+            Canvas.SetTop(RightLine, InnerBorder.Height / 2);
         }
 
         public void formatForCanvas()
@@ -185,6 +209,7 @@ namespace RoomVisualizer
             if (e.Effects.HasFlag(DragDropEffects.Move))
             {
                 Mouse.SetCursor(Cursors.Pen);
+                
             }
             else
             {
