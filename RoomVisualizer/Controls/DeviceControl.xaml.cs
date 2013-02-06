@@ -200,12 +200,23 @@ namespace RoomVisualizer
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
+
+            // We consider it a drag only if the Device is a stationary Device, and the mouse button is pushed
             if (e.LeftButton == MouseButtonState.Pressed && this.iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
             {
                 // Drag event started on a device supporting setting location
                 DataObject data = new DataObject();
                 data.SetData("deviceControl", this);
 
+                // Update formatting for the DeviceControl and the Ghost
+                MainWindow.GhostBorder.BorderBrush = DrawingResources.pairedBrush;
+                this.Opacity = 0.5;
+                double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
+                MainWindow.GhostTextBlock.Width = Math.Ceiling(deviceSize * 0.67);
+                MainWindow.GhostBorder.Width = Math.Ceiling(deviceSize * 0.67);
+                MainWindow.GhostBorder.Height = Math.Ceiling(deviceSize * 0.67);
+
+                // Start Dragging
                 DragDrop.DoDragDrop(this, data, DragDropEffects.Move);            
             }
         }

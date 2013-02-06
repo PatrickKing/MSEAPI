@@ -29,23 +29,36 @@ namespace RoomVisualizer
         /// <summary>
         /// Shared accessor for the window's canvas object.
         /// </summary>
+
+        private static Canvas sharedCanvas;
         public static Canvas SharedCanvas
         {
             get { return sharedCanvas; }
         }
-        private static Canvas sharedCanvas;
-
+        
+        private static WrapPanel sharedWrapPanel;
         public static WrapPanel SharedDeviceStackPanel
         {
             get { return sharedWrapPanel; }
         }
-        private static WrapPanel sharedWrapPanel;
-
+        
+        private static WrapPanel surfaceWrapPanel;
         public static WrapPanel SurfaceWrapPanel
         {
             get { return surfaceWrapPanel; }
+        }       
+
+        private static Border ghostBorder;
+        public static Border GhostBorder
+        {
+            get { return ghostBorder; }
         }
-        private static WrapPanel surfaceWrapPanel;
+
+        private static TextBlock ghostText;
+        public static TextBlock GhostTextBlock
+        {
+            get { return ghostText; }
+        }
 
         #region Instance Variables
 
@@ -89,9 +102,13 @@ namespace RoomVisualizer
         public MainWindow()
         {
             InitializeComponent();
+
             sharedCanvas = canvas;
             sharedWrapPanel = unpairedDeviceStackPanel;
             surfaceWrapPanel = surfaceStackPanel;
+
+            ghostBorder = ghost;
+            ghostText = ghostTextBlock;
 
         }
 
@@ -101,15 +118,53 @@ namespace RoomVisualizer
         {
             base.OnDragOver(e);
 
+            Point mouseLocation = e.GetPosition(sharedCanvas);
+            Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));
 
+            // If the Cursor is within the Canvas
+            if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
+            {
+                // Ensure the Ghost and Text are Visible while dragging
+                MainWindow.GhostBorder.Visibility = System.Windows.Visibility.Visible;
+                ghostTextBlock.Visibility = System.Windows.Visibility.Visible;
 
+                // Relocate Ghost
+                Canvas.SetLeft(MainWindow.GhostBorder, mouseLocation.X - (MainWindow.GhostBorder.Width / 2));
+                Canvas.SetTop(MainWindow.GhostBorder, mouseLocation.Y - (MainWindow.GhostBorder.Height / 2));
+
+                // Update Location Text
+                Point p = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+                ghostTextBlock.Text = "(" + Math.Round(p.X,1) + ", " + Math.Round(p.Y,1) + ")";
+
+                // Relocate Ghost Text
+                Canvas.SetLeft(ghostTextBlock, mouseLocation.X - (MainWindow.GhostBorder.Width / 2));
+                Canvas.SetTop(ghostTextBlock, mouseLocation.Y - (MainWindow.GhostBorder.Height / 2));
+
+            }
+
+            // If the Cursor is not within the Canvas
+            else
+            {
+                // Hide the Ghost and Text because it would be drawn off the Canvas
+                MainWindow.GhostBorder.Visibility = System.Windows.Visibility.Hidden;
+                ghostTextBlock.Visibility = System.Windows.Visibility.Hidden;
+            }
         }
 
         protected override void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
             Point mouseLocation = e.GetPosition(sharedCanvas);
+
+            // Grab the data we packed into the DataObject
             DeviceControl deviceControl = (DeviceControl)e.Data.GetData("deviceControl");
+
+            // Hide the Ghost and Text since a Drop has been made
+            MainWindow.GhostBorder.Visibility = System.Windows.Visibility.Hidden;
+            ghostTextBlock.Visibility = System.Windows.Visibility.Hidden;
+
+            // Return the Opacity of the DeviceControl
+            deviceControl.Opacity = 1;
 
             PairableDevice device = deviceControl.PairableDevice;
             IADevice iaDevice = deviceControl.IADevice;
@@ -132,6 +187,7 @@ namespace RoomVisualizer
                 request.SetBodyWith(null);
             }
 
+            // Send a request to the Device that their location has changed
             kinectManager.IntAirAct.SendRequest(request, iaDevice);
         }
         #endregion

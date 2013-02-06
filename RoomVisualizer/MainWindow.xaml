@@ -19,6 +19,8 @@
         <Border ClipToBounds="True" Canvas.Left="5" Canvas.Top="5" Background="White" BorderBrush="Black" BorderThickness="1" Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" CornerRadius="5" Panel.ZIndex="9999">
             <Canvas Name="canvas" AllowDrop="True" ClipToBounds="True" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <Grid  Width="{Binding ElementName=canvas, Path=Width}" Height="{Binding ElementName=canvas, Path=Height}" Name="GridLines"></Grid>
+                <Border x:Name="ghost" Height="64" Width="64" BorderThickness="4" Canvas.Left="0" Canvas.Top="0"></Border>
+                <TextBlock Name="ghostTextBlock" TextAlignment="Center" Padding="10" FontSize="16"></TextBlock>
             </Canvas>
         </Border>
 
