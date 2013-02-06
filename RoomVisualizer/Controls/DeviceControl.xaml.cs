@@ -96,6 +96,9 @@ namespace RoomVisualizer
             InnerBorder.Width = Math.Ceiling(deviceSize * 0.67);
             InnerBorder.Height = Math.Ceiling(deviceSize * 0.67);
 
+            DeviceRectangle.Width = Math.Ceiling(deviceSize * 0.67);
+            DeviceRectangle.Height = Math.Ceiling(deviceSize * 0.67);
+
             InnerBorder.BorderBrush = DrawingResources.pairedBrush;
 
             Canvas.SetLeft(DeviceNameLabel, -45);
@@ -106,6 +109,7 @@ namespace RoomVisualizer
             DeviceNameLabel.Margin = new Thickness(0, 25, 0, 0);
             DeviceNameLabel.FontSize = 18;
             InnerBorder.Margin = new Thickness(0);
+            DeviceRectangle.Margin = new Thickness(0);
 
             Canvas.SetLeft(LeftLine, InnerBorder.Width / 2);
             Canvas.SetTop(LeftLine, InnerBorder.Height / 2);
@@ -144,6 +148,9 @@ namespace RoomVisualizer
             InnerBorder.Width = 64;
             InnerBorder.Height = 64;
 
+            DeviceRectangle.Width = 64;
+            DeviceRectangle.Height = 64;
+
             DeviceNameLabel.Width = this.Width;
             DeviceNameLabel.Margin = new Thickness(0);
 
@@ -152,6 +159,7 @@ namespace RoomVisualizer
 
             DeviceNameLabel.FontSize = 12;
             InnerBorder.Margin = new Thickness(18,0,0,0);
+            DeviceRectangle.Margin = new Thickness(18, 0, 0, 0);
             InnerBorder.BorderBrush = DrawingResources.unpairedBrush;
 
             LeftLine.Visibility = System.Windows.Visibility.Hidden;
@@ -193,31 +201,22 @@ namespace RoomVisualizer
         }
 
         #region Drag and Drop
-        /// <summary>
-        /// For the Drag Event for the Unlocated Surfaces
-        /// </summary>
-        /// <param name="e"></param>
-        protected override void OnMouseMove(MouseEventArgs e)
+
+        protected override void OnTouchDown(TouchEventArgs e)
         {
-            base.OnMouseMove(e);
+            base.OnTouchDown(e);
+
+            startDragging();
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
 
             // We consider it a drag only if the Device is a stationary Device, and the mouse button is pushed
-            if (e.LeftButton == MouseButtonState.Pressed && this.iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            if (e.LeftButton == MouseButtonState.Pressed)
             {
-                // Drag event started on a device supporting setting location
-                DataObject data = new DataObject();
-                data.SetData("deviceControl", this);
-
-                // Update formatting for the DeviceControl and the Ghost
-                MainWindow.GhostBorder.BorderBrush = DrawingResources.pairedBrush;
-                this.Opacity = 0.5;
-                double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
-                MainWindow.GhostTextBlock.Width = Math.Ceiling(deviceSize * 0.67);
-                MainWindow.GhostBorder.Width = Math.Ceiling(deviceSize * 0.67);
-                MainWindow.GhostBorder.Height = Math.Ceiling(deviceSize * 0.67);
-
-                // Start Dragging
-                DragDrop.DoDragDrop(this, data, DragDropEffects.Move);            
+                startDragging();
             }
         }
 
@@ -237,6 +236,28 @@ namespace RoomVisualizer
             }
 
             e.Handled = true;
+        }
+
+        private void startDragging()
+        {
+            // We consider it a drag only if the Device is a stationary Device
+            if (this.iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            {
+                // Drag event started on a device supporting setting location
+                DataObject data = new DataObject();
+                data.SetData("deviceControl", this);
+
+                // Update formatting for the DeviceControl and the Ghost
+                MainWindow.GhostBorder.BorderBrush = DrawingResources.pairedBrush;
+                this.Opacity = 0.5;
+                double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
+                MainWindow.GhostTextBlock.Width = Math.Ceiling(deviceSize * 0.67);
+                MainWindow.GhostBorder.Width = Math.Ceiling(deviceSize * 0.67);
+                MainWindow.GhostBorder.Height = Math.Ceiling(deviceSize * 0.67);
+
+                // Start Dragging
+                DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+            }
         }
         #endregion
 
