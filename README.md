@@ -1,6 +1,6 @@
 # What is the Multi-Surface Environment API?
 
-An API for creating Multi-Surface Environments
+An API for creating Multi-Surface Environments. This repository is used as server for location based calls. The RoomVisualizer project is used as a centralized place that displays all information that is currently known to the API
 
 # Getting Started with MSE API
 
@@ -11,7 +11,3 @@ An API for creating Multi-Surface Environments
 
     The `--recursive` ensures that all submodules get downloaded. If you forget, you can use `git submodule update --recursive --init` later.
 5. Open `MSEAPI.sln` in Visual Studio and ensure it builds correctly `F6`
-
-# Jenkins
-
-This repository is set up with Jenkins, so whenever something is pushed to GitHub, then Jenkins runs the build script
