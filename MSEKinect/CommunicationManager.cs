@@ -86,7 +86,9 @@ namespace MSEKinect
                 Point offsetLocation = personManager.Tracker.Location.Value;
 
                 double angle = Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation);
-                response.SetBodyWith(angle);
+                //response.SetBodyWith(angle);
+
+                response.SetBodyWith(90);
             }
             else
             {
