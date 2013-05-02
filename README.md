@@ -4,7 +4,7 @@ An API for creating Multi-Surface Environments. This repository is used as serve
 
 # Getting Started with MSE API
 
-1.  Install [Kinect SDK 1.6](http://go.microsoft.com/fwlink/?LinkID=262831) (The API currently supports only version 1.6 only)
+1.  Install [Kinect SDK 1.6](http://go.microsoft.com/fwlink/?LinkID=262831) (The API currently supports version 1.6 only)
 2.  Install [Bonjour SDK] (https://developer.apple.com/bonjour/) (Must have Apple Developer Account)
 3.  Install [NuGet] (http://nuget.codeplex.com/)
 4.  Clone MSE API repository using `git clone git@github.com:ase-lab/MSEAPI.git --recursive`
