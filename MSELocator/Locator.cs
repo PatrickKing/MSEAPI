@@ -64,6 +64,13 @@ namespace MSELocator
             return GetDevicesInView(_devices.Find(x => x.Identifier.Equals(identifier)));
         }
 
+        /// <summary>
+        /// Computes the intersection point of two devices. 
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <param name="target"></param>
+        /// <param name="Position"></param>
+        /// <returns>Returns the intersection point of the two devices.</returns>
         public Point GetIntersectionPoint(Device observer, Device target, String Position)
         {
             Point returnPoint = new Point();
@@ -71,7 +78,8 @@ namespace MSELocator
             if (Position.Equals("Back"))
             {
                 Double y = (Double)(target.Location.Value.Y + (target.Height) / 2);
-                Double slope = Math.Tan((Double)observer.Orientation);
+                Double slope = (Double)observer.Orientation * Math.PI / 180;
+                slope = Math.Tan(slope);
                 Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
                 Double x = (Double)((y - n) / slope);
 
@@ -80,7 +88,6 @@ namespace MSELocator
             else if (Position.Equals("Front"))
             {
                 Double y = (Double)(target.Location.Value.Y - (target.Height) / 2);
-                //Double slope = Math.Tan((Double)observer.Orientation);
                 Double slope = (Double)observer.Orientation * Math.PI / 180;
                 slope = Math.Tan(slope);
                 Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
@@ -90,19 +97,34 @@ namespace MSELocator
             }
             else if (Position.Equals("Right"))
             {
+                Double x = (Double)(target.Location.Value.X + (target.Width) / 2);
+                Double slope = (Double)observer.Orientation * Math.PI / 180;
+                slope = Math.Tan(slope);
+                Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
+                Double y = (Double)(slope * x + n);
+
+                returnPoint = new Point(x, y);
             }
             else if (Position.Equals("Left"))
             {
+                Double x = (Double)(target.Location.Value.X - (target.Width) / 2);
+                Double slope = (Double)observer.Orientation * Math.PI / 180;
+                slope = Math.Tan(slope);
+                Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
+                Double y = (Double)(slope * x + n);
+
+                returnPoint = new Point(x, y);
             }
 
             return returnPoint;
         }
 
         /// <summary>
-        /// 
+        /// Computes the devices within the field of view of the observer alongside the intersection point 
+        /// with each of these devices. Returns an empty dictionary if FieldOfView or Location are null on the observer.
         /// </summary>
         /// <param name="observer"></param>
-        /// <returns></returns>
+        /// <returns>Devices in the field of view of the observer and their intersection points.</returns>
         public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints(Device observer)
         {                        
             Dictionary<Device, Point> returnDevices = new Dictionary<Device, Point>();
@@ -112,7 +134,7 @@ namespace MSELocator
             foreach (Device device in devicesInView)
             {
                 // Find Relative Position to the observer
-                if (observer.Location.Value.Y > device.Location.Value.Y)
+                if (observer.Location.Value.Y > device.Location.Value.Y + (device.Height)/2)
                 {
                     // Device is in the back, check right, center, or left
                     if (observer.Location.Value.X > device.Location.Value.X)
@@ -136,7 +158,7 @@ namespace MSELocator
 
                 }
 
-                else if (observer.Location.Value.Y < device.Location.Value.Y)
+                else if (observer.Location.Value.Y < device.Location.Value.Y - (device.Height) / 2)
                 {
                     // Device is in the front, check right, center, or left
                     if (observer.Location.Value.X > device.Location.Value.X)
@@ -164,10 +186,14 @@ namespace MSELocator
                     if (observer.Location.Value.X > device.Location.Value.X)
                     {
                         // Device is to the right
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Right");
+                        returnDevices.Add(device, returnPoint);
                     }
                     else
                     {
                         // Device is to the left
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Left");
+                        returnDevices.Add(device, returnPoint);
                     }
                 }
                 

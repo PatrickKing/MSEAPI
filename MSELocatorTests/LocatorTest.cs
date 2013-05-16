@@ -53,6 +53,26 @@ namespace MSELocatorTests
         }
 
         [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPointsTests2()
+        {
+            //Create Locator with Devices which should intersect
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 2.5), 0, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 2.5), 0, 1, 5);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(0.5, 2.5);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+        }
+
+        [TestMethod()]
         public void GetDevicesInViewTest()
         {
             //Create Locator with Devices which should intersect
