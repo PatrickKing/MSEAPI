@@ -64,6 +64,119 @@ namespace MSELocator
             return GetDevicesInView(_devices.Find(x => x.Identifier.Equals(identifier)));
         }
 
+        public Point GetIntersectionPoint(Device observer, Device target, String Position)
+        {
+            Point returnPoint = new Point();
+
+            if (Position.Equals("Back"))
+            {
+                Double y = (Double)(target.Location.Value.Y + (target.Height) / 2);
+                Double slope = Math.Tan((Double)observer.Orientation);
+                Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
+                Double x = (Double)((y - n) / slope);
+
+                returnPoint = new Point(x, y);
+            }
+            else if (Position.Equals("Front"))
+            {
+                Double y = (Double)(target.Location.Value.Y - (target.Height) / 2);
+                //Double slope = Math.Tan((Double)observer.Orientation);
+                Double slope = (Double)observer.Orientation * Math.PI / 180;
+                slope = Math.Tan(slope);
+                Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
+                Double x = (Double)((y - n) / slope);
+
+                returnPoint = new Point(x, y);
+            }
+            else if (Position.Equals("Right"))
+            {
+            }
+            else if (Position.Equals("Left"))
+            {
+            }
+
+            return returnPoint;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <returns></returns>
+        public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints(Device observer)
+        {                        
+            Dictionary<Device, Point> returnDevices = new Dictionary<Device, Point>();
+
+            List<Device> devicesInView = GetDevicesInView(observer);
+
+            foreach (Device device in devicesInView)
+            {
+                // Find Relative Position to the observer
+                if (observer.Location.Value.Y > device.Location.Value.Y)
+                {
+                    // Device is in the back, check right, center, or left
+                    if (observer.Location.Value.X > device.Location.Value.X)
+                    {
+                        // Device is in the upper right corner
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Back");
+                        returnDevices.Add(device, returnPoint);
+                    }
+                    else if (observer.Location.Value.X < device.Location.Value.X)
+                    {
+                        // Device is in the upper left corner
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Back");
+                        returnDevices.Add(device, returnPoint);
+                    }
+                    else
+                    {
+                        // Device is strictly in the back
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Back");
+                        returnDevices.Add(device, returnPoint);
+                    }
+
+                }
+
+                else if (observer.Location.Value.Y < device.Location.Value.Y)
+                {
+                    // Device is in the front, check right, center, or left
+                    if (observer.Location.Value.X > device.Location.Value.X)
+                    {
+                        // Device is in the lower right corner
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Front");
+                        returnDevices.Add(device, returnPoint);
+                    }
+                    else if (observer.Location.Value.X < device.Location.Value.X)
+                    {
+                        // Device is in the lower left corner
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Front");
+                        returnDevices.Add(device, returnPoint);
+                    }
+                    else
+                    {
+                        // Device is strictly in the front
+                        Point returnPoint = GetIntersectionPoint(observer, device, "Front");
+                        returnDevices.Add(device, returnPoint);
+                    }
+                }
+                else
+                {
+                    // Device is either to the right or left
+                    if (observer.Location.Value.X > device.Location.Value.X)
+                    {
+                        // Device is to the right
+                    }
+                    else
+                    {
+                        // Device is to the left
+                    }
+                }
+                
+
+            }
+
+            return returnDevices;
+        }
+
         /// <summary>
         /// Computes the devices within the field of view of the observer. Returns an empty list if FieldOfView or Location are null on the observer.
         /// </summary>

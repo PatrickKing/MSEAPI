@@ -11,24 +11,35 @@ namespace MSELocator
     {
 
 
+        //private double? _Orientation;
+        //public double? Orientation
+        //{
+        //    get { return _Orientation; }
+        //    set 
+        //    {
+        //        if (value.HasValue)
+        //        {
+        //            _Orientation = Util.NormalizeAngle(value.Value);
+        //        }
+        //        else
+        //        {
+        //            _Orientation = null;
+        //        }
+
+        //        if (OrientationChanged != null)
+        //            OrientationChanged(this);
+        //    }
+        //}
+
         private double? _Orientation;
         public double? Orientation
         {
             get { return _Orientation; }
-            set 
+            set
             {
-                if (value.HasValue)
-                {
-                    _Orientation = Util.NormalizeAngle(value.Value);
-                }
-                else
-                {
-                    _Orientation = null;
-                }
-
-                if (OrientationChanged != null)
-                    OrientationChanged(this);
+                _Orientation = value;
             }
+
         }
 
         private double? _FieldOfView;
@@ -63,6 +74,26 @@ namespace MSELocator
                 _Location = value;
                 if (LocationChanged != null)
                     LocationChanged(this);
+            }
+        }
+
+        private Double? _Height;
+        public Double? Height
+        {
+            get { return _Height; }
+            set
+            {
+                _Height = value;
+            }
+        }
+
+        private Double? _Width;
+        public Double? Width
+        {
+            get { return _Width; }
+            set
+            {
+                _Width = value;
             }
         }
 
