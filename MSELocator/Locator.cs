@@ -120,6 +120,44 @@ namespace MSELocator
         }
 
         /// <summary>
+        /// Checks if the the observer device's line of sight intersects the target device.
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public bool DoesObserverInteresectTarget(Device observer, Device target)
+        {
+            Double topYline = (Double) (target.Location.Value.Y + (target.Height) / 2);
+            Double bottomYline = (Double)(target.Location.Value.Y - (target.Height) / 2);
+            Double rightXline = (Double)(target.Location.Value.X + (target.Width) / 2);
+            Double leftXline = (Double)(target.Location.Value.X - (target.Width) / 2);
+
+            Double slope = (Double)observer.Orientation * Math.PI / 180;
+            slope = Math.Tan(slope);
+            Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
+
+            Double x = (topYline - n) / slope;
+            if (x >= leftXline && x <= rightXline)
+                return true;
+
+            x = (bottomYline - n) / slope;
+            if (x >= leftXline && x <= rightXline)
+                return true;
+
+            double y = slope * rightXline + n;
+            if (y >= bottomYline && y <= topYline)
+                return true;
+
+            y = slope * leftXline + n;
+            if (y >= bottomYline && y <= topYline)
+                return true;
+
+
+            return false;
+        }
+
+
+        /// <summary>
         /// Computes the devices within the field of view of the observer alongside the intersection point 
         /// with each of these devices. Returns an empty dictionary if FieldOfView or Location are null on the observer.
         /// </summary>
@@ -133,6 +171,10 @@ namespace MSELocator
 
             foreach (Device device in devicesInView)
             {
+               //if the observer device doesn't intersect the target device then skip device.
+                if(!DoesObserverInteresectTarget(observer,device))
+                 continue;
+
                 // Find Relative Position to the observer
                 if (observer.Location.Value.Y > device.Location.Value.Y + (device.Height)/2)
                 {
@@ -202,6 +244,141 @@ namespace MSELocator
 
             return returnDevices;
         }
+
+        public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints2(Device observer)
+        {
+            Dictionary<Device, Point> returnDevices = new Dictionary<Device, Point>();
+
+            List<Device> devicesInView = GetDevicesInView(observer);
+
+            foreach (Device target in devicesInView)
+            {
+                //if the observer device doesn't intersect the target device then skip device.
+                if (!DoesObserverInteresectTarget(observer, target))
+                    continue;
+
+                //device in bottom right corner
+                if (observer.Location.Value.X >= target.Location.Value.X && observer.Location.Value.Y <= target.Location.Value.Y)
+                {
+                    Point returnPoint = GetIntersectionPoint2(observer, target, "BottomRight");
+                    returnDevices.Add(target, returnPoint);
+
+                }
+                //device in bottom left corner
+                else if (observer.Location.Value.X < target.Location.Value.X && observer.Location.Value.Y < target.Location.Value.Y)
+                {
+                    Point returnPoint = GetIntersectionPoint2(observer, target, "BottomLeft");
+                    returnDevices.Add(target, returnPoint);
+                }
+                //device in top left corner
+                else if (observer.Location.Value.X <= target.Location.Value.X && observer.Location.Value.Y >= target.Location.Value.Y)
+                {
+                    Point returnPoint = GetIntersectionPoint2(observer, target, "TopLeft");
+                    returnDevices.Add(target, returnPoint);
+                }
+                //device in top right corner
+                else if (observer.Location.Value.X > target.Location.Value.X && observer.Location.Value.Y > target.Location.Value.Y)
+                {
+                    Point returnPoint = GetIntersectionPoint2(observer, target, "TopRight");
+                    returnDevices.Add(target, returnPoint);
+                }
+
+            }
+
+            return returnDevices;
+        
+        }
+
+        public Point GetIntersectionPoint2(Device observer, Device target, String Position)
+        {
+            //line equation of the observer's line of sight : y = slope*x + n
+            Double slope = (Double)observer.Orientation * Math.PI / 180;
+            slope = Math.Tan(slope);
+            Double n = observer.Location.Value.Y - (slope * observer.Location.Value.X);
+
+            //all 4 sides of the target device
+            Double topYline = (Double) (target.Location.Value.Y + (target.Height) / 2);
+            Double bottomYline = (Double)(target.Location.Value.Y - (target.Height) / 2);
+            Double rightXline = (Double)(target.Location.Value.X + (target.Width) / 2);
+            Double leftXline = (Double)(target.Location.Value.X - (target.Width) / 2);
+
+            Double x,y;
+
+            if(Position.Equals("BottomRight")){
+                if(observer.Orientation == 180){
+                    y = observer.Location.Value.Y;
+                    return new Point(rightXline,y);
+                }
+                else{
+                    x = (bottomYline - n) / slope;
+                    if( x <= rightXline)
+                        return new Point (x,bottomYline);
+                    else{
+                        y = slope*rightXline + n;
+                        return new Point (rightXline,y);
+                    }
+                }
+            }
+            else if (Position.Equals("TopRight"))
+            {
+                if (observer.Orientation == 180)
+                {
+                    y = observer.Location.Value.Y;
+                    return new Point(rightXline, y);
+                }
+                else
+                {
+                    x = (topYline - n) / slope;
+                    if (x <= rightXline)
+                        return new Point(x, topYline);
+                    else
+                    {
+                        y = slope * rightXline + n;
+                        return new Point(rightXline, y);
+                    }
+                }
+            }
+            else if (Position.Equals("TopLeft"))
+            {
+                if (observer.Orientation == 0)
+                {
+                    y = observer.Location.Value.Y;
+                    return new Point(leftXline, y);
+                }
+                else
+                {
+                    x = (topYline - n) / slope;
+                    if (x >= leftXline)
+                        return new Point(x, topYline);
+                    else
+                    {
+                        y = slope * leftXline + n;
+                        return new Point(leftXline, y);
+                    }
+                }
+            }
+            else if (Position.Equals("BottomLeft"))
+            {
+                if (observer.Orientation == 0)
+                {
+                    y = observer.Location.Value.Y;
+                    return new Point(leftXline, y);
+                }
+                else
+                {
+                    x = (bottomYline - n) / slope;
+                    if (x >= leftXline)
+                        return new Point(x, bottomYline);
+                    else
+                    {
+                        y = slope * leftXline + n;
+                        return new Point(leftXline, y);
+                    }
+                }
+            }
+            return new Point(0, 0);
+        }
+
 
         /// <summary>
         /// Computes the devices within the field of view of the observer. Returns an empty list if FieldOfView or Location are null on the observer.
