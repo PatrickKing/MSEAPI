@@ -61,7 +61,7 @@ namespace MSELocatorTests
             //Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 2.5), 0, 0.5, 0.5);
             //Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 2.5), 0, 1, 5);
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(4, 6.1), 0, 0.5, 0.5);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(2, 8), 319, 0.5, 0.5);
             Device table = GenerateDeviceWithDimensions("TableTop", new Point(5,5), 0, 2, 2);
 
             locator.Devices.Add(iPad);
@@ -71,7 +71,7 @@ namespace MSELocatorTests
 
             Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints2(iPad);
 
-            Assert.IsTrue(dic.Count == 1);
+            Assert.IsTrue(dic.Count == 0);
             //Assert.AreEqual(dic[table].X, p.X, 0.01);
             //Assert.AreEqual(dic[table].Y, p.Y, 0.01);
         }
