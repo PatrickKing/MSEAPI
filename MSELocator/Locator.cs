@@ -156,6 +156,188 @@ namespace MSELocator
             return false;
         }
 
+        /// <summary>
+        /// Calculates the coordinates of the corners of the device.
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns> Returns a list of the corner points of the device</returns>
+        public Point[] getCoordinatesOfDevice(Device device)
+        {
+            Point[] returnCoordinates = new Point[4];
+            Point center = (Point)device.Location;
+            double rotationAngle;
+
+            // Calculate the original coordinates of the device before rotation            
+            // Upper Right Point
+            returnCoordinates[0].X = (Double)(center.X + (device.Width/2));
+            returnCoordinates[0].Y = (Double)(center.Y + (device.Height/2));
+
+            // Lower Right Point
+            returnCoordinates[1].X = (Double)(center.X + (device.Width/2));
+            returnCoordinates[1].Y = (Double)(center.Y - (device.Height/2));
+
+            // Lower Left Point
+            returnCoordinates[2].X = (Double)(center.X - (device.Width / 2));
+            returnCoordinates[2].Y = (Double)(center.Y - (device.Height / 2));
+
+            // Upper Left Point
+            returnCoordinates[3].X = (Double)(center.X - (device.Width / 2));
+            returnCoordinates[3].Y = (Double)(center.Y + (device.Height / 2));
+
+            // Consider the orientation of the device to calculate teh rotation angle
+            if (device.Orientation >= 0 && device.Orientation <= 180)
+            {
+                rotationAngle = (Double)(device.Orientation - 90);
+            }
+            else
+            {
+                rotationAngle = (Double)(device.Orientation - 270);
+            }
+
+            // Convert rotation angle to radians
+            rotationAngle = rotationAngle * Math.PI / 180;
+
+            // Calculate the new coordinates of the device
+            int index = 0;
+            foreach (Point point in returnCoordinates)
+            {
+                Double x = ((point.X - center.X) * Math.Cos(rotationAngle)) + center.X - ((point.Y - center.Y) * Math.Sin(rotationAngle));
+                Double y = ((point.Y - center.Y) * Math.Cos(rotationAngle)) + center.Y + ((point.X - center.X) * Math.Sin(rotationAngle));
+                returnCoordinates[index] = new Point(x, y);
+                index++;
+            }
+
+            return returnCoordinates;
+        }
+
+        /// <summary>
+        /// Calculates and returns the line equations of the device.
+        /// </summary>
+        /// <param name="cornerCoordinates"></param>
+        /// <returns> Returns a list of slopes and intersects of lines of the device </returns>
+        public Double[,] getLineEquationsOfDevice(Point[] cornerCoordinates)
+        {
+            Double[,] returnLines = new Double[4,2];
+            Double slope;
+            Double intersect;
+            for (int index = 0; index < cornerCoordinates.Length-1; index++)
+            {
+                // TODO need to handle the case when it is vertical
+                slope = (cornerCoordinates[index].Y - cornerCoordinates[index+1].Y) / (cornerCoordinates[index].X - cornerCoordinates[index+1].X);
+                intersect = cornerCoordinates[index].Y - slope * cornerCoordinates[index].X;
+                returnLines[index,0] = slope;
+                returnLines[index,1] = intersect;
+            }
+            slope = (cornerCoordinates[3].Y - cornerCoordinates[0].Y) / (cornerCoordinates[3].X - cornerCoordinates[0].X);
+            intersect = cornerCoordinates[3].Y - slope * cornerCoordinates[3].X;
+            returnLines[3,0] = slope;
+            returnLines[3,1] = intersect;
+
+            return returnLines;
+        }
+
+        /// <summary>
+        /// Calculates the intersection point of two lines given their slopes and intercepts
+        /// </summary>
+        /// <param name="slope1"></param>
+        /// <param name="intercept1"></param>
+        /// <param name="slope2"></param>
+        /// <param name="intercept2"></param>
+        /// <returns> Returns the intersection point of the two lines </returns>
+        public Point findIntersectionPointofTwoLines(Double slope1, Double intercept1, Double slope2, Double intercept2)
+        {
+            Point intersectionPoint = new Point();
+
+            Double delta = slope2 - slope1;
+            if (delta == 0)
+            {
+                // TODO lines are parallel
+            }
+            else
+            {
+                Double x = (intercept1 - intercept2) / delta;
+                Double y = (slope2 * intercept1 - slope1 * intercept2) / delta;
+                intersectionPoint = new Point(x, y);
+            }
+
+            return intersectionPoint;
+        }
+
+        /// <summary>
+        /// Calculates the distance between two points
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns> Returns the distance between the two points</returns>
+        public Double distance(Point start, Point end)
+        {
+            Double returnDistance = Math.Sqrt((end.X - start.X) * (end.X - start.X) + (end.Y - start.Y) * (end.Y - start.Y));
+
+            return returnDistance;
+        }
+
+        public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints3(Device observer)
+        {
+            // Initialize a dictionray that will contain the devices in range with the 
+            // Intersection points with each of these devices
+            Dictionary<Device, Point> returnDevices = new Dictionary<Device, Point>();
+            List<Device> devicesInView = GetDevicesInView(observer);
+
+            // Iterate through devices in view
+            foreach (Device target in devicesInView)
+            {
+                //if the observer device doesn't intersect the target device then skip to the next device.
+                if (!DoesObserverInteresectTarget(observer, target))
+                    continue;
+
+                // Set the closest distance to the target to a very high number\
+                // Declare the intersection point to be used later
+                Double closestDistance = 32000;
+                Point intersectionPoint = new Point();
+
+                //line equation of the observer's line of sight : y = slope*x + n
+                Double slope = (Double)observer.Orientation * Math.PI / 180;
+                slope = Math.Tan(slope);
+                Double intercept = observer.Location.Value.Y - (slope * observer.Location.Value.X);
+
+                // Get the device coordinates
+                // Get the equation of the edges of the device
+                // Declare a list of points of intersection with each of the sides of the device
+                Point[] deviceCoordinates = getCoordinatesOfDevice(target);
+                Double[,] lineEquations = getLineEquationsOfDevice(deviceCoordinates);
+                List<Point> intersectionPoints = new List<Point>();
+
+
+                // Iterate through the device edges
+                for(int index=0; index<4; index++)
+                {                    
+                    // Add the point to the list if no exception is raised
+                    try
+                    {
+                        intersectionPoints.Add(findIntersectionPointofTwoLines(slope, intercept, lineEquations[index,0], lineEquations[index,1]));
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+
+                // Iterate through the points of intersection
+                foreach (Point point in intersectionPoints)
+                {
+                    // Choose the closest point to the observer
+                    if (distance(observer.Location.Value, point) < closestDistance)
+                    {
+                        closestDistance = distance(observer.Location.Value, point);
+                        intersectionPoint = point;
+                    }
+                }
+
+                // Add the device and the point of intersection to the dictionary
+                returnDevices.Add(target, intersectionPoint);
+            }
+
+            return returnDevices;
+        }
 
         /// <summary>
         /// Computes the devices within the field of view of the observer alongside the intersection point 
