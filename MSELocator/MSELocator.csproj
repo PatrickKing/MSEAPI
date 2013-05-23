@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Device.cs" />
+    <Compile Include="Line.cs" />
     <Compile Include="Locator.cs" />
     <Compile Include="LocatorInterface.cs" />
     <Compile Include="Person.cs" />

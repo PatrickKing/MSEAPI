@@ -276,6 +276,107 @@ namespace MSELocator
             return returnDistance;
         }
 
+        /// <summary>
+        /// Computes the devices within the field of view of the observer alongside the intersection point 
+        /// with each of these devices. Returns an empty dictionary if FieldOfView or Location are null on the observer.
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <returns>Devices in the field of view of the observer and their intersection points.</returns>
+        public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints4(Device observer)
+        {
+            Dictionary<Device, Point> returnDevices = new Dictionary<Device, Point>();
+
+            Line obseverLineOfSight = new Line(observer.Location, observer.Orientation);
+
+            List<Device> devicesInView = GetDevicesInView(observer);
+
+            foreach (Device target in devicesInView)
+            {
+                List<Line> sides = getLinesOfShape(target);
+                List<Point?> intersectionPoints = new List<Point?>();
+
+                foreach (Line side in sides)
+                {
+                    Point? intPoint = Line.getIntersectionPoint(obseverLineOfSight, side);
+                    if (intPoint != null)
+                        intersectionPoints.Add(intPoint);
+                }
+
+                if (intersectionPoints.Count == 0)
+                    continue;
+
+                Point? nearestPoint = intersectionPoints[0];
+                double shortestDistance = Line.getDistanceBetweenPoints((Point)observer.Location, (Point)nearestPoint);
+
+                foreach (Point point in intersectionPoints)
+                {
+                    double distance = Line.getDistanceBetweenPoints((Point)observer.Location, point);
+                    if (distance < shortestDistance)
+                    {
+                        nearestPoint = point;
+                        shortestDistance = distance;
+                    }
+                }
+                returnDevices.Add(target, (Point)nearestPoint);
+            }
+
+            return returnDevices;
+
+        }
+
+        /// <summary>
+        /// Uses the the size and orientation of the device to compute all 4 line equations a device.
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns>The line euqations of all 4 sides of a device</returns>
+        public List<Line> getLinesOfShape(Device device)
+        {
+            List<Line> returnLines = new List<Line>();
+            List<Point> corners = getCornersOfShape(device);
+
+            Line topSide = new Line(corners[0], corners[1]);
+            Line rightSide = new Line(corners[1], corners[2]);
+            Line bottomSide = new Line(corners[2], corners[3]);
+            Line leftSide = new Line(corners[3], corners[0]);
+
+            returnLines.Add(topSide);
+            returnLines.Add(rightSide);
+            returnLines.Add(bottomSide);
+            returnLines.Add(leftSide);
+
+            return returnLines;
+
+        }
+
+        /// <summary>
+        /// Computes the position of all 4 corners of a device using size and orientation of a device.
+        /// </summary>
+        /// <param name="device"></param>
+        /// <returns>A list of points of all 4 corners of a device.</returns>
+        public List<Point> getCornersOfShape(Device device)
+        {
+            List<Point> returnPoints = new List<Point>();
+            List<Point> intPoints = new List<Point>();
+            Point deviceLocation = device.Location.Value;
+
+            intPoints.Add(new Point((double)(deviceLocation.X - device.Width / 2), (double)(deviceLocation.Y + device.Height / 2)));
+            intPoints.Add(new Point((double)(deviceLocation.X + device.Width / 2), (double)(deviceLocation.Y + device.Height / 2)));
+            intPoints.Add(new Point((double)(deviceLocation.X + device.Width / 2), (double)(deviceLocation.Y - device.Height / 2)));
+            intPoints.Add(new Point((double)(deviceLocation.X - device.Width / 2), (double)(deviceLocation.Y - device.Height / 2)));
+
+            foreach (Point point in intPoints)
+            {
+                double angle = (Double)device.Orientation * Math.PI / 180;
+                double xValue = (point.X - deviceLocation.X) * Math.Cos(angle) - (point.Y - deviceLocation.Y) * Math.Sin(angle) + deviceLocation.X;
+                double yValue = (point.Y - deviceLocation.Y) * Math.Sin(angle) + (point.Y - deviceLocation.Y) * Math.Cos(angle) + deviceLocation.Y;
+
+                Point newPoint = new Point(xValue, yValue);
+                returnPoints.Add(newPoint);
+            }
+
+            return returnPoints;
+        }
+
         public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints3(Device observer)
         {
             // Initialize a dictionray that will contain the devices in range with the 
