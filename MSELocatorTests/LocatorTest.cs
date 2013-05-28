@@ -82,17 +82,60 @@ namespace MSELocatorTests
             //Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 2.5), 0, 0.5, 0.5);
             //Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 2.5), 0, 1, 5);
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(2, 8), 319, 0.5, 0.5);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0,0), 45, 0.5, 0.5);
             Device table = GenerateDeviceWithDimensions("TableTop", new Point(5,5), 0, 2, 2);
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            Point p = new Point(0.5, 2.5);
+            Point p = new Point(4, 4);
 
-            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints2(iPad);
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
 
-            Assert.IsTrue(dic.Count == 0);
+            //Assert.IsTrue(dic.Count == 0);
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPointsTests3()
+        {
+            //Create Locator with Devices which should intersect
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(5, 0), 90, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(5, 5), 90, 2, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(5, 4);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
+
+            //Assert.IsTrue(dic.Count == 0);
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPointsTests4()
+        {
+            //Create Locator with Devices which should intersect
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(5, 8), 282.4, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(5, 5), 90 , 2, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(5, 4);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
+            //List<Device> lis = locator.GetDevicesInView(iPad);
+
+             Assert.IsTrue(dic.Count == 0);
             //Assert.AreEqual(dic[table].X, p.X, 0.01);
             //Assert.AreEqual(dic[table].Y, p.Y, 0.01);
         }

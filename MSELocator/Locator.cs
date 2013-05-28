@@ -368,7 +368,7 @@ namespace MSELocator
             {
                 double angle = (Double)device.Orientation * Math.PI / 180;
                 double xValue = (point.X - deviceLocation.X) * Math.Cos(angle) - (point.Y - deviceLocation.Y) * Math.Sin(angle) + deviceLocation.X;
-                double yValue = (point.Y - deviceLocation.Y) * Math.Sin(angle) + (point.Y - deviceLocation.Y) * Math.Cos(angle) + deviceLocation.Y;
+                double yValue = (point.Y - deviceLocation.Y) * Math.Cos(angle) + (point.X - deviceLocation.X) * Math.Sin(angle) + deviceLocation.Y;
 
                 Point newPoint = new Point(xValue, yValue);
                 returnPoints.Add(newPoint);

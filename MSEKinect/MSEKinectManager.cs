@@ -28,7 +28,7 @@ namespace MSEKinect
         {
             get { return personManager; }
         }
-
+         
         public DeviceManager DeviceManager
         {
             get { return deviceManager; }
