@@ -124,8 +124,8 @@ namespace MSELocatorTests
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(5, 8), 282.4, 0.5, 0.5);
-            Device table = GenerateDeviceWithDimensions("TableTop", new Point(5, 5), 90 , 2, 2);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0,0), 95, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(0,5), 0 , 2, 2);
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);

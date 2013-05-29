@@ -317,7 +317,9 @@ namespace MSELocator
                         shortestDistance = distance;
                     }
                 }
-                returnDevices.Add(target, (Point)nearestPoint);
+
+                Point ratioOnScreen = GetRatioPositionOnScreen(target, (Point)nearestPoint);
+                returnDevices.Add(target, ratioOnScreen);
             }
 
             return returnDevices;
@@ -375,6 +377,52 @@ namespace MSELocator
             }
 
             return returnPoints;
+        }
+
+        public Point GetRatioPositionOnScreen(Device target, Point intersection){
+            List<Point> cornersOfShape = getCornersOfShape(target);
+
+            Double distance1 = Line.getDistanceBetweenPoints(intersection,cornersOfShape[0]);
+            Double distance2 = Line.getDistanceBetweenPoints(intersection,cornersOfShape[1]);
+            Double distance3 = Line.getDistanceBetweenPoints(cornersOfShape[0],cornersOfShape[1]);
+            if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
+            {
+                Double xRatio = distance1 / distance3;
+                Double yRatio = 1;
+                return new Point(xRatio, yRatio);
+            }
+
+            distance1 = Line.getDistanceBetweenPoints(intersection, cornersOfShape[2]);
+            distance2 = Line.getDistanceBetweenPoints(intersection, cornersOfShape[1]);
+            distance3 = Line.getDistanceBetweenPoints(cornersOfShape[1], cornersOfShape[2]);
+            if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
+            {
+                Double xRatio = 1;
+                Double yRatio = distance1 / distance3;
+                return new Point(xRatio, yRatio);
+            }
+
+            distance1 = Line.getDistanceBetweenPoints(intersection, cornersOfShape[3]);
+            distance2 = Line.getDistanceBetweenPoints(intersection, cornersOfShape[2]);
+            distance3 = Line.getDistanceBetweenPoints(cornersOfShape[2], cornersOfShape[3]);
+            if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
+            {
+                Double xRatio = distance1 / distance3;
+                Double yRatio = 0;
+                return new Point(xRatio, yRatio);
+            }
+
+            distance1 = Line.getDistanceBetweenPoints(intersection, cornersOfShape[3]);
+            distance2 = Line.getDistanceBetweenPoints(intersection, cornersOfShape[0]);
+            distance3 = Line.getDistanceBetweenPoints(cornersOfShape[3], cornersOfShape[0]);
+            if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
+            {
+                Double xRatio = 0;
+                Double yRatio = distance1 / distance3;
+                return new Point(xRatio, yRatio);
+            }
+
+            return new Point(-1, -1);
         }
 
         public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints3(Device observer)
