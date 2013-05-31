@@ -20,7 +20,7 @@ namespace MSELocatorTests
             }; 
         }
 
-        public Device GenerateDeviceWithDimensions(String id, Point loc, Double orn, Double height, Double width)
+        public Device GenerateDeviceWithDimensions(String id, Point loc, Double? orn, Double? height, Double? width)
         {
             return new Device
             {
@@ -59,7 +59,7 @@ namespace MSELocatorTests
             Locator locator = new Locator();
 
             Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 0), 46, 1, 1);
-            Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 3), 0, 2, 2);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 3), 45, null, null); 
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
@@ -138,6 +138,28 @@ namespace MSELocatorTests
              Assert.IsTrue(dic.Count == 0);
             //Assert.AreEqual(dic[table].X, p.X, 0.01);
             //Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPoints_NullValuesInDevices()
+        {
+
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 0), 90, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(0, 5), 0, null, null);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(5, 4);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
+            //List<Device> lis = locator.GetDevicesInView(iPad);
+
+            Assert.IsTrue(dic.Count == 0);
+
+
         }
 
         [TestMethod()]

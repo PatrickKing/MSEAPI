@@ -292,6 +292,9 @@ namespace MSELocator
 
             foreach (Device target in devicesInView)
             {
+                if (target.Width == null || target.Width == null)
+                    continue;
+
                 List<Line> sides = getLinesOfShape(target);
                 List<Point?> intersectionPoints = new List<Point?>();
 
@@ -368,10 +371,11 @@ namespace MSELocator
 
             foreach (Point point in intPoints)
             {
+                double angle;
                 // Check if the device's orientation is not null
                 if (device.Orientation != null)
-                { double angle = (Double)device.Orientation * Math.PI / 180; }
-                else { double angle = (3 * Math.PI) / 2; }
+                { angle = (Double)device.Orientation * Math.PI / 180; }
+                else { angle = (3 * Math.PI) / 2; }
                 double xValue = (point.X - deviceLocation.X) * Math.Cos(angle) - (point.Y - deviceLocation.Y) * Math.Sin(angle) + deviceLocation.X;
                 double yValue = (point.Y - deviceLocation.Y) * Math.Cos(angle) + (point.X - deviceLocation.X) * Math.Sin(angle) + deviceLocation.Y;
 

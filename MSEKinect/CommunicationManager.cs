@@ -314,6 +314,50 @@ namespace MSEKinect
 
         }
 
+        void GetDevicesWithIntersectionPoint(IARequest request, IAResponse response)
+        {
+            String deviceIdentifier = request.Parameters["identifier"];
+
+            // Find the associated device in the Current Devices 
+            Device observer = locator.Devices.Find(d => d.Identifier.Equals(deviceIdentifier));
+            if (observer == null)
+            {
+                response.StatusCode = 404;
+                return;
+            }
+
+            Dictionary<IntermediateDevice, Point> deviceAndIntersections = ConvertToUsePairableDevices(locator.GetDevicesInViewWithIntersectionPoints4(observer)); 
+            
+            // Get the devices in view, and convert them for serialization
+            List<Device> devicesInView = locator.GetDevicesInView(observer);
+            List<IntermediateDevice> intDevices = PairableDevice.GetCompleteIntermediateDevicesList(devicesInView);
+            if (intDevices.Count == 0)
+            {
+                response.StatusCode = 404;
+                return;
+            }
+
+            response.SetBodyWith(intDevices);
+        }
+
+        private Dictionary<IntermediateDevice, Point> ConvertToUsePairableDevices(Dictionary<Device, Point> inputDictionary)
+        {
+            Dictionary<IntermediateDevice, Point> convertedDictionary = new Dictionary<IntermediateDevice, Point>();
+
+            foreach (KeyValuePair<Device,Point> entry in inputDictionary)
+            {
+                //Convert from Device to PairableDevice
+                //TODO - Fix this atrocity
+                IntermediateDevice intermediateDevice = PairableDevice.GetCompleteIntermediateDevice(entry.Key); 
+                convertedDictionary.Add(intermediateDevice,entry.Value); 
+            }
+
+            return convertedDictionary;
+
+        }
+
+
+
 
         #endregion
 

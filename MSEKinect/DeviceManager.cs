@@ -65,6 +65,9 @@ namespace MSEKinect
 				PairingState = PairingState.NotPaired
 			};
 
+            FindDeviceWidthAndHeight(iaDevice); 
+
+
             if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
             {
                 IARequest request = new IARequest(Routes.GetLocationRoute);
@@ -102,6 +105,44 @@ namespace MSEKinect
 				DeviceAdded(this, pairableDevice);
 			
 		}
+
+        private void FindDeviceWidthAndHeight(IADevice iaDevice)
+        {
+            //Does the device contain and width and height route 
+            if (iaDevice.SupportedRoutes.Contains(Routes.GetWidthAndHeightRoute))
+            {
+                IARequest request = new IARequest(Routes.GetWidthAndHeightRoute);
+                IntAirAct.SendRequest(request, iaDevice, delegate(IAResponse response, Exception error)
+                {
+                    if (response == null || response.StatusCode == 404)
+                    {
+                        logger.TraceEvent(TraceEventType.Error, 100, "All devices should provide a width and height"); 
+                    }
+                    else if (response.StatusCode == 200)
+                    {
+                        Dictionary<String,double> dictionary = response.BodyAs<Dictionary<String,double>>();
+
+                        Device localDevice = locator.Devices.Find(d => d.Identifier.Equals(iaDevice.Name));
+
+                        //Device still exists, set width and height for device
+                        if (localDevice != null)
+                        {
+                            localDevice.Height = dictionary["height"];
+                            localDevice.Width = dictionary["width"];
+                            
+                        }
+                        //Otherwise, device has disappeared, no action required
+                        else
+                        {
+                            
+                        }
+
+                    }
+                });
+
+            }
+
+        }
 
 		public void DeviceLost(IADevice iaDevice)
 		{
