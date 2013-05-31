@@ -49,6 +49,7 @@ namespace MSEKinect
             intAirAct.Route(Routes.GetAllDevicesInViewRoute, new Action<IARequest, IAResponse>(GetDevicesInView));
             intAirAct.Route(Routes.GetNearestDeviceInRangeRoute, new Action<IARequest, IAResponse>(GetNearestDeviceInRange));
             intAirAct.Route(Routes.GetAllDevicesInRangeRoute, new Action<IARequest, IAResponse>(GetDevicesInRange));
+            intAirAct.Route(Routes.GetAllDevicesWithIntersectionPointsRoute, new Action<IARequest, IAResponse>(GetDevicesWithIntersectionPoint));
 
 
 

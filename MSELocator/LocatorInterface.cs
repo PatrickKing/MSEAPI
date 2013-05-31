@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 
 namespace MSELocator
 {
@@ -44,6 +45,8 @@ namespace MSELocator
         Device GetNearestDeviceWithinRange(String identifier, double distance);
 
         Device GetNearestDeviceWithinRange(Device observer, double distance);
+
+        Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints4(Device observer);
 
         #endregion
 
