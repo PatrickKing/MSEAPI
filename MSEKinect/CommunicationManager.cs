@@ -327,33 +327,31 @@ namespace MSEKinect
                 return;
             }
 
-            Dictionary<IntermediateDevice, Point> deviceAndIntersections = ConvertToUsePairableDevices(locator.GetDevicesInViewWithIntersectionPoints4(observer)); 
-            
-            // Get the devices in view, and convert them for serialization
-            List<Device> devicesInView = locator.GetDevicesInView(observer);
-            List<IntermediateDevice> intDevices = PairableDevice.GetCompleteIntermediateDevicesList(devicesInView);
-            if (intDevices.Count == 0)
+            List<IntermediateDevice> deviceAndIntersections = ConvertToUsePairableDevices(locator.GetDevicesInViewWithIntersectionPoints4(observer));
+
+            if (deviceAndIntersections.Count == 0)
             {
                 response.StatusCode = 404;
                 return;
             }
 
-            response.SetBodyWith(intDevices);
+            response.SetBodyWith(deviceAndIntersections);
         }
 
-        private Dictionary<IntermediateDevice, Point> ConvertToUsePairableDevices(Dictionary<Device, Point> inputDictionary)
+        private List<IntermediateDevice> ConvertToUsePairableDevices(Dictionary<Device, Point> inputDictionary)
         {
-            Dictionary<IntermediateDevice, Point> convertedDictionary = new Dictionary<IntermediateDevice, Point>();
+            List<IntermediateDevice> convertedList = new List<IntermediateDevice>();
 
             foreach (KeyValuePair<Device,Point> entry in inputDictionary)
             {
-                //Convert from Device to PairableDevice
+                //Convert from Device to IntermediateDevice
                 //TODO - Fix this atrocity
-                IntermediateDevice intermediateDevice = PairableDevice.GetCompleteIntermediateDevice(entry.Key); 
-                convertedDictionary.Add(intermediateDevice,entry.Value); 
+                IntermediateDevice intermediateDevice = PairableDevice.GetCompleteIntermediateDevice(entry.Key);
+                intermediateDevice.intersectionPoint = entry.Value;
+                convertedList.Add(intermediateDevice); 
             }
 
-            return convertedDictionary;
+            return convertedList;
 
         }
 
