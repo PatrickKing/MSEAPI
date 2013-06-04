@@ -163,7 +163,7 @@ namespace MSELocator
                 // Check if the device's orientation is not null
                 if (device.Orientation != null)
                 { angle = (Double)device.Orientation * Math.PI / 180; }
-                else { angle =  Math.PI / 2; }
+                else { angle = 0; }
                 double xValue = (point.X - deviceLocation.X) * Math.Cos(angle) - (point.Y - deviceLocation.Y) * Math.Sin(angle) + deviceLocation.X;
                 double yValue = (point.Y - deviceLocation.Y) * Math.Cos(angle) + (point.X - deviceLocation.X) * Math.Sin(angle) + deviceLocation.Y;
 
