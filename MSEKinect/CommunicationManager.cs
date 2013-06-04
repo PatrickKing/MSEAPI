@@ -327,7 +327,7 @@ namespace MSEKinect
                 return;
             }
 
-            List<IntermediateDevice> deviceAndIntersections = ConvertToUsePairableDevices(locator.GetDevicesInViewWithIntersectionPoints4(observer));
+            List<IntermediateDevice> deviceAndIntersections = ConvertToUsePairableDevices(locator.GetDevicesInViewWithIntersectionPoints(observer));
 
             if (deviceAndIntersections.Count == 0)
             {

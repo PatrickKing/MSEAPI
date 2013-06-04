@@ -66,7 +66,7 @@ namespace MSELocatorTests
 
             Point p = new Point(2, 2);
 
-            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints3(iPad);
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
 
             Assert.IsTrue(dic.Count == 0);
             //Assert.AreEqual(dic[table].X, p.X, 0.01);
@@ -90,7 +90,7 @@ namespace MSELocatorTests
 
             Point p = new Point(4, 4);
 
-            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
 
             //Assert.IsTrue(dic.Count == 0);
             Assert.AreEqual(dic[table].X, p.X, 0.01);
@@ -111,7 +111,7 @@ namespace MSELocatorTests
 
             Point p = new Point(5, 4);
 
-            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
 
             //Assert.IsTrue(dic.Count == 0);
             Assert.AreEqual(dic[table].X, p.X, 0.01);
@@ -132,7 +132,7 @@ namespace MSELocatorTests
 
             Point p = new Point(5, 4);
 
-            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
             //List<Device> lis = locator.GetDevicesInView(iPad);
 
              Assert.IsTrue(dic.Count == 0);
@@ -154,7 +154,7 @@ namespace MSELocatorTests
 
             Point p = new Point(5, 4);
 
-            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints4(iPad);
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
             //List<Device> lis = locator.GetDevicesInView(iPad);
 
             Assert.IsTrue(dic.Count == 0);
