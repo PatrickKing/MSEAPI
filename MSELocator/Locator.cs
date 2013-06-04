@@ -152,10 +152,10 @@ namespace MSELocator
             List<Point> intPoints = new List<Point>();
             Point deviceLocation = device.Location.Value;
 
-            intPoints.Add(new Point((double)(deviceLocation.X - device.Width / 2), (double)(deviceLocation.Y + device.Height / 2)));
             intPoints.Add(new Point((double)(deviceLocation.X + device.Width / 2), (double)(deviceLocation.Y + device.Height / 2)));
             intPoints.Add(new Point((double)(deviceLocation.X + device.Width / 2), (double)(deviceLocation.Y - device.Height / 2)));
             intPoints.Add(new Point((double)(deviceLocation.X - device.Width / 2), (double)(deviceLocation.Y - device.Height / 2)));
+            intPoints.Add(new Point((double)(deviceLocation.X - device.Width / 2), (double)(deviceLocation.Y + device.Height / 2)));
 
             foreach (Point point in intPoints)
             {
@@ -163,7 +163,7 @@ namespace MSELocator
                 // Check if the device's orientation is not null
                 if (device.Orientation != null)
                 { angle = (Double)device.Orientation * Math.PI / 180; }
-                else { angle = (3 * Math.PI) / 2; }
+                else { angle =  Math.PI / 2; }
                 double xValue = (point.X - deviceLocation.X) * Math.Cos(angle) - (point.Y - deviceLocation.Y) * Math.Sin(angle) + deviceLocation.X;
                 double yValue = (point.Y - deviceLocation.Y) * Math.Cos(angle) + (point.X - deviceLocation.X) * Math.Sin(angle) + deviceLocation.Y;
 
@@ -190,8 +190,8 @@ namespace MSELocator
             Double distance3 = Line.getDistanceBetweenPoints(cornersOfShape[0],cornersOfShape[1]);
             if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
             {
-                Double yRatio = distance1 / distance3;
-                Double xRatio = 1;
+                Double xRatio = distance1 / distance3;
+                Double yRatio = 0;
                 return new Point(xRatio, yRatio);
             }
 
@@ -200,8 +200,8 @@ namespace MSELocator
             distance3 = Line.getDistanceBetweenPoints(cornersOfShape[1], cornersOfShape[2]);
             if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
             {
-                Double yRatio = 1;
-                Double xRatio = distance1 / distance3;
+                Double xRatio = 1;
+                Double yRatio = distance2 / distance3;
                 return new Point(xRatio, yRatio);
             }
 
@@ -210,8 +210,8 @@ namespace MSELocator
             distance3 = Line.getDistanceBetweenPoints(cornersOfShape[2], cornersOfShape[3]);
             if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
             {
-                Double yRatio = distance1 / distance3;
-                Double xRatio = 0;
+                Double xRatio = distance1 / distance3;
+                Double yRatio = 1;
                 return new Point(xRatio, yRatio);
             }
 
@@ -220,8 +220,8 @@ namespace MSELocator
             distance3 = Line.getDistanceBetweenPoints(cornersOfShape[3], cornersOfShape[0]);
             if (Math.Abs(distance3 - (distance1 + distance2)) < 0.01)
             {
-                Double yRatio = 0;
-                Double xRatio = distance1 / distance3;
+                Double xRatio = 0;
+                Double yRatio = distance2 / distance3;
                 return new Point(xRatio, yRatio);
             }
 
