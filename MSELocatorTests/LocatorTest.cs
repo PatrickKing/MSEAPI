@@ -120,20 +120,18 @@ namespace MSELocatorTests
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0,0), 45, 0.5, 0.5);
-            Device table = GenerateDeviceWithDimensions("TableTop", new Point(5,5), 90, 2, 2);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(4,0), 135, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(2,2), null, 2, 2);
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            Point p = new Point(0, 1);
+            Point p = new Point(1, 1);
 
             Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
-            //List<Device> lis = locator.GetDevicesInView(iPad);
 
-             //Assert.IsTrue(dic.Count == 0);
-             Assert.AreEqual(dic[table].X, p.X, 0.01);
-             Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
         }
 
         [TestMethod()]
@@ -142,18 +140,128 @@ namespace MSELocatorTests
 
             Locator locator = new Locator();
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 0), 90, 0.5, 0.5);
-            Device table = GenerateDeviceWithDimensions("TableTop", new Point(0, 5), 0, null, null);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(4, 4), 225, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(2, 2), null, 2, 2);
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            Point p = new Point(5, 4);
+            Point p = new Point(1, 0);
 
             Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
-            //List<Device> lis = locator.GetDevicesInView(iPad);
 
-            Assert.IsTrue(dic.Count == 0);
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+
+
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPoints_belowCenter()
+        {
+
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(2, 0), 90, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(2, 2), null, 2, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(0.5, 1);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+
+
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPoints_aboveCenter()
+        {
+
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(2, 4), 270, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(2, 2), null, 2, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(0.5, 0);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+
+
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPoints_rightToCenter()
+        {
+
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(4, 2), 180, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(2, 2), null, 2.5, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(1, 0.5);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+
+
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPoints_leftToCenter()
+        {
+
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 2), 0, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(2, 2), null, 2.5, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(0, 0.5);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+
+
+        }
+
+        [TestMethod()]
+        public void GetDevicesInViewWithIntersectionPoints_55DegreesFromLowerLeft()
+        {
+
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(1, 0), 55, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(2, 2), null, 2.5, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(0.26, 1);
+
+            Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+
+            Assert.AreEqual(dic[table].X, p.X, 0.01);
+            Assert.AreEqual(dic[table].Y, p.Y, 0.01);
 
 
         }

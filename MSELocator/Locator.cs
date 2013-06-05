@@ -157,26 +157,26 @@ namespace MSELocator
             intPoints.Add(new Point((double)(deviceLocation.X - device.Width / 2), (double)(deviceLocation.Y - device.Height / 2)));
             intPoints.Add(new Point((double)(deviceLocation.X - device.Width / 2), (double)(deviceLocation.Y + device.Height / 2)));
 
+            double angle;
+            // Check if the device's orientation is not null
+            if (device.Orientation != null)
+            {
+                // This will help when we consider sending to moving devices that change its 
+                // orientation dynamically. The choice of 270 is for consistency with the 
+                // current code that handles the special case of a tabletop facing away 
+                // from the kinect
+                angle = ((Double)device.Orientation - 270);
+                angle = angle * Math.PI / 180;
+            }
+
+            else
+            {
+                // No changes neccessary
+                return intPoints;
+            }
+
             foreach (Point point in intPoints)
             {
-                double angle;
-                // Check if the device's orientation is not null
-                if (device.Orientation != null)
-                {
-                    // This will help when we consider sending to moving devices that change its 
-                    // orientation dynamically. The choice of 270 is for consistency with the 
-                    // current code that handles the special case of a tabletop facing away 
-                    // from the kinect
-                    angle = ((Double)device.Orientation - 270);
-                    angle = angle * Math.PI / 180; 
-                }
-
-                else 
-                { 
-                    // No changes neccessary
-                    returnPoints.Add(point);
-                    continue;
-                }
                 double xValue = (point.X - deviceLocation.X) * Math.Cos(angle) - (point.Y - deviceLocation.Y) * Math.Sin(angle) + deviceLocation.X;
                 double yValue = (point.Y - deviceLocation.Y) * Math.Cos(angle) + (point.X - deviceLocation.X) * Math.Sin(angle) + deviceLocation.Y;
 

@@ -127,19 +127,29 @@ namespace MSELocator
 
             if (line1.isLineSegement)
             {
-                if (IntersectionPoint.Value.X > line1.startPoint.Value.X && IntersectionPoint.Value.X > line1.endPoint.Value.X ||
-                    IntersectionPoint.Value.X < line1.startPoint.Value.X && IntersectionPoint.Value.X < line1.endPoint.Value.X ||
-                    IntersectionPoint.Value.Y > line1.startPoint.Value.Y && IntersectionPoint.Value.Y > line1.endPoint.Value.Y ||
-                    IntersectionPoint.Value.Y < line1.startPoint.Value.Y && IntersectionPoint.Value.Y < line1.endPoint.Value.Y)
+                //if (IntersectionPoint.Value.X > line1.startPoint.Value.X && IntersectionPoint.Value.X > line1.endPoint.Value.X ||
+                //    IntersectionPoint.Value.X < line1.startPoint.Value.X && IntersectionPoint.Value.X < line1.endPoint.Value.X ||
+                //    IntersectionPoint.Value.Y > line1.startPoint.Value.Y && IntersectionPoint.Value.Y > line1.endPoint.Value.Y ||
+                //    IntersectionPoint.Value.Y < line1.startPoint.Value.Y && IntersectionPoint.Value.Y < line1.endPoint.Value.Y)
+                //    return null;
+                if(isGreater(IntersectionPoint.Value.X, line1.startPoint.Value.X) && isGreater(IntersectionPoint.Value.X, line1.endPoint.Value.X) ||
+                    isLess(IntersectionPoint.Value.X, line1.startPoint.Value.X) && isLess(IntersectionPoint.Value.X, line1.endPoint.Value.X) ||
+                    isGreater(IntersectionPoint.Value.Y, line1.startPoint.Value.Y) && isGreater(IntersectionPoint.Value.Y, line1.endPoint.Value.Y) ||
+                    isLess(IntersectionPoint.Value.Y, line1.startPoint.Value.Y) && isLess(IntersectionPoint.Value.Y, line1.endPoint.Value.Y))
                     return null;
             }
             
             if (line2.isLineSegement)
             {
-                if (IntersectionPoint.Value.X > line2.startPoint.Value.X && IntersectionPoint.Value.X > line2.endPoint.Value.X ||
-                    IntersectionPoint.Value.X < line2.startPoint.Value.X && IntersectionPoint.Value.X < line2.endPoint.Value.X ||
-                    IntersectionPoint.Value.Y > line2.startPoint.Value.Y && IntersectionPoint.Value.Y > line2.endPoint.Value.Y ||
-                    IntersectionPoint.Value.Y < line2.startPoint.Value.Y && IntersectionPoint.Value.Y < line2.endPoint.Value.Y)
+                //if (IntersectionPoint.Value.X > line2.startPoint.Value.X && IntersectionPoint.Value.X > line2.endPoint.Value.X ||
+                //    IntersectionPoint.Value.X < line2.startPoint.Value.X && IntersectionPoint.Value.X < line2.endPoint.Value.X ||
+                //    IntersectionPoint.Value.Y > line2.startPoint.Value.Y && IntersectionPoint.Value.Y > line2.endPoint.Value.Y ||
+                //    IntersectionPoint.Value.Y < line2.startPoint.Value.Y && IntersectionPoint.Value.Y < line2.endPoint.Value.Y)
+                //    return null;
+                if (isGreater(IntersectionPoint.Value.X, line2.startPoint.Value.X) && isGreater(IntersectionPoint.Value.X, line2.endPoint.Value.X) ||
+                    isLess(IntersectionPoint.Value.X, line2.startPoint.Value.X) && isLess(IntersectionPoint.Value.X, line2.endPoint.Value.X) ||
+                    isGreater(IntersectionPoint.Value.Y, line2.startPoint.Value.Y) && isGreater(IntersectionPoint.Value.Y, line2.endPoint.Value.Y) ||
+                    isLess(IntersectionPoint.Value.Y, line2.startPoint.Value.Y) && isLess(IntersectionPoint.Value.Y, line2.endPoint.Value.Y))
                     return null;
             }
              
@@ -153,7 +163,20 @@ namespace MSELocator
             return distance;
         }
 
+        public static bool isGreater(Double num1, Double num2)
+        {
+            Double answer = num1 - num2;
+            answer = Math.Round(answer, 3);
+            if (answer > 0) { return true; }
+            return false;
+        }
 
-        
+        public static bool isLess(Double num1, Double num2)
+        {
+            Double answer = num1 - num2;
+            answer = Math.Round(answer, 3);
+            if (answer < 0) { return true; }
+            return false;
+        }
     }
 }
