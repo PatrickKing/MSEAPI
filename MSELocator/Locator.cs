@@ -162,9 +162,18 @@ namespace MSELocator
                 double angle;
                 // Check if the device's orientation is not null
                 if (device.Orientation != null)
-                { angle = (Double)device.Orientation * Math.PI / 180; }
+                {
+                    // This will help when we consider sending to moving devices that change its 
+                    // orientation dynamically. The choice of 270 is for consistency with the 
+                    // current code that handles the special case of a tabletop facing away 
+                    // from the kinect
+                    angle = ((Double)device.Orientation - 270);
+                    angle = angle * Math.PI / 180; 
+                }
+
                 else 
                 { 
+                    // No changes neccessary
                     returnPoints.Add(point);
                     continue;
                 }

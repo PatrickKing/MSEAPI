@@ -80,20 +80,16 @@ namespace MSELocatorTests
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
 
-            //Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 2.5), 0, 0.5, 0.5);
-            //Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 2.5), 0, 1, 5);
-
             Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0,0), 45, 0.5, 0.5);
-            Device table = GenerateDeviceWithDimensions("TableTop", new Point(5,5), 0, 2, 2);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(5,5), null, 2, 2);
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            Point p = new Point(4, 4);
+            Point p = new Point(0, 1);
 
             Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
 
-            //Assert.IsTrue(dic.Count == 0);
             Assert.AreEqual(dic[table].X, p.X, 0.01);
             Assert.AreEqual(dic[table].Y, p.Y, 0.01);
         }
@@ -104,17 +100,16 @@ namespace MSELocatorTests
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(5, 0), 90, 0.5, 0.5);
-            Device table = GenerateDeviceWithDimensions("TableTop", new Point(5, 5), 90, 2, 2);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 6), 315, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(6, 2), null, 2, 6);
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            Point p = new Point(5, 4);
+            Point p = new Point(0, 0);
 
             Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
 
-            //Assert.IsTrue(dic.Count == 0);
             Assert.AreEqual(dic[table].X, p.X, 0.01);
             Assert.AreEqual(dic[table].Y, p.Y, 0.01);
         }
