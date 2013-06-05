@@ -9,6 +9,7 @@ namespace MSELocatorTests
     [TestClass]
     public class LocatorTest
     {
+        #region Helper Functions
 
         public Device GenerateDevice(String id, Point loc, Double orn)
         {
@@ -32,19 +33,23 @@ namespace MSELocatorTests
             };
         }
 
+        #endregion 
+
+        #region GetDevicesInViewWithIntersectionPoint Tests
+
         [TestMethod()]
-        public void GetDevicesInViewWithIntersectionPointsTests()
+        public void GetDevicesInViewWithIntersectionPoints_normalInput()
         {
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 0), 45, 1, 1);
-            Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 2.5), 0, 1, 5);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(3, 0), 70, 1, 1);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(4, 3), null, 1, 5);
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            Point p = new Point(2,2);
+            Point p = new Point(0.48,1);
 
             Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
 
@@ -53,28 +58,24 @@ namespace MSELocatorTests
         }
 
         [TestMethod()]
-        public void GetDevicesInViewWithIntersectionPoints3Tests_normalInput()
+        public void GetDevicesInViewWithIntersectionPoints_nullHeightAndWidth()
         {
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
 
-            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 0), 46, 1, 1);
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(0, 0), 45, 1, 1);
             Device table = GenerateDeviceWithDimensions("TableTop", new Point(3, 3), 45, null, null); 
 
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            Point p = new Point(2, 2);
-
             Dictionary<Device, Point> dic = locator.GetDevicesInViewWithIntersectionPoints(iPad);
 
             Assert.IsTrue(dic.Count == 0);
-            //Assert.AreEqual(dic[table].X, p.X, 0.01);
-            //Assert.AreEqual(dic[table].Y, p.Y, 0.01);
         }
 
         [TestMethod()]
-        public void GetDevicesInViewWithIntersectionPointsTests2()
+        public void GetDevicesInViewWithIntersectionPoints_lowerLeftCorner()
         {
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
@@ -98,7 +99,7 @@ namespace MSELocatorTests
         }
 
         [TestMethod()]
-        public void GetDevicesInViewWithIntersectionPointsTests3()
+        public void GetDevicesInViewWithIntersectionPoints_upperLeftCorner()
         {
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
@@ -119,7 +120,7 @@ namespace MSELocatorTests
         }
 
         [TestMethod()]
-        public void GetDevicesInViewWithIntersectionPointsTests4()
+        public void GetDevicesInViewWithIntersectionPoints_lowerRightCorner()
         {
             //Create Locator with Devices which should intersect
             Locator locator = new Locator();
@@ -141,7 +142,7 @@ namespace MSELocatorTests
         }
 
         [TestMethod()]
-        public void GetDevicesInViewWithIntersectionPoints_NullValuesInDevices()
+        public void GetDevicesInViewWithIntersectionPoints_upperRightCorner()
         {
 
             Locator locator = new Locator();
@@ -161,6 +162,10 @@ namespace MSELocatorTests
 
 
         }
+
+        #endregion
+
+        #region GetDevicesInView Tests
 
         [TestMethod()]
         public void GetDevicesInViewTest()
@@ -214,5 +219,6 @@ namespace MSELocatorTests
             Assert.AreEqual(315.0, result, 0.001);
         }
 
+        #endregion 
     }
 }
