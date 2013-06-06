@@ -165,7 +165,7 @@ namespace MSELocator
                 // orientation dynamically. The choice of 270 is for consistency with the 
                 // current code that handles the special case of a tabletop facing away 
                 // from the kinect
-                angle = ((Double)device.Orientation - 270);
+                angle = ((Double)device.Orientation - 90);
                 angle = angle * Math.PI / 180;
             }
 
