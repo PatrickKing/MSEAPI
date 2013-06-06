@@ -371,5 +371,15 @@ namespace RoomVisualizer
         {
             this.pairableDevice.Orientation = e.Time;
         }
+
+        private void DeviceRectangle_MouseEnter(object sender, MouseEventArgs e)
+        {
+            deviceRotationControl.Opacity = 1;
+        }
+
+        private void DeviceRectangle_MouseLeave(object sender, MouseEventArgs e)
+        {
+            deviceRotationControl.Opacity = 0;
+        }
     }
 }

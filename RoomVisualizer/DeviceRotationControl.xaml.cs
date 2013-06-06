@@ -29,6 +29,7 @@ namespace RoomVisualizer
 
             slabel.FontSize = 20;
             slabel.Content = "90";
+            this.Opacity = 0;
         }
 
         private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -45,6 +46,15 @@ namespace RoomVisualizer
             _started = true;
         }
 
+        private void Viewport3D_MouseEnter(object sender, MouseEventArgs e)
+        {
+            this.Opacity = 1;
+        }
+
+        private void Viewport3D_MouseLeave(object sender, MouseEventArgs e)
+        {
+            this.Opacity = 0;
+        }
     }
 
     public class RotationSliderEventArgs : EventArgs
