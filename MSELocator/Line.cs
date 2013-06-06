@@ -127,11 +127,6 @@ namespace MSELocator
 
             if (line1.isLineSegement)
             {
-                //if (IntersectionPoint.Value.X > line1.startPoint.Value.X && IntersectionPoint.Value.X > line1.endPoint.Value.X ||
-                //    IntersectionPoint.Value.X < line1.startPoint.Value.X && IntersectionPoint.Value.X < line1.endPoint.Value.X ||
-                //    IntersectionPoint.Value.Y > line1.startPoint.Value.Y && IntersectionPoint.Value.Y > line1.endPoint.Value.Y ||
-                //    IntersectionPoint.Value.Y < line1.startPoint.Value.Y && IntersectionPoint.Value.Y < line1.endPoint.Value.Y)
-                //    return null;
                 if(isGreater(IntersectionPoint.Value.X, line1.startPoint.Value.X) && isGreater(IntersectionPoint.Value.X, line1.endPoint.Value.X) ||
                     isLess(IntersectionPoint.Value.X, line1.startPoint.Value.X) && isLess(IntersectionPoint.Value.X, line1.endPoint.Value.X) ||
                     isGreater(IntersectionPoint.Value.Y, line1.startPoint.Value.Y) && isGreater(IntersectionPoint.Value.Y, line1.endPoint.Value.Y) ||
@@ -141,11 +136,6 @@ namespace MSELocator
             
             if (line2.isLineSegement)
             {
-                //if (IntersectionPoint.Value.X > line2.startPoint.Value.X && IntersectionPoint.Value.X > line2.endPoint.Value.X ||
-                //    IntersectionPoint.Value.X < line2.startPoint.Value.X && IntersectionPoint.Value.X < line2.endPoint.Value.X ||
-                //    IntersectionPoint.Value.Y > line2.startPoint.Value.Y && IntersectionPoint.Value.Y > line2.endPoint.Value.Y ||
-                //    IntersectionPoint.Value.Y < line2.startPoint.Value.Y && IntersectionPoint.Value.Y < line2.endPoint.Value.Y)
-                //    return null;
                 if (isGreater(IntersectionPoint.Value.X, line2.startPoint.Value.X) && isGreater(IntersectionPoint.Value.X, line2.endPoint.Value.X) ||
                     isLess(IntersectionPoint.Value.X, line2.startPoint.Value.X) && isLess(IntersectionPoint.Value.X, line2.endPoint.Value.X) ||
                     isGreater(IntersectionPoint.Value.Y, line2.startPoint.Value.Y) && isGreater(IntersectionPoint.Value.Y, line2.endPoint.Value.Y) ||
