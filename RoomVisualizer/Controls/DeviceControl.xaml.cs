@@ -24,6 +24,8 @@ namespace RoomVisualizer
     /// </summary>
     public partial class DeviceControl : UserControl
     {
+        private DeviceRotationControl deviceRotationControl;
+
         private enum DisplayState
         {
             UnpairedAndOnStackPanel,
@@ -92,6 +94,11 @@ namespace RoomVisualizer
 
         public void formatSurfaceForCanvas()
         {
+            deviceRotationControl.Visibility = System.Windows.Visibility.Visible;
+            LeftLine.Visibility = System.Windows.Visibility.Visible;
+            RightLine.Visibility = System.Windows.Visibility.Visible;
+            this.pairableDevice.Orientation = 90;
+
             double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
             InnerBorder.Width = Math.Ceiling(deviceSize * 0.67);
             InnerBorder.Height = Math.Ceiling(deviceSize * 0.67);
@@ -145,6 +152,8 @@ namespace RoomVisualizer
 
         public void formatForStackPanel()
         {
+            deviceRotationControl.Visibility = System.Windows.Visibility.Hidden;
+
             InnerBorder.Width = 64;
             InnerBorder.Height = 64;
 
@@ -172,6 +181,12 @@ namespace RoomVisualizer
 
             this.iaDevice = iaDevice;
             this.pairableDevice = pairableDevice;
+
+            deviceRotationControl = new DeviceRotationControl();
+            deviceRotationControl.onSliderValueChanged += new EventHandler<RotationSliderEventArgs>(onOrientationSliderChanged);
+            canvas.Children.Add(deviceRotationControl);
+            Canvas.SetLeft(deviceRotationControl, 0);
+            Canvas.SetTop(deviceRotationControl, 0);
 
             //Setup Events
             pairableDevice.LocationChanged += onLocationChanged;
@@ -211,12 +226,15 @@ namespace RoomVisualizer
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            base.OnMouseDown(e);
-
-            // We consider it a drag only if the Device is a stationary Device, and the mouse button is pushed
-            if (e.LeftButton == MouseButtonState.Pressed)
+            if (e.OriginalSource == DeviceRectangle)
             {
-                startDragging();
+                base.OnMouseDown(e);
+
+                // We consider it a drag only if the Device is a stationary Device, and the mouse button is pushed
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    startDragging();
+                }
             }
         }
 
@@ -347,6 +365,11 @@ namespace RoomVisualizer
 
             }));
 
+        }
+
+        void onOrientationSliderChanged(object sender, RotationSliderEventArgs e)
+        {
+            this.pairableDevice.Orientation = e.Time;
         }
     }
 }
