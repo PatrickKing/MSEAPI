@@ -28,7 +28,7 @@ namespace RoomVisualizer
             InitializeComponent();
 
             slabel.FontSize = 20;
-            slabel.Content = "90";
+            slabel.Content = "90°";
             this.Opacity = 0;
         }
 
@@ -36,7 +36,7 @@ namespace RoomVisualizer
         {
             if (_started)
             {
-                slabel.Content = ((int)rotationSlider.Value).ToString();
+                slabel.Content = ((int)rotationSlider.Value).ToString() + "°";
                 onSliderValueChanged(this, new RotationSliderEventArgs((int)rotationSlider.Value));
             }
         }

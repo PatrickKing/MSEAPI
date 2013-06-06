@@ -24,7 +24,7 @@
                                   Orientation="Horizontal"
                                   Width="75"
                                   Minimum="0"
-                                  Maximum="360"
+                                  Maximum="359"
                                   Initialized="timeSlider_Initialized"
                                   ValueChanged="slider_ValueChanged" 
                                   Value="90" />
