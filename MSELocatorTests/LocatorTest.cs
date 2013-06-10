@@ -266,6 +266,29 @@ namespace MSELocatorTests
 
         }
 
+        [TestMethod()]
+        public void GetDevicesInFront()
+        {
+
+            Locator locator = new Locator();
+
+            Device iPad = GenerateDeviceWithDimensions("iPad", new Point(4, 4), 90, 0.5, 0.5);
+            Device table = GenerateDeviceWithDimensions("TableTop", new Point(100, 5), null, 2, 2);
+
+            locator.Devices.Add(iPad);
+            locator.Devices.Add(table);
+
+            Point p = new Point(1, 0);
+
+            List<Device> dic = locator.GetDevicesInFront(iPad);
+
+            Assert.AreEqual(dic.Count , 1);
+            //Assert.AreEqual(dic[table].X, p.X, 0.01);
+            //Assert.AreEqual(dic[table].Y, p.Y, 0.01);
+
+
+        }
+
         #endregion
 
         #region GetDevicesInView Tests

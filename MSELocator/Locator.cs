@@ -76,7 +76,7 @@ namespace MSELocator
 
             Line obseverLineOfSight = new Line(observer.Location, observer.Orientation);
 
-            List<Device> devicesInView = GetDevicesInView(observer);
+            List<Device> devicesInView = GetDevicesInFront(observer);
 
             foreach (Device target in devicesInView)
             {
@@ -301,6 +301,59 @@ namespace MSELocator
             return returnDevices;
 
         }
+
+        /// <summary>
+        /// Computes the devices that are in front of the observer device. Returns an empty list if FieldOfView or Location are null on the observer.
+        /// </summary>
+        /// <param name="observer"></param>
+        /// <returns>Devices in the field of view of the observer.</returns>
+        public List<Device> GetDevicesInFront(Device observer)
+        {
+            List<Device> returnDevices = new List<Device>();
+
+            //(CB - Should we throw an exception here? Rather then just returning an empty list?)
+            if (observer.Location == null || observer.Orientation == null)
+                return returnDevices;
+            if (observer.FieldOfView == 0.0)
+                return returnDevices;
+
+            // We imagine the field of view as two vectors, pointing away from the observing device. Targets between the vectors are in view.
+            // We will use angles to represent these vectors.
+            double leftFieldOfView = Util.NormalizeAngle(observer.Orientation.Value + 90);
+            double rightFieldOfView = Util.NormalizeAngle(observer.Orientation.Value - 90);
+
+
+            foreach (Device target in _devices)
+            {
+                if (target == observer || !target.Location.HasValue)
+                    continue;
+
+                // Atan2 is the inverse tangent function, given lengths for the opposite and adjacent legs of a right triangle, it returns the angle
+                double angle = Util.NormalizeAngle(Math.Atan2(target.Location.Value.Y - observer.Location.Value.Y, target.Location.Value.X - observer.Location.Value.X) * 180 / Math.PI);
+
+                // Ordinarily, the angle defining the left boundary of the field of view will be larger than the angle for the right.
+                // For example, if our device has an orientation of 90.0 and a field of view of 15 degrees, then the left and right FoV vectors are at 97.5 and 82.5 degrees.
+                // In this case, the target must be at an angle between left and right to be in view.
+                if (leftFieldOfView > rightFieldOfView && angle < leftFieldOfView && angle > rightFieldOfView)
+                {
+                    returnDevices.Add(target);
+                }
+                // If the field of view includes the X axis, then the left field of view will be smaller than the right field of view.
+                // For example, if our device has an orientation of 0.0 and a field of view of 15 degrees, then the left FoV vector will be at 7.5 degrees,
+                // and the right FoV will be at 352.5 degrees.
+                else if (leftFieldOfView < rightFieldOfView)
+                {
+                    if (angle < leftFieldOfView || angle > rightFieldOfView)
+                        returnDevices.Add(target);
+                }
+
+
+            }
+
+            return returnDevices;
+
+        }
+
         #endregion
 
         #region GetNearestDeviceInView
