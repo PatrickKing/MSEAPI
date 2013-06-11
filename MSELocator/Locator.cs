@@ -319,8 +319,8 @@ namespace MSELocator
 
             // We imagine the field of view as two vectors, pointing away from the observing device. Targets between the vectors are in view.
             // We will use angles to represent these vectors.
-            double leftFieldOfView = Util.NormalizeAngle(observer.Orientation.Value + 90);
-            double rightFieldOfView = Util.NormalizeAngle(observer.Orientation.Value - 90);
+            double leftFieldOfView = Util.NormalizeAngle(observer.Orientation.Value + 30);
+            double rightFieldOfView = Util.NormalizeAngle(observer.Orientation.Value - 30);
 
 
             foreach (Device target in _devices)
