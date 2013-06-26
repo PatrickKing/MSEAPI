@@ -186,7 +186,7 @@ namespace RoomVisualizer
                     double distance = Math.Sqrt(Math.Pow(mouseLocationOnCanvas.X - personLocation.X, 2) + Math.Pow(mouseLocationOnCanvas.Y - personLocation.Y, 2));
                     
                     //if the mouse drop is close to a person, pair the device with that person.
-                    if ( distance < 0.3 && keyPair.Key.PairingState == PairingState.NotPaired)
+                    if ( distance < 0.3 && keyPair.Key.PairingState != PairingState.Paired)
                     {
                         if (device.PairingState == PairingState.Paired)
                             kinectManager.PairingRecognizer.UnpairDevice(device);

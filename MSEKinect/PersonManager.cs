@@ -215,7 +215,6 @@ namespace MSEKinect
                     else
                     {
 
-
                         if (person.PairingState == PairingState.Paired)
                         {
                             person.PairingState = PairingState.PairedButOccluded;
