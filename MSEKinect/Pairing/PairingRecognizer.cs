@@ -106,6 +106,27 @@ namespace MSEKinect
 
         }
 
+        public void UnpairDevice(PairableDevice pairingDevice)
+        {
+            if (pairingDevice.PairingState == PairingState.Paired)
+            {
+                List<PairablePerson> pPersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+                PairablePerson pairingPerson = pPersons.Find(p => p.HeldDeviceIdentifier == pairingDevice.Identifier);
+
+                pairingDevice.HeldByPersonIdentifier = null;
+                pairingDevice.PairingState = PairingState.NotPaired;
+
+                pairingPerson.PairingState = PairingState.NotPaired;
+
+                // Dispatch a message to the device
+                IARequest request = new IARequest(Routes.BecomeUnpairedRoute);
+                // Find the IntAirAct device matching the current device.
+                IADevice iaDevice = intAirAct.Devices.Find(d => d.Name == pairingDevice.Identifier);
+                intAirAct.SendRequest(request, iaDevice);
+                System.Diagnostics.Debug.WriteLine(iaDevice.Name + " " + iaDevice.Host);
+            }
+        }
+
 
         /// <summary>
         /// This function is called when the Gesture Recognizer recognizes a Pair gesture. This function determines 

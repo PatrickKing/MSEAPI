@@ -174,9 +174,11 @@ namespace RoomVisualizer
 
             Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));
 
+            //if the dragged device is a pairable device (i.e iPad)
             if (!iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
             {
-                Point mouseLocationOnCanvas = mouseLocation = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas); 
+                Point mouseLocationOnCanvas = mouseLocation = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+                bool pairedToNewDevice = false;
 
                 foreach(KeyValuePair<PairablePerson,PersonControl> keyPair in PersonControlDictionary)
                 {
@@ -184,25 +186,37 @@ namespace RoomVisualizer
                     double distance = Math.Sqrt(Math.Pow(mouseLocationOnCanvas.X - personLocation.X, 2) + Math.Pow(mouseLocationOnCanvas.Y - personLocation.Y, 2));
                     
                     //if the mouse drop is close to a person, pair the device with that person.
-                    if ( distance < 0.5 && keyPair.Key.PairingState == PairingState.NotPaired)
+                    if ( distance < 0.3 && keyPair.Key.PairingState == PairingState.NotPaired)
                     {
+                        if (device.PairingState == PairingState.Paired)
+                            kinectManager.PairingRecognizer.UnpairDevice(device);
+                       
                         kinectManager.PairingRecognizer.Pair(device, keyPair.Key);
+                        pairedToNewDevice = true;
                         break;
                     }
-
                 }
+
+                //if the mouse drop is not close to a person then unpair the device.
+                if(!pairedToNewDevice)
+                    kinectManager.PairingRecognizer.UnpairDevice(device);
             }
-            else if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
+
+            //if the dragged device is not a pairable device (i.e table-top)
+            else if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
             {
-                // Dropped within Canvas, so we want to place it on the canvas
-                device.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
-                request.SetBodyWith(new IntermediatePoint(device.Location.Value));
-            }
-            else
-            {
-                // Not dropped within Canvas, so we want to put it back on the stack panel
-                device.Location = null;
-                request.SetBodyWith(null);
+                if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
+                {
+                    // Dropped within Canvas, so we want to place it on the canvas
+                    device.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+                    request.SetBodyWith(new IntermediatePoint(device.Location.Value));
+                }
+                else
+                {
+                    // Not dropped within Canvas, so we want to put it back on the stack panel
+                    device.Location = null;
+                    request.SetBodyWith(null);
+                }
             }
 
             // Send a request to the Device that their location has changed
