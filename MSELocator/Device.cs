@@ -31,17 +31,6 @@ namespace MSELocator
             }
         }
 
-        //private double? _Orientation;
-        //public double? Orientation
-        //{
-        //    get { return _Orientation; }
-        //    set
-        //    {
-        //        _Orientation = value;
-        //    }
-
-        //}
-
         private double? _FieldOfView;
         public double? FieldOfView
         {

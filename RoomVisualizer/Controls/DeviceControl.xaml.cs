@@ -258,9 +258,6 @@ namespace RoomVisualizer
 
         private void startDragging()
         {
-            // We consider it a drag only if the Device is a stationary Device
-            if (this.iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
-            {
                 // Drag event started on a device supporting setting location
                 DataObject data = new DataObject();
                 data.SetData("deviceControl", this);
@@ -275,7 +272,7 @@ namespace RoomVisualizer
 
                 // Start Dragging
                 DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
-            }
+
         }
         #endregion
 

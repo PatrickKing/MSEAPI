@@ -24,6 +24,11 @@ namespace MSEKinect
             get{ return locator; }
         }
 
+        public PairingRecognizer PairingRecognizer
+        {
+            get { return pairingRecognizer ; }
+        }
+
         public PersonManager PersonManager
         {
             get { return personManager; }

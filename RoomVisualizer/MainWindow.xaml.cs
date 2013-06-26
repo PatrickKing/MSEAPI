@@ -174,7 +174,25 @@ namespace RoomVisualizer
 
             Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));
 
-            if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
+            if (!iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            {
+                Point mouseLocationOnCanvas = mouseLocation = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas); 
+
+                foreach(KeyValuePair<PairablePerson,PersonControl> keyPair in PersonControlDictionary)
+                {
+                    Point personLocation = keyPair.Key.Location.Value;
+                    double distance = Math.Sqrt(Math.Pow(mouseLocationOnCanvas.X - personLocation.X, 2) + Math.Pow(mouseLocationOnCanvas.Y - personLocation.Y, 2));
+                    
+                    //if the mouse drop is close to a person, pair the device with that person.
+                    if ( distance < 0.5 && keyPair.Key.PairingState == PairingState.NotPaired)
+                    {
+                        kinectManager.PairingRecognizer.Pair(device, keyPair.Key);
+                        break;
+                    }
+
+                }
+            }
+            else if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
             {
                 // Dropped within Canvas, so we want to place it on the canvas
                 device.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
@@ -188,7 +206,7 @@ namespace RoomVisualizer
             }
 
             // Send a request to the Device that their location has changed
-            kinectManager.IntAirAct.SendRequest(request, iaDevice);
+           kinectManager.IntAirAct.SendRequest(request, iaDevice);
         }
         #endregion
 

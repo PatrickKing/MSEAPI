@@ -80,7 +80,7 @@ namespace MSEKinect
         }
 
 
-        internal void Pair(PairableDevice pairingDevice, PairablePerson pairingPerson)
+        public void Pair(PairableDevice pairingDevice, PairablePerson pairingPerson)
         {
             //Change the Pairing State 
             pairingDevice.PairingState = PairingState.Paired;
