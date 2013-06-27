@@ -130,6 +130,8 @@ namespace RoomVisualizer
             double deviceSize = 0.5 * MainWindow.SharedCanvas.ActualWidth / DrawingResources.ROOM_WIDTH;
             InnerBorder.Width = Math.Ceiling(deviceSize);
             InnerBorder.Height = Math.Ceiling(deviceSize);
+            DeviceRectangle.Width = Math.Ceiling(deviceSize);
+            DeviceRectangle.Height = Math.Ceiling(deviceSize);
 
             InnerBorder.BorderBrush = DrawingResources.pairedBrush;
 

@@ -108,7 +108,7 @@ namespace MSEKinect
 
         public void UnpairDevice(PairableDevice pairingDevice)
         {
-            if (pairingDevice.PairingState == PairingState.Paired)
+            if (pairingDevice.PairingState != PairingState.NotPaired)
             {
                 List<PairablePerson> pPersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
                 PairablePerson pairingPerson = pPersons.Find(p => p.HeldDeviceIdentifier == pairingDevice.Identifier);
@@ -117,6 +117,7 @@ namespace MSEKinect
                 pairingDevice.PairingState = PairingState.NotPaired;
 
                 pairingPerson.PairingState = PairingState.NotPaired;
+                pairingPerson.HeldDeviceIdentifier = null;
 
                 // Dispatch a message to the device
                 IARequest request = new IARequest(Routes.BecomeUnpairedRoute);
