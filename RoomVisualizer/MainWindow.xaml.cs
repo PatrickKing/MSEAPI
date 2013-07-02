@@ -217,10 +217,10 @@ namespace RoomVisualizer
                     device.Location = null;
                     request.SetBodyWith(null);
                 }
-            }
 
-            // Send a request to the Device that their location has changed
-           kinectManager.IntAirAct.SendRequest(request, iaDevice);
+                // Send a request to the Device that their location has changed
+                kinectManager.IntAirAct.SendRequest(request, iaDevice);
+            }
         }
         #endregion
 
