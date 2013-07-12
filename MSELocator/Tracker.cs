@@ -19,13 +19,11 @@ namespace MSELocator
         public delegate void TrackerEventSignature(Tracker sender);
         public event TrackerEventSignature RangeChanged;
 
-        public string KinectID;
         private double? _MinRange;
 
 
         public Tracker(string KinectID)
         {
-            this.KinectID = KinectID;
             this.Identifier = KinectID;
         }
 

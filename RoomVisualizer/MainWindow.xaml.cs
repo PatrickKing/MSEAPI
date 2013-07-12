@@ -288,9 +288,18 @@ namespace RoomVisualizer
 
         private void KinectDiscovered(string kinectID)
         {
+
+            //Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.KinectID.Equals(kinectID));
+
+            //Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            //{
+            //    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+            //    availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+            //}));
+
             if (kinectManager.Locator.Trackers.Count == 1)
             {
-                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.KinectID.Equals(kinectID));
+                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
 
                 this.Dispatcher.Invoke(new Action(delegate()
                 {
@@ -306,7 +315,7 @@ namespace RoomVisualizer
             }
             else if (kinectManager.Locator.Trackers.Count == 2)
             {
-                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.KinectID.Equals(kinectID));
+                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
 
                 this.Dispatcher.Invoke(new Action(delegate()
                 {
@@ -316,7 +325,7 @@ namespace RoomVisualizer
                     tracker.FieldOfView = 57;
                     canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH , DrawingResources.ROOM_HEIGHT/2);
+                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH, DrawingResources.ROOM_HEIGHT / 2);
                     tracker.Orientation = 180;
                 }));
             }

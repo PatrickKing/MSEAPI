@@ -98,6 +98,7 @@ namespace MSEKinect
             //Trackers.Add(newTracker);
             locator.Trackers.Add(newTracker);
             newKinectDiscovered(NewKinectID);
+            kinectserver.startKinectStream(NewKinectID);
         }
 
 
@@ -212,7 +213,7 @@ namespace MSEKinect
                 // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
                 // the skeleton's position. See Tracker for more details.
                 //tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
-                locator.Trackers.Find(x => x.KinectID.Equals(kinectID)).UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
+                locator.Trackers.Find(x => x.Identifier.Equals(kinectID)).UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
                 // TODO: Also update Person's orientation.
 
                 // If the Person has a paired device, infer that the device is located where the person is, and update its location too
@@ -306,7 +307,7 @@ namespace MSEKinect
                     {
                         if (pairablePerson.PairingState == PairingState.PairedButOccluded)
                         {
-                            Point skeletonInRoomSpace = locator.Trackers.Find(x => x.KinectID.Equals(kinectID)).ConvertSkeletonToRoomSpace(new Vector(skeleton.Position.Z, skeleton.Position.X));
+                            Point skeletonInRoomSpace = locator.Trackers.Find(x => x.Identifier.Equals(kinectID)).ConvertSkeletonToRoomSpace(new Vector(skeleton.Position.Z, skeleton.Position.X));
 
                             if (skeletonInRoomSpace.X < (pairablePerson.Location.Value.X + SAVINGDISTANCE) &&
                                 skeletonInRoomSpace.X > (pairablePerson.Location.Value.X - SAVINGDISTANCE) &&
@@ -328,6 +329,9 @@ namespace MSEKinect
             // For any skeletons that weren't matched to an occluded person, we create a new PairablePerson
             foreach (Skeleton skeleton in skeletons)
             {
+
+                if (skeleton.TrackingId == 0)
+                    continue;
                 //New Skeleton Found
                 //if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
                 if (pairablePersons.Find(x => skeleton.TrackingId.ToString().Equals(x.Identifier)) == null)
