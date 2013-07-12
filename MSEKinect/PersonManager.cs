@@ -8,6 +8,7 @@ using System.Timers;
 using IntAirAct;
 using MSEGestureRecognizer;
 using MSELocator;
+using KinectServer;
 
 using System.Windows;
 
@@ -35,6 +36,8 @@ namespace MSEKinect
         GestureController gestureController;
         LocatorInterface locator;
         IAIntAirAct intAirAct;
+        MSEKinectServer kinectserver;
+
 
         Tracker tracker;
         public Tracker Tracker 
@@ -45,6 +48,13 @@ namespace MSEKinect
                 tracker = value;
                 TrackerSet(this, tracker);
             }
+        }
+
+        private List<Tracker> _trackers;
+        public List<Tracker> Trackers
+        {
+            get { return _trackers; }
+            set { _trackers = value; }
         }
 
         #endregion
@@ -58,6 +68,9 @@ namespace MSEKinect
         public delegate void TrackerChangedEventSignature(PersonManager sender, Tracker tracker);
         public event TrackerChangedEventSignature TrackerSet;
 
+        public delegate void NewKinectDiscovered(string NewKinectID);
+        public event NewKinectDiscovered newKinectDiscovered;
+
         #endregion
 
         #region Constructor, Start and Stop
@@ -68,10 +81,31 @@ namespace MSEKinect
             this.locator = locator;
             this.intAirAct = intAirAct;
 
-            tracker = new Tracker() { Location = new Point(0, 0), Orientation = 0, Identifier = "MSEKinect" };
-            locator.Trackers.Add(tracker);
+            kinectserver = new MSEKinectServer();
+            kinectserver.Start();
+
+            kinectserver.NewKinectDiscovered += new NewKinectDiscoveredEventSignature(kinectserver_NewKinectDiscovered);
+            kinectserver.SkeletonsRecieved += new SkeletonsReceivedEventSignature(kinectserver_SkeletonsRecieved);
+
+            Trackers = new List<Tracker>();
+            //tracker = new Tracker() { Location = new Point(0, 0), Orientation = 0, Identifier = "MSEKinect", KinectID = "pewpew" };
+            //locator.Trackers.Add(tracker);
         }
 
+        void kinectserver_NewKinectDiscovered(string NewKinectID)
+        {
+            Tracker newTracker = new Tracker(NewKinectID);
+            Trackers.Add(newTracker);
+            locator.Trackers.Add(newTracker);
+            newKinectDiscovered(NewKinectID);
+        }
+
+
+        void kinectserver_SkeletonsRecieved(string KinectID, List<Skeleton> SkeletonList)
+        {
+            UpdatePersonsAndDevices(SkeletonList, KinectID);
+            //gestureController.UpdateAllGestureGroups(GetAllSkeletonData(e));
+        }
 
         public void StartPersonManager()
         {
@@ -79,8 +113,8 @@ namespace MSEKinect
 
             if (KinectSensor.KinectSensors.Count > 0)
             {
-                ks = KinectSensor.KinectSensors[0];
-                ks.Start();
+                //ks = KinectSensor.KinectSensors[0];
+                //ks.Start();
 
 
 
@@ -98,8 +132,8 @@ namespace MSEKinect
                     MaxDeviationRadius = 0.5f,
                 };
 
-                ks.SkeletonStream.Enable(parameters);
-                ks.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(ks_SkeletonFrameReady);
+                //ks.SkeletonStream.Enable(parameters);
+                //ks.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(ks_SkeletonFrameReady);
             }
         }
 
@@ -116,7 +150,7 @@ namespace MSEKinect
         #region Handling Skeleton Frames from Kinect
 
         //TODO Add documentation explaining how this works
-        void ks_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        void ks_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e, string kinectID)
         {
             //Checks if the stream is enabled for cases (though unlikely) when stream isn't enabled
             if (!((KinectSensor)sender).SkeletonStream.IsEnabled)
@@ -127,7 +161,7 @@ namespace MSEKinect
             //Process the skeleton frame
             else
             {
-                UpdatePersonsAndDevices(GetTrackedSkeletonsAndPositions(e));
+                UpdatePersonsAndDevices(GetTrackedSkeletonsAndPositions(e), kinectID);
                 gestureController.UpdateAllGestureGroups(GetAllSkeletonData(e));
             }
 
@@ -139,7 +173,7 @@ namespace MSEKinect
         /// Single function to update location, and eventually orientation, of persons and devices in response to new Kinect frames.
         /// </summary>
         /// <param name="skeletons"></param>
-        private void UpdatePersonsAndDevices(List<Skeleton> skeletons)
+        private void UpdatePersonsAndDevices(List<Skeleton> skeletons, string kinectID)
         {
             //Kinect occasionally returns null for a skeleton frame which leads to a null list<Skeleton>: skip this frame so that we don't drop any People
             if (skeletons == null)
@@ -156,13 +190,13 @@ namespace MSEKinect
 
             AddNewPeople(skeletons, pairablePersons);
             RemoveOldPeople(skeletons, pairablePersons, pairableDevices);
-            UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices);
+            UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices, kinectID);
 
             //Sync up the Locator's Person collection
             locator.Persons = new List<Person>(pairablePersons);
         }
 
-        private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
+        private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices, String kinectID)
         {
             // PairablePersons and Skeletons now contain only corresponding elements, except for people who are occluded, they don't have a matching skeleton
             // Update each Person
@@ -179,8 +213,8 @@ namespace MSEKinect
                 // The Kinect looks down the Z axis in its coordinate space, left right movement happens on the X axis, and vertical movement on the Y axis
                 // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
                 // the skeleton's position. See Tracker for more details.
-                tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
-
+                //tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
+                locator.Trackers.Find(x => x.KinectID.Equals(kinectID)).UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
                 // TODO: Also update Person's orientation.
 
                 // If the Person has a paired device, infer that the device is located where the person is, and update its location too

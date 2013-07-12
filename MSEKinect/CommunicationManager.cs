@@ -62,6 +62,7 @@ namespace MSEKinect
         #region Pairing
         void UpdateDevicePairingState(IARequest request, IAResponse response)
         {
+            Console.WriteLine(request.Parameters["identifier"]);
             pairingRecognizer.DevicePairAttempt(request.Parameters["identifier"]);
         }
         #endregion
@@ -81,10 +82,10 @@ namespace MSEKinect
                 return;
             }
 
-            if (requestingDevice.Location.HasValue && personManager.Tracker.Location.HasValue)
+            if (requestingDevice.Location.HasValue && locator.Trackers[0].Location.HasValue)
             {
                 Point requestingDeviceLocation = requestingDevice.Location.Value;
-                Point offsetLocation = personManager.Tracker.Location.Value;
+                Point offsetLocation = locator.Trackers[0].Location.Value;
 
                 double angle = Util.AngleBetweenPoints(requestingDeviceLocation, offsetLocation);
                 response.SetBodyWith(angle);

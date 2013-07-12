@@ -17,6 +17,7 @@ using IntAirAct;
 using MSEAPI_SharedNetworking;
 using MSEKinect;
 using MSELocator;
+using KinectServer;
 
 namespace RoomVisualizer
 {
@@ -226,6 +227,11 @@ namespace RoomVisualizer
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+
+            this.Dispatcher.Invoke(new Action(delegate()
+            {
+              
+        
             DrawingResources.GenerateGridLines(canvas, GridLines, GridLinesScaleSlider.Value);
             GridLines.ShowGridLines = true;
 
@@ -254,27 +260,66 @@ namespace RoomVisualizer
             kinectManager.DeviceManager.DeviceRemoved += deviceRemoved;
             kinectManager.PersonManager.PersonAdded += personAdded;
             kinectManager.PersonManager.PersonRemoved += personRemoved;
+            kinectManager.PersonManager.newKinectDiscovered += KinectDiscovered;
 
             //Seperate components for displaying the visible skeletons
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
 
 
             //Hardcode tracker position and orientation
-            Tracker tracker = kinectManager.Locator.Trackers[0];
+            //Tracker tracker = kinectManager.Locator.Trackers[0];
 
-            //TODO - Set up event handling for new Trackers and put this code in there.
-            TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-            canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+            ////TODO - Set up event handling for new Trackers and put this code in there.
+            //TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+            //canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-            // Values retrieved from:
-            // http://blogs.msdn.com/b/kinectforwindows/archive/2012/01/20/near-mode-what-it-is-and-isn-t.aspx
-            // http://msdn.microsoft.com/en-us/library/jj131033.aspx
-            tracker.MinRange = 0.8;
-            tracker.MaxRange = 4;
-            tracker.FieldOfView = 57;
+            //// Values retrieved from:
+            //// http://blogs.msdn.com/b/kinectforwindows/archive/2012/01/20/near-mode-what-it-is-and-isn-t.aspx
+            //// http://msdn.microsoft.com/en-us/library/jj131033.aspx
+            //tracker.MinRange = 0.8;
+            //tracker.MaxRange = 4;
+            //tracker.FieldOfView = 57;
 
-            tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-            tracker.Orientation = 270;
+            //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
+            //tracker.Orientation = 275;
+
+            }));
+        }
+
+        private void KinectDiscovered(string kinectID)
+        {
+            if (kinectManager.Locator.Trackers.Count == 1)
+            {
+                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.KinectID.Equals(kinectID));
+
+                this.Dispatcher.Invoke(new Action(delegate()
+                {
+                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+                    tracker.MinRange = 0.8;
+                    tracker.MaxRange = 4;
+                    tracker.FieldOfView = 57;
+                    canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+
+                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
+                    tracker.Orientation = 270;
+                }));
+            }
+            else if (kinectManager.Locator.Trackers.Count == 2)
+            {
+                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.KinectID.Equals(kinectID));
+
+                this.Dispatcher.Invoke(new Action(delegate()
+                {
+                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+                    tracker.MinRange = 0.8;
+                    tracker.MaxRange = 4;
+                    tracker.FieldOfView = 57;
+                    canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+
+                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH , DrawingResources.ROOM_HEIGHT/2);
+                    tracker.Orientation = 180;
+                }));
+            }
         }
 
         //Window Close (End the Kinect Manager) 
@@ -326,17 +371,24 @@ namespace RoomVisualizer
 
         void personAdded(PersonManager personManager, PairablePerson pairablePerson)
         {
-            PersonControlDictionary[pairablePerson] = new PersonControl(pairablePerson);
-            canvas.Children.Add(PersonControlDictionary[pairablePerson]);
+            this.Dispatcher.Invoke(new Action(delegate()
+            {
+                PersonControlDictionary[pairablePerson] = new PersonControl(pairablePerson);
+                canvas.Children.Add(PersonControlDictionary[pairablePerson]);
+            }));
         }
 
         void personRemoved(PersonManager personManager, PairablePerson pairablePerson)
         {
-            if (PersonControlDictionary.ContainsKey(pairablePerson))
+
+            this.Dispatcher.Invoke(new Action(delegate()
             {
-                canvas.Children.Remove(PersonControlDictionary[pairablePerson]);
-                PersonControlDictionary.Remove(pairablePerson);
-            }
+                if (PersonControlDictionary.ContainsKey(pairablePerson))
+                {
+                    canvas.Children.Remove(PersonControlDictionary[pairablePerson]);
+                    PersonControlDictionary.Remove(pairablePerson);
+                }
+            }));
         }
 
         void trackerChanged(PersonManager sender, Tracker tracker)

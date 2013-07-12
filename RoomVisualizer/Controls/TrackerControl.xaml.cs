@@ -25,8 +25,8 @@ namespace RoomVisualizer
 
         public TrackerControl(Tracker tracker)
         {
-            InitializeComponent();
 
+            InitializeComponent();
 
             LeftLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
             RightLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
