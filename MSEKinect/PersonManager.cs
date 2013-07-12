@@ -39,23 +39,23 @@ namespace MSEKinect
         MSEKinectServer kinectserver;
 
 
-        Tracker tracker;
-        public Tracker Tracker 
-        { 
-            get { return tracker; } 
-            private set 
-            { 
-                tracker = value;
-                TrackerSet(this, tracker);
-            }
-        }
+        //Tracker tracker;
+        //public Tracker Tracker 
+        //{ 
+        //    get { return tracker; } 
+        //    private set 
+        //    { 
+        //        tracker = value;
+        //        TrackerSet(this, tracker);
+        //    }
+        //}
 
-        private List<Tracker> _trackers;
-        public List<Tracker> Trackers
-        {
-            get { return _trackers; }
-            set { _trackers = value; }
-        }
+        //private List<Tracker> _trackers;
+        //public List<Tracker> Trackers
+        //{
+        //    get { return _trackers; }
+        //    set { _trackers = value; }
+        //}
 
         #endregion
 
@@ -87,7 +87,7 @@ namespace MSEKinect
             kinectserver.NewKinectDiscovered += new NewKinectDiscoveredEventSignature(kinectserver_NewKinectDiscovered);
             kinectserver.SkeletonsRecieved += new SkeletonsReceivedEventSignature(kinectserver_SkeletonsRecieved);
 
-            Trackers = new List<Tracker>();
+            //Trackers = new List<Tracker>();
             //tracker = new Tracker() { Location = new Point(0, 0), Orientation = 0, Identifier = "MSEKinect", KinectID = "pewpew" };
             //locator.Trackers.Add(tracker);
         }
@@ -95,7 +95,7 @@ namespace MSEKinect
         void kinectserver_NewKinectDiscovered(string NewKinectID)
         {
             Tracker newTracker = new Tracker(NewKinectID);
-            Trackers.Add(newTracker);
+            //Trackers.Add(newTracker);
             locator.Trackers.Add(newTracker);
             newKinectDiscovered(NewKinectID);
         }
@@ -111,7 +111,7 @@ namespace MSEKinect
         {
             // If there is a Kinect connected, get the Kinect
 
-            if (KinectSensor.KinectSensors.Count > 0)
+           // if (KinectSensor.KinectSensors.Count > 0)
             {
                 //ks = KinectSensor.KinectSensors[0];
                 //ks.Start();
@@ -156,8 +156,6 @@ namespace MSEKinect
             if (!((KinectSensor)sender).SkeletonStream.IsEnabled)
                 return;
 
-
-
             //Process the skeleton frame
             else
             {
@@ -188,8 +186,8 @@ namespace MSEKinect
             if (skeletons == null)
                 skeletons = new List<Skeleton>();
 
-            AddNewPeople(skeletons, pairablePersons);
-            RemoveOldPeople(skeletons, pairablePersons, pairableDevices);
+            AddNewPeople(skeletons, pairablePersons, kinectID);
+            RemoveOldPeople(skeletons, pairablePersons, pairableDevices, kinectID);
             UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices, kinectID);
 
             //Sync up the Locator's Person collection
@@ -203,7 +201,7 @@ namespace MSEKinect
             foreach (PairablePerson person in pairablePersons)
             {
                 // If the person is occluded, we don't have a skeleton to use for position updates right now
-                if (person.PairingState == PairingState.PairedButOccluded)
+                if (person.PairingState == PairingState.PairedButOccluded || !person.TrackedByIdentifier.Equals(kinectID))
                 {
                     continue;
                 }
@@ -228,7 +226,7 @@ namespace MSEKinect
             }
         }
 
-        private void RemoveOldPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices)
+        private void RemoveOldPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices, String kinectID)
         {
             // For any Persons that have left the scene, remove their PairablePerson from , and if it was paired, unhook their paired device
             List<PairablePerson> vanishedPersons = new List<PairablePerson>();
@@ -236,6 +234,10 @@ namespace MSEKinect
             {
                 if (skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier)) == null)
                 {
+
+                    if (!person.TrackedByIdentifier.Equals(kinectID))
+                        continue;
+
                     //Remove Held-By-Person Identifier
                     PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
 
@@ -291,7 +293,7 @@ namespace MSEKinect
         }
 
 
-        private void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons)
+        private void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, String kinectID)
         {
             // First, test each new skeleton to see if it matches an occluded person
             foreach (Skeleton skeleton in skeletons)
@@ -304,7 +306,7 @@ namespace MSEKinect
                     {
                         if (pairablePerson.PairingState == PairingState.PairedButOccluded)
                         {
-                            Point skeletonInRoomSpace = Tracker.ConvertSkeletonToRoomSpace(new Vector(skeleton.Position.Z, skeleton.Position.X));
+                            Point skeletonInRoomSpace = locator.Trackers.Find(x => x.KinectID.Equals(kinectID)).ConvertSkeletonToRoomSpace(new Vector(skeleton.Position.Z, skeleton.Position.X));
 
                             if (skeletonInRoomSpace.X < (pairablePerson.Location.Value.X + SAVINGDISTANCE) &&
                                 skeletonInRoomSpace.X > (pairablePerson.Location.Value.X - SAVINGDISTANCE) &&
@@ -335,7 +337,8 @@ namespace MSEKinect
                         Location = new Point(0, 0),
                         Orientation = 0.0,
                         Identifier = skeleton.TrackingId.ToString(),
-                        PairingState = PairingState.NotPaired
+                        PairingState = PairingState.NotPaired,
+                        TrackedByIdentifier = kinectID
                     };
                     pairablePersons.Add(person);
 

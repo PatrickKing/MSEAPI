@@ -230,8 +230,8 @@ namespace MSEKinectTests
             };
 
             // Position the tracker
-            Server.PersonManager.Tracker.Location = new Point(0, 2);
-            Server.PersonManager.Tracker.Orientation = 270;
+            //Server.PersonManager.Tracker.Location = new Point(0, 2);
+            //Server.PersonManager.Tracker.Orientation = 270;
             Server.Locator.Devices.Add(device);
             Server.Locator.Persons.Add(person);
 

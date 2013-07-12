@@ -253,7 +253,7 @@ namespace RoomVisualizer
             kinectManager.Start();
 
             // The tracker is created in the PersonManager constructor, so there's actually no way for us to listen for its creation the first time
-            trackerChanged(kinectManager.PersonManager, kinectManager.PersonManager.Tracker);
+            //trackerChanged(kinectManager.PersonManager, kinectManager.PersonManager.Tracker);
 
             //Setup Events for Device Addition and Removal, Person Addition and Removal 
             kinectManager.DeviceManager.DeviceAdded += deviceAdded;

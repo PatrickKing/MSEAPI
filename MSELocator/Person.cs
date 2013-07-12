@@ -15,7 +15,14 @@ namespace MSELocator
         {
             get { return _HeldDeviceIdentifier; }
             set { _HeldDeviceIdentifier = value; }
-        } 
+        }
+
+        private String _TrackedByIdentifier;
+        public String TrackedByIdentifier
+        {
+            get { return _TrackedByIdentifier; }
+            set { _TrackedByIdentifier = value; }
+        }
 
         private Point? _Location;
         public Point? Location

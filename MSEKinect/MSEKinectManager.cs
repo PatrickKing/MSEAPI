@@ -45,7 +45,7 @@ namespace MSEKinect
         }
 
 
-        public MSEKinectManager(bool RequireKinect = true)
+        public MSEKinectManager(bool RequireKinect = false)
         {
             if (RequireKinect)
                 TestKinectAvailability();
