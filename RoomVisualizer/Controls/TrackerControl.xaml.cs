@@ -23,10 +23,29 @@ namespace RoomVisualizer
     public partial class TrackerControl : UserControl
     {
 
+        DeviceRotationControl deviceRotationControl;
+
+        private Tracker _Tracker;
+        public Tracker Tracker
+        {
+            set { }
+            get { return _Tracker; }
+
+        }
+
         public TrackerControl(Tracker tracker)
         {
+            this._Tracker = tracker;
 
             InitializeComponent();
+
+            deviceRotationControl = new DeviceRotationControl();
+            deviceRotationControl.onSliderValueChanged += new EventHandler<RotationSliderEventArgs>(onOrientationSliderChanged);
+            canvas.Children.Add(deviceRotationControl);
+            Canvas.SetLeft(deviceRotationControl, 0);
+            Canvas.SetTop(deviceRotationControl, 0);
+            deviceRotationControl.Visibility = System.Windows.Visibility.Visible;
+            deviceRotationControl.Opacity = 1;
 
             LeftLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
             RightLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
@@ -38,10 +57,103 @@ namespace RoomVisualizer
         }
 
 
+        void onOrientationSliderChanged(object sender, RotationSliderEventArgs e)
+        {
+            this.Tracker.Orientation = e.Time;
+        }
+
+        private void DeviceRectangle_MouseEnter(object sender, MouseEventArgs e)
+        {
+            deviceRotationControl.Opacity = 1;
+        }
+
+        private void DeviceRectangle_MouseLeave(object sender, MouseEventArgs e)
+        {
+            deviceRotationControl.Opacity = 0;
+        }
+
+        #region Drag and Drop
+
+        protected override void OnTouchDown(TouchEventArgs e)
+        {
+            base.OnTouchDown(e);
+
+            startDragging();
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            //if (e.OriginalSource == DeviceRectangle)
+            {
+                base.OnMouseDown(e);
+
+                // We consider it a drag only if the Device is a stationary Device, and the mouse button is pushed
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    startDragging();
+                }
+            }
+        }
+
+
+        protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
+        {
+            base.OnGiveFeedback(e);
+
+            if (e.Effects.HasFlag(DragDropEffects.Move))
+            {
+                Mouse.SetCursor(Cursors.Pen);
+
+            }
+            else
+            {
+                Mouse.SetCursor(Cursors.No);
+            }
+
+            e.Handled = true;
+        }
+
+        private void startDragging()
+        {
+            // Drag event started on a device supporting setting location
+            DataObject data = new DataObject();
+            data.SetData("trackerControl", this);
+
+            // Start Dragging
+            DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+
+        }
+        #endregion
+
+
         public void onOrientationChanged(Device device)
         {
             // We are using RotateTransform now to make things easier. Everything should be drawn pointing downwards (270 degrees)
-            this.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
+            //this.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
+
+            // Draw two lines to serve as field of view indicators
+            double topAngle = Util.NormalizeAngle(Tracker.Orientation.Value + Tracker.FieldOfView.Value);
+            double topX = Math.Cos(topAngle * Math.PI / 180);
+            double topY = Math.Sin(topAngle * Math.PI / 180);
+
+
+            double bottomAngle = Util.NormalizeAngle(Tracker.Orientation.Value - Tracker.FieldOfView.Value);
+            double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
+            double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
+
+            Point newLeft = DrawingResources.ConvertPointToProperLength(new Point(topX, topY), DrawingResources.DEVICE_FOV_LENGTH);
+            Point newRight = DrawingResources.ConvertPointToProperLength(new Point(bottomX, bottomY), DrawingResources.DEVICE_FOV_LENGTH);
+
+            //Dispatch UI Changes to Main Thread
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                LeftLine.X2 = newLeft.X;
+                LeftLine.Y2 = -newLeft.Y;
+
+                RightLine.X2 = newRight.X;
+                RightLine.Y2 = -newRight.Y;
+
+            }));
         }
 
         public void onLocationChanged(Device device)

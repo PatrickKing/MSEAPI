@@ -154,73 +154,97 @@ namespace RoomVisualizer
 
         protected override void OnDrop(DragEventArgs e)
         {
-            base.OnDrop(e);
-            Point mouseLocation = e.GetPosition(sharedCanvas);
+            string DataType = e.Data.GetFormats(true)[0];
 
-            // Grab the data we packed into the DataObject
-            DeviceControl deviceControl = (DeviceControl)e.Data.GetData("deviceControl");
-
-            // Hide the Ghost and Text since a Drop has been made
-            MainWindow.GhostBorder.Visibility = System.Windows.Visibility.Hidden;
-            ghostTextBlock.Visibility = System.Windows.Visibility.Hidden;
-
-            // Return the Opacity of the DeviceControl
-            deviceControl.Opacity = 1;
-
-            PairableDevice device = deviceControl.PairableDevice;
-            IADevice iaDevice = deviceControl.IADevice;
-
-            IARequest request = new IARequest(Routes.SetLocationRoute);
-            request.Parameters["identifier"] = iaDevice.Name;
-
-            Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));
-
-            //if the dragged device is a pairable device (i.e iPad)
-            if (!iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            if (DataType == "trackerControl")
             {
-                Point mouseLocationOnCanvas = mouseLocation = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
-                bool pairedToNewDevice = false;
+                base.OnDrop(e);
+                Point mouseLocation = e.GetPosition(sharedCanvas);
 
-                foreach(KeyValuePair<PairablePerson,PersonControl> keyPair in PersonControlDictionary)
-                {
-                    Point personLocation = keyPair.Key.Location.Value;
-                    double distance = Math.Sqrt(Math.Pow(mouseLocationOnCanvas.X - personLocation.X, 2) + Math.Pow(mouseLocationOnCanvas.Y - personLocation.Y, 2));
-                    
-                    //if the mouse drop is close to a person, pair the device with that person.
-                    if ( distance < 0.3 && (device.HeldByPersonIdentifier == keyPair.Key.Identifier || keyPair.Key.PairingState != PairingState.Paired))
-                    {
-                        if (device.PairingState == PairingState.Paired || device.PairingState == PairingState.PairedButOccluded)
-                            kinectManager.PairingRecognizer.UnpairDevice(device);
-                       
-                        kinectManager.PairingRecognizer.Pair(device, keyPair.Key);
-                        pairedToNewDevice = true;
-                        break;
-                    }
-                }
+                // Grab the data we packed into the DataObject
+                TrackerControl trackerControl = (TrackerControl)e.Data.GetData("trackerControl");
 
-                //if the mouse drop is not close to a person then unpair the device.
-                if(!pairedToNewDevice)
-                    kinectManager.PairingRecognizer.UnpairDevice(device);
+                // Hide the Ghost and Text since a Drop has been made
+                MainWindow.GhostBorder.Visibility = System.Windows.Visibility.Hidden;
+                ghostTextBlock.Visibility = System.Windows.Visibility.Hidden;
+
+                // Return the Opacity of the DeviceControl
+                trackerControl.Opacity = 1;
+
+                trackerControl.Tracker.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
             }
-
-            //if the dragged device is not a pairable device (i.e table-top)
-            else if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+            
+            
+            else if (DataType == "deviceControl")
             {
-                if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
+                base.OnDrop(e);
+                Point mouseLocation = e.GetPosition(sharedCanvas);
+
+                // Grab the data we packed into the DataObject
+                DeviceControl deviceControl = (DeviceControl)e.Data.GetData("deviceControl");
+
+                // Hide the Ghost and Text since a Drop has been made
+                MainWindow.GhostBorder.Visibility = System.Windows.Visibility.Hidden;
+                ghostTextBlock.Visibility = System.Windows.Visibility.Hidden;
+
+                // Return the Opacity of the DeviceControl
+                deviceControl.Opacity = 1;
+
+                PairableDevice device = deviceControl.PairableDevice;
+                IADevice iaDevice = deviceControl.IADevice;
+
+                IARequest request = new IARequest(Routes.SetLocationRoute);
+                request.Parameters["identifier"] = iaDevice.Name;
+
+                Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));
+
+                //if the dragged device is a pairable device (i.e iPad)
+                if (!iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
                 {
-                    // Dropped within Canvas, so we want to place it on the canvas
-                    device.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
-                    request.SetBodyWith(new IntermediatePoint(device.Location.Value));
-                }
-                else
-                {
-                    // Not dropped within Canvas, so we want to put it back on the stack panel
-                    device.Location = null;
-                    request.SetBodyWith(null);
+                    Point mouseLocationOnCanvas = mouseLocation = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+                    bool pairedToNewDevice = false;
+
+                    foreach (KeyValuePair<PairablePerson, PersonControl> keyPair in PersonControlDictionary)
+                    {
+                        Point personLocation = keyPair.Key.Location.Value;
+                        double distance = Math.Sqrt(Math.Pow(mouseLocationOnCanvas.X - personLocation.X, 2) + Math.Pow(mouseLocationOnCanvas.Y - personLocation.Y, 2));
+
+                        //if the mouse drop is close to a person, pair the device with that person.
+                        if (distance < 0.3 && (device.HeldByPersonIdentifier == keyPair.Key.Identifier || keyPair.Key.PairingState != PairingState.Paired))
+                        {
+                            if (device.PairingState == PairingState.Paired || device.PairingState == PairingState.PairedButOccluded)
+                                kinectManager.PairingRecognizer.UnpairDevice(device);
+
+                            kinectManager.PairingRecognizer.Pair(device, keyPair.Key);
+                            pairedToNewDevice = true;
+                            break;
+                        }
+                    }
+
+                    //if the mouse drop is not close to a person then unpair the device.
+                    if (!pairedToNewDevice)
+                        kinectManager.PairingRecognizer.UnpairDevice(device);
                 }
 
-                // Send a request to the Device that their location has changed
-                kinectManager.IntAirAct.SendRequest(request, iaDevice);
+                //if the dragged device is not a pairable device (i.e table-top)
+                else if (iaDevice.SupportedRoutes.Contains(Routes.GetLocationRoute))
+                {
+                    if (mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y)
+                    {
+                        // Dropped within Canvas, so we want to place it on the canvas
+                        device.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+                        request.SetBodyWith(new IntermediatePoint(device.Location.Value));
+                    }
+                    else
+                    {
+                        // Not dropped within Canvas, so we want to put it back on the stack panel
+                        device.Location = null;
+                        request.SetBodyWith(null);
+                    }
+
+                    // Send a request to the Device that their location has changed
+                    kinectManager.IntAirAct.SendRequest(request, iaDevice);
+                }
             }
         }
         #endregion
@@ -289,10 +313,11 @@ namespace RoomVisualizer
         private void KinectDiscovered(string kinectID)
         {
 
-            //Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.KinectID.Equals(kinectID));
+            //Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
 
             //Application.Current.Dispatcher.BeginInvoke(new Action(() =>
             //{
+            //    tracker.StopStreaming();
             //    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
             //    availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
             //}));
@@ -326,6 +351,23 @@ namespace RoomVisualizer
                     canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
                     tracker.Location = new Point(DrawingResources.ROOM_WIDTH, DrawingResources.ROOM_HEIGHT / 2);
+                    tracker.Orientation = 180;
+                }));
+            }
+
+            else if (kinectManager.Locator.Trackers.Count == 3)
+            {
+                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
+
+                this.Dispatcher.Invoke(new Action(delegate()
+                {
+                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+                    tracker.MinRange = 0.8;
+                    tracker.MaxRange = 4;
+                    tracker.FieldOfView = 57;
+                    canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+
+                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH /2, 0);
                     tracker.Orientation = 180;
                 }));
             }

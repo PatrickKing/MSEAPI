@@ -82,7 +82,6 @@ namespace MSEKinect
             this.intAirAct = intAirAct;
 
             kinectserver = new MSEKinectServer();
-            kinectserver.Start();
 
             kinectserver.NewKinectDiscovered += new NewKinectDiscoveredEventSignature(kinectserver_NewKinectDiscovered);
             kinectserver.SkeletonsRecieved += new SkeletonsReceivedEventSignature(kinectserver_SkeletonsRecieved);
@@ -94,7 +93,7 @@ namespace MSEKinect
 
         void kinectserver_NewKinectDiscovered(string NewKinectID)
         {
-            Tracker newTracker = new Tracker(NewKinectID);
+            Tracker newTracker = new Tracker(NewKinectID, this.kinectserver);
             //Trackers.Add(newTracker);
             locator.Trackers.Add(newTracker);
             newKinectDiscovered(NewKinectID);

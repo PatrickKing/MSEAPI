@@ -5,6 +5,7 @@ using System.Text;
 
 using System.Windows;
 using System.Windows.Media;
+using KinectServer;
 //using Microsoft.Kinect;
 
 namespace MSELocator
@@ -19,12 +20,15 @@ namespace MSELocator
         public delegate void TrackerEventSignature(Tracker sender);
         public event TrackerEventSignature RangeChanged;
 
+        private MSEKinectServer _kinectServer;
+            
         private double? _MinRange;
 
 
-        public Tracker(string KinectID)
+        public Tracker(string KinectID, MSEKinectServer ks)
         {
             this.Identifier = KinectID;
+            this._kinectServer = ks;
         }
 
         public Tracker()
@@ -62,9 +66,21 @@ namespace MSELocator
             }
         }
 
+        /// <summary>
+        /// Calling this function will send a message to the kinect client of this tracker telling it to start sending skeleton data.
+        /// </summary>
+        public void StartStreaming()
+        {
+            this._kinectServer.startKinectStream(this.Identifier);
+        }
 
-
-
+        /// <summary>
+        /// Calling this function will send a message to the kinect client of this tracker telling it stop sending skeleton data.
+        /// </summary>
+        public void StopStreaming()
+        {
+            this._kinectServer.stopKinectStream(this.Identifier);
+        }
 
 
 
