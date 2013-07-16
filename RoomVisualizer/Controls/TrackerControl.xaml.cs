@@ -42,10 +42,9 @@ namespace RoomVisualizer
             deviceRotationControl = new DeviceRotationControl();
             deviceRotationControl.onSliderValueChanged += new EventHandler<RotationSliderEventArgs>(onOrientationSliderChanged);
             canvas.Children.Add(deviceRotationControl);
-            Canvas.SetLeft(deviceRotationControl, 0);
-            Canvas.SetTop(deviceRotationControl, 0);
-            deviceRotationControl.Visibility = System.Windows.Visibility.Visible;
-            deviceRotationControl.Opacity = 1;
+            Canvas.SetLeft(deviceRotationControl, -45);
+            Canvas.SetTop(deviceRotationControl, -10);
+            deviceRotationControl.Opacity = 0;
 
             LeftLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
             RightLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
@@ -62,12 +61,12 @@ namespace RoomVisualizer
             this.Tracker.Orientation = e.Time;
         }
 
-        private void DeviceRectangle_MouseEnter(object sender, MouseEventArgs e)
+        private void Shape_MouseEnter(object sender, MouseEventArgs e)
         {
             deviceRotationControl.Opacity = 1;
         }
 
-        private void DeviceRectangle_MouseLeave(object sender, MouseEventArgs e)
+        private void Shape_MouseLeave(object sender, MouseEventArgs e)
         {
             deviceRotationControl.Opacity = 0;
         }
@@ -128,33 +127,13 @@ namespace RoomVisualizer
 
         public void onOrientationChanged(Device device)
         {
-            // We are using RotateTransform now to make things easier. Everything should be drawn pointing downwards (270 degrees)
-            //this.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
+            // We are using RotateTransform now to make things easier. Everything should be drawn pointing downwards (270 degrees);
+            LeftLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
+            RightLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
+            NearTriangle.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
+            FarLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
 
-            // Draw two lines to serve as field of view indicators
-            double topAngle = Util.NormalizeAngle(Tracker.Orientation.Value + Tracker.FieldOfView.Value);
-            double topX = Math.Cos(topAngle * Math.PI / 180);
-            double topY = Math.Sin(topAngle * Math.PI / 180);
-
-
-            double bottomAngle = Util.NormalizeAngle(Tracker.Orientation.Value - Tracker.FieldOfView.Value);
-            double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
-            double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
-
-            Point newLeft = DrawingResources.ConvertPointToProperLength(new Point(topX, topY), DrawingResources.DEVICE_FOV_LENGTH);
-            Point newRight = DrawingResources.ConvertPointToProperLength(new Point(bottomX, bottomY), DrawingResources.DEVICE_FOV_LENGTH);
-
-            //Dispatch UI Changes to Main Thread
-            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                LeftLine.X2 = newLeft.X;
-                LeftLine.Y2 = -newLeft.Y;
-
-                RightLine.X2 = newRight.X;
-                RightLine.Y2 = -newRight.Y;
-
-            }));
-        }
+        } 
 
         public void onLocationChanged(Device device)
         {
