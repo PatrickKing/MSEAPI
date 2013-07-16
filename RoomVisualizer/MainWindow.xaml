@@ -67,6 +67,7 @@
             </Border>
             <TextBlock Text="MultiSurface Visualizer" FontFamily="Segoe UI" FontSize="30" FontStretch="UltraExpanded" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <Image Source="Images/Icon-144.png" Height="300" Width="300" Stretch="Fill" HorizontalAlignment="Center" />
+            <Button Content="Reset People" Height="42" Name="button1" Width="140" Click="resetButton_Click" />
         </StackPanel>
     </Grid>
 </Window>

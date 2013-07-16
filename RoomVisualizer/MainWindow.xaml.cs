@@ -350,27 +350,11 @@ namespace RoomVisualizer
                     tracker.FieldOfView = 57;
                     canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH, DrawingResources.ROOM_HEIGHT / 2);
-                    tracker.Orientation = 180;
+                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2 + 2, DrawingResources.ROOM_HEIGHT);
+                    tracker.Orientation = 270;
                 }));
             }
 
-            else if (kinectManager.Locator.Trackers.Count == 3)
-            {
-                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
-
-                this.Dispatcher.Invoke(new Action(delegate()
-                {
-                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-                    tracker.MinRange = 0.8;
-                    tracker.MaxRange = 4;
-                    tracker.FieldOfView = 57;
-                    canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-
-                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH /2, 0);
-                    tracker.Orientation = 180;
-                }));
-            }
         }
 
         //Window Close (End the Kinect Manager) 
@@ -509,6 +493,20 @@ namespace RoomVisualizer
             if (e.Key == Key.Escape)
             {
                 Environment.Exit(0);
+            }
+        }
+
+        private void resetButton_Click(object sender, RoutedEventArgs e)
+        {
+            kinectManager.PersonManager.resetPeople();
+
+            foreach(PairablePerson pairablePerson in PersonControlDictionary.Keys.ToList())
+            {
+                this.Dispatcher.Invoke(new Action(delegate()
+                {
+                    canvas.Children.Remove(PersonControlDictionary[pairablePerson]);
+                    PersonControlDictionary.Remove(pairablePerson);
+                }));
             }
         }
 

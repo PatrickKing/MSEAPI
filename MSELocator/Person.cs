@@ -17,11 +17,13 @@ namespace MSELocator
             set { _HeldDeviceIdentifier = value; }
         }
 
-        private String _TrackedByIdentifier;
-        public String TrackedByIdentifier
+        public String TrackedByIdentifier;
+
+        private List<String> _TrackedByIdentifier1;
+        public List<String> TrackedByIdentifier1
         {
-            get { return _TrackedByIdentifier; }
-            set { _TrackedByIdentifier = value; }
+            get { return _TrackedByIdentifier1; }
+            set { _TrackedByIdentifier1 = value; }
         }
 
         private Point? _Location;
@@ -63,9 +65,17 @@ namespace MSELocator
             set { _Identifier = value; }
         }
 
+        private Dictionary<String, String> _TrackerIDwithSkeletonID;
+        public Dictionary<String, String> TrackerIDwithSkeletonID
+        {
+            get { return _TrackerIDwithSkeletonID; }
+            set { _TrackerIDwithSkeletonID = value;}
+        }
+
         public delegate void PersonEventSignature(Person sender);
         public event PersonEventSignature LocationChanged;
         public event PersonEventSignature OrientationChanged;
+
 
         /// <summary>
         /// This method overrrides the equals, to allow comparison of Persons, based on their identifier.

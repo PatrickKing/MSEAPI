@@ -53,6 +53,18 @@ namespace RoomVisualizer
             tracker.OrientationChanged += onOrientationChanged;
             tracker.FOVChanged += onFOVChanged;
             tracker.RangeChanged += onRangeChanged;
+
+            //formatForStackPanel();
+        }
+
+        private void formatForStackPanel()
+        {
+            NearTriangle.Visibility = System.Windows.Visibility.Hidden;
+            LeftLine.Visibility = System.Windows.Visibility.Hidden;
+            RightLine.Visibility = System.Windows.Visibility.Hidden;
+            deviceRotationControl.Visibility = System.Windows.Visibility.Hidden;
+            FarLine.Visibility = System.Windows.Visibility.Hidden;
+            TrackerEllipse.Margin = new Thickness(50, 50, 0, 0);
         }
 
 

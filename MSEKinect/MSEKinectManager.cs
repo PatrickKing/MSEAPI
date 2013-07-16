@@ -82,6 +82,14 @@ namespace MSEKinect
             communicationManager = null;
         }
 
+        public void resetPeople()
+        {
+            foreach (Person person in locator.Persons.ToList())
+            {
+                locator.Persons.Remove(person);
+            }
+        }
+
 
         /// <summary>
         /// Test whether a Kinect sensor is available, exit if none are.

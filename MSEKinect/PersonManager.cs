@@ -23,6 +23,9 @@ namespace MSEKinect
         // Distance in meters on either side on both axis that if a new skeleton appears in this area and a device has been unpaired within the timer, it'll automatically pair this skeleton/device
         const double SAVINGDISTANCE = 0.25;
 
+        // If a skeleton poistion is found to be this close to a person it will be associated with that person.
+        const double PROXIMITYDISTANCE = 0.1;
+
 
 
         #endregion
@@ -97,7 +100,15 @@ namespace MSEKinect
             //Trackers.Add(newTracker);
             locator.Trackers.Add(newTracker);
             newKinectDiscovered(NewKinectID);
-            kinectserver.startKinectStream(NewKinectID);
+            newTracker.StartStreaming();
+        }
+
+        public void resetPeople()
+        {
+            foreach (Person person in locator.Persons.ToList())
+            {
+                locator.Persons.Remove(person);
+            }
         }
 
 
@@ -200,26 +211,30 @@ namespace MSEKinect
             // Update each Person
             foreach (PairablePerson person in pairablePersons)
             {
-                // If the person is occluded, we don't have a skeleton to use for position updates right now
-                if (person.PairingState == PairingState.PairedButOccluded || !person.TrackedByIdentifier.Equals(kinectID))
+                if (person.TrackerIDwithSkeletonID.Count>0 && person.TrackerIDwithSkeletonID.Keys.ElementAt(0).Equals(kinectID))
                 {
-                    continue;
-                }
+                    // If the person is occluded, we don't have a skeleton to use for position updates right now
+                    if (person.PairingState == PairingState.PairedButOccluded)
+                    {
+                        continue;
+                    }
+                    Skeleton skeleton = skeletons.Find(x => person.TrackerIDwithSkeletonID.Values.Contains(x.TrackingId.ToString()));
+                    //Skeleton skeleton = skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier));
 
-                Skeleton skeleton = skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier));
+                    // The Kinect looks down the Z axis in its coordinate space, left right movement happens on the X axis, and vertical movement on the Y axis
+                    // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
+                    // the skeleton's position. See Tracker for more details.
+                    //tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
+                    if (skeleton != null)
+                    { locator.Trackers.Find(x => x.Identifier.Equals(kinectID)).UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X)); }
+                    // TODO: Also update Person's orientation.
 
-                // The Kinect looks down the Z axis in its coordinate space, left right movement happens on the X axis, and vertical movement on the Y axis
-                // To translate this into the tracker's coordinate space, where it is at 0,0 and looks down the X axis, we pass in the Z and X components of 
-                // the skeleton's position. See Tracker for more details.
-                //tracker.UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
-                locator.Trackers.Find(x => x.Identifier.Equals(kinectID)).UpdatePositionForPerson(person, new Vector(skeleton.Position.Z, skeleton.Position.X));
-                // TODO: Also update Person's orientation.
-
-                // If the Person has a paired device, infer that the device is located where the person is, and update its location too
-                if (person.PairingState == PairingState.Paired && person.HeldDeviceIdentifier != null)
-                {
-                    Device device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
-                    device.Location = person.Location;
+                    // If the Person has a paired device, infer that the device is located where the person is, and update its location too
+                    if (person.PairingState == PairingState.Paired && person.HeldDeviceIdentifier != null)
+                    {
+                        Device device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
+                        device.Location = person.Location;
+                    }
                 }
 
 
@@ -232,11 +247,34 @@ namespace MSEKinect
             List<PairablePerson> vanishedPersons = new List<PairablePerson>();
             foreach (PairablePerson person in pairablePersons)
             {
-                if (skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier)) == null)
+                foreach (KeyValuePair<string, string> entry in person.TrackerIDwithSkeletonID.ToList())
+                {
+                    if (entry.Key.Equals(kinectID))
+                    {
+                        bool found = false;
+                        foreach (Skeleton skeleton in skeletons)
+                        {
+                            if (entry.Value.Equals(skeleton.TrackingId.ToString()))
+                            {
+                                found = true;
+                            }
+                        }
+                        if (!found)
+                        {
+                            // Remove from the dictionary
+                            person.TrackerIDwithSkeletonID.Remove(kinectID);
+                        }
+                    }
+                }
+
+
+
+                //if (skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier)) == null)
+                if(person.TrackerIDwithSkeletonID.Count == 0)
                 {
 
-                    if (!person.TrackedByIdentifier.Equals(kinectID))
-                        continue;
+                    //if (!person.TrackedByIdentifier.Equals(kinectID))
+                    //    continue;
 
                     //Remove Held-By-Person Identifier
                     PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
@@ -290,11 +328,35 @@ namespace MSEKinect
             vanishedPersons.Add(person);
             if (PersonRemoved != null)
                 PersonRemoved(this, person);
-        }
+        } 
 
 
         private void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, String kinectID)
         {
+
+            foreach (Skeleton skeleton in skeletons)
+            {
+                Point skeletonInRoomSpace = locator.Trackers.Find(x => x.Identifier.Equals(kinectID)).ConvertSkeletonToRoomSpace(new Vector(skeleton.Position.Z, skeleton.Position.X));
+
+                foreach (PairablePerson pairablePerson in pairablePersons)
+                {
+                    //if this skeleton is very close to
+                    if (skeletonInRoomSpace.X < (pairablePerson.Location.Value.X + PROXIMITYDISTANCE) &&
+                        skeletonInRoomSpace.X > (pairablePerson.Location.Value.X - PROXIMITYDISTANCE) &&
+                        skeletonInRoomSpace.Y < (pairablePerson.Location.Value.Y + PROXIMITYDISTANCE) &&
+                        skeletonInRoomSpace.Y > (pairablePerson.Location.Value.Y - PROXIMITYDISTANCE))
+                    {
+                        if (!pairablePerson.TrackerIDwithSkeletonID.ContainsKey(kinectID))
+                        {
+                            pairablePerson.TrackerIDwithSkeletonID.Add(kinectID, skeleton.TrackingId.ToString());
+                        }
+                        break;
+                    }
+                }
+
+            }
+
+
             // First, test each new skeleton to see if it matches an occluded person
             foreach (Skeleton skeleton in skeletons)
             {
@@ -333,7 +395,8 @@ namespace MSEKinect
                     continue;
                 //New Skeleton Found
                 //if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
-                if (pairablePersons.Find(x => skeleton.TrackingId.ToString().Equals(x.Identifier)) == null)
+                //if (pairablePersons.Find(x => skeleton.TrackingId.ToString().Equals(x.Identifier)) == null )
+                if(pairablePersons.Find(x => x.TrackerIDwithSkeletonID.ContainsValue(skeleton.TrackingId.ToString())) == null)
                 {
                     PairablePerson person = new PairablePerson
                     {
@@ -341,8 +404,13 @@ namespace MSEKinect
                         Orientation = 0.0,
                         Identifier = skeleton.TrackingId.ToString(),
                         PairingState = PairingState.NotPaired,
+                        TrackerIDwithSkeletonID = new Dictionary<string, string>(),
                         TrackedByIdentifier = kinectID
                     };
+
+                    //add the tracker id to the top of the list
+                    person.TrackerIDwithSkeletonID.Add(kinectID,skeleton.TrackingId.ToString());
+
                     pairablePersons.Add(person);
 
                     if (PersonAdded != null)

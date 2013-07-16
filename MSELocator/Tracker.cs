@@ -24,7 +24,6 @@ namespace MSELocator
             
         private double? _MinRange;
 
-
         public Tracker(string KinectID, MSEKinectServer ks)
         {
             this.Identifier = KinectID;
