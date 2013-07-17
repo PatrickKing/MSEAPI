@@ -24,7 +24,7 @@ namespace MSEKinect
         const double SAVINGDISTANCE = 0.25;
 
         // If a skeleton poistion is found to be this close to a person it will be associated with that person.
-        const double PROXIMITYDISTANCE = 0.1;
+        const double PROXIMITYDISTANCE = 0.25;
 
 
 
@@ -249,7 +249,7 @@ namespace MSEKinect
             {
                 foreach (KeyValuePair<string, string> entry in person.TrackerIDwithSkeletonID.ToList())
                 {
-                    if (entry.Key.Equals(kinectID))
+                    if (entry.Key != null && entry.Key.Equals(kinectID))
                     {
                         bool found = false;
                         foreach (Skeleton skeleton in skeletons)
@@ -340,7 +340,7 @@ namespace MSEKinect
 
                 foreach (PairablePerson pairablePerson in pairablePersons)
                 {
-                    //if this skeleton is very close to
+                    //if this skeleton is very close to an existing person, that kinect will be added to the person's list of TrackerIDwithSkeletonID
                     if (skeletonInRoomSpace.X < (pairablePerson.Location.Value.X + PROXIMITYDISTANCE) &&
                         skeletonInRoomSpace.X > (pairablePerson.Location.Value.X - PROXIMITYDISTANCE) &&
                         skeletonInRoomSpace.Y < (pairablePerson.Location.Value.Y + PROXIMITYDISTANCE) &&
@@ -512,6 +512,31 @@ namespace MSEKinect
         }
 
 
+
+
+        #endregion
+
+
+        #region Calibration
+
+        public void calibrate()
+        {
+            if (locator.Trackers.Count == 2 && locator.Persons.Count == 2)
+            {
+                Person person1 = locator.Persons[0];
+                Tracker tracker1 = locator.Trackers.Find(x => x.Identifier.Equals(person1.TrackerIDwithSkeletonID.Keys.ToList()[0]));
+
+                Person person2 = locator.Persons[1];
+                Tracker tracker2 = locator.Trackers.Find(x => x.Identifier.Equals(person2.TrackerIDwithSkeletonID.Keys.ToList()[0]));
+
+                double xValue = person1.Location.Value.X - person2.Location.Value.X;
+                double yValue = person1.Location.Value.Y - person2.Location.Value.Y;
+
+                Point newPosition = new Point(tracker2.Location.Value.X + xValue, tracker2.Location.Value.Y + yValue);
+                tracker2.Location = newPosition;
+            }
+
+        }
 
 
         #endregion

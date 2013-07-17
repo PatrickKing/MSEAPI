@@ -350,8 +350,8 @@ namespace RoomVisualizer
                     tracker.FieldOfView = 57;
                     canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2 + 2, DrawingResources.ROOM_HEIGHT);
-                    tracker.Orientation = 270;
+                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH, DrawingResources.ROOM_HEIGHT /2);
+                    tracker.Orientation = 180;
                 }));
             }
 
@@ -508,6 +508,11 @@ namespace RoomVisualizer
                     PersonControlDictionary.Remove(pairablePerson);
                 }));
             }
+        }
+
+        private void calibrateButton_Click(object sender, RoutedEventArgs e)
+        {
+            kinectManager.PersonManager.calibrate();
         }
 
 
