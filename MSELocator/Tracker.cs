@@ -28,6 +28,18 @@ namespace MSELocator
         {
             this.Identifier = KinectID;
             this._kinectServer = ks;
+            this.State = CallibrationState.NotCalibrated;
+        }
+
+        public enum CallibrationState { Calibrated, NotCalibrated };
+        private CallibrationState? _state;
+        public CallibrationState? State
+        {
+            get { return _state; }
+            set
+            {
+                _state = value;
+            }
         }
 
         public Tracker()
