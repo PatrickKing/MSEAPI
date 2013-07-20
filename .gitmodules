@@ -7,3 +7,6 @@
 [submodule "KinectServer"]
 	path = KinectServer
 	url = https://github.com/ase-lab/KinectServer.git
+[submodule "MSEAPI-CS"]
+	path = MSEAPI-CS
+	url = https://github.com/ase-lab/MSEAPI-CS.git
