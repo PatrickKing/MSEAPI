@@ -285,6 +285,7 @@ namespace RoomVisualizer
             kinectManager.PersonManager.PersonAdded += personAdded;
             kinectManager.PersonManager.PersonRemoved += personRemoved;
             kinectManager.PersonManager.newKinectDiscovered += KinectDiscovered;
+            kinectManager.PersonManager.kinectRemoved += KinectRemoved;
 
             //Seperate components for displaying the visible skeletons
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
@@ -355,6 +356,16 @@ namespace RoomVisualizer
                 }));
             }
 
+        }
+
+        private void KinectRemoved(string KinectID)
+        {
+
+           this.Dispatcher.Invoke(new Action(delegate()
+            {
+                canvas.Children.Remove(TrackerControlDictionary[KinectID]);
+                TrackerControlDictionary.Remove(KinectID);
+           }));
         }
 
         //Window Close (End the Kinect Manager) 

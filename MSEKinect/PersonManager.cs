@@ -74,6 +74,9 @@ namespace MSEKinect
         public delegate void NewKinectDiscovered(string NewKinectID);
         public event NewKinectDiscovered newKinectDiscovered;
 
+        public delegate void KinectRemoved(string NewKinectID);
+        public event KinectRemoved kinectRemoved;
+
         #endregion
 
         #region Constructor, Start and Stop
@@ -88,10 +91,20 @@ namespace MSEKinect
 
             kinectserver.NewKinectDiscovered += new NewKinectDiscoveredEventSignature(kinectserver_NewKinectDiscovered);
             kinectserver.SkeletonsRecieved += new SkeletonsReceivedEventSignature(kinectserver_SkeletonsRecieved);
+            kinectserver.kinectRemoved += new KinectRemovedSignature(kinectserver_kinectRemoved);
 
             //Trackers = new List<Tracker>();
             //tracker = new Tracker() { Location = new Point(0, 0), Orientation = 0, Identifier = "MSEKinect", KinectID = "pewpew" };
             //locator.Trackers.Add(tracker);
+        }
+
+        void kinectserver_kinectRemoved(string KinectID)
+        {
+            if (locator.Trackers.Count != 0)
+            {
+                locator.Trackers.Remove( locator.Trackers.Find(x => x.Identifier.Equals(KinectID)));
+                kinectRemoved(KinectID);
+            }
         }
 
         void kinectserver_NewKinectDiscovered(string NewKinectID)
@@ -154,6 +167,7 @@ namespace MSEKinect
             {
                 ks.Stop();
             }
+            kinectserver.Stop();
         }
 
         #endregion
