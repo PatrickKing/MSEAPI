@@ -53,10 +53,6 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IntAirActCS\csharp-monads\Monads\Monads.csproj">
-      <Project>{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}</Project>
-      <Name>Monads</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MSEAPI-CS-SharedNetworking\MSEAPI-SharedNetworking\MSEAPI-SharedNetworking.csproj">
       <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
       <Name>MSEAPI-SharedNetworking</Name>

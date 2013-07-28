@@ -29,10 +29,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZeroconfService", "IntAirAc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-SharedNetworking", "MSEAPI-CS-SharedNetworking\MSEAPI-SharedNetworking\MSEAPI-SharedNetworking.csproj", "{09505CBD-76EE-43EE-9390-BB90EFF36E45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-CS", "MSEAPI-CS\MSEAPI-CS\MSEAPI-CS.csproj", "{E5292769-7735-41E5-81B2-FC1389BC6BCF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monads", "IntAirActCS\csharp-monads\Monads\Monads.csproj", "{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}"
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = MSEAPI.vsmdi
@@ -156,28 +152,6 @@ Global
 		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{09505CBD-76EE-43EE-9390-BB90EFF36E45}.Release|x86.ActiveCfg = Release|Any CPU
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Debug|x86.ActiveCfg = Debug|x86
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Debug|x86.Build.0 = Debug|x86
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Release|Mixed Platforms.Build.0 = Release|x86
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Release|x86.ActiveCfg = Release|x86
-		{E5292769-7735-41E5-81B2-FC1389BC6BCF}.Release|x86.Build.0 = Release|x86
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Release|Any CPU.Build.0 = Release|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
