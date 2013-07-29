@@ -27,7 +27,7 @@
                                   Maximum="359"
                                   Initialized="timeSlider_Initialized"
                                   ValueChanged="slider_ValueChanged" 
-                                  Value="90" />
+                                  Value="270" />
                 
                 
 

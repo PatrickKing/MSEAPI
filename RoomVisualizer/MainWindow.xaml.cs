@@ -36,7 +36,13 @@ namespace RoomVisualizer
         {
             get { return sharedCanvas; }
         }
-        
+
+        private static WrapPanel kinectWrapPanel;
+        public static WrapPanel KinectWrapPanel
+        {
+            get { return kinectWrapPanel; }
+        }
+
         private static WrapPanel sharedWrapPanel;
         public static WrapPanel SharedDeviceStackPanel
         {
@@ -107,6 +113,7 @@ namespace RoomVisualizer
             sharedCanvas = canvas;
             sharedWrapPanel = unpairedDeviceStackPanel;
             surfaceWrapPanel = surfaceStackPanel;
+            kinectWrapPanel = availableKinectsStackPanel;
 
             ghostBorder = ghost;
             ghostText = ghostTextBlock;
@@ -152,6 +159,29 @@ namespace RoomVisualizer
             }
         }
 
+        private void setupTrackerForStackPanel(TrackerControl trackerControl)
+        {
+            trackerControl.NearTriangle.Points.Clear();
+            trackerControl.NearTriangle.Points.Add(new Point(50, 15));
+            trackerControl.NearTriangle.Points.Add(new Point(75, 40));
+            trackerControl.NearTriangle.Points.Add(new Point(25, 40));
+
+            trackerControl.FarLine.X1 = 100;
+            trackerControl.FarLine.Y1 = 65;
+            trackerControl.FarLine.X2 = 0;
+            trackerControl.FarLine.Y2 = 65;
+
+            trackerControl.LeftLine.X1 = 50;
+            trackerControl.LeftLine.Y1 = 15;
+            trackerControl.LeftLine.X2 = 100;
+            trackerControl.LeftLine.Y2 = 65;
+
+            trackerControl.RightLine.X1 = 50;
+            trackerControl.RightLine.Y1 = 15;
+            trackerControl.RightLine.X2 = 0;
+            trackerControl.RightLine.Y2 = 65;
+        }
+
         protected override void OnDrop(DragEventArgs e)
         {
             string DataType = e.Data.GetFormats(true)[0];
@@ -168,10 +198,39 @@ namespace RoomVisualizer
                 MainWindow.GhostBorder.Visibility = System.Windows.Visibility.Hidden;
                 ghostTextBlock.Visibility = System.Windows.Visibility.Hidden;
 
-                // Return the Opacity of the DeviceControl
+                // Return the Opacity of the TrackerControl
                 trackerControl.Opacity = 1;
 
                 trackerControl.Tracker.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+
+                // Check if the TrackerControl is already a child of Shared Canvas
+
+                Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));   
+
+                if (!trackerControl.IsDescendantOf(SharedCanvas))
+                {
+                    trackerControl.Tracker.MinRange = 0.8;
+                    trackerControl.Tracker.MaxRange = 4;
+                    trackerControl.Tracker.FieldOfView = 60;
+
+                    kinectWrapPanel.Children.Remove(trackerControl);
+                    SharedCanvas.Children.Add(trackerControl);
+
+                    // Start the kinect stream here
+                    trackerControl.Tracker.StartStreaming();
+                    
+                }
+
+                // If the Cursor is within the Canvas
+                else if (!(mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y))
+                {
+                    trackerControl.Tracker.StopStreaming();
+
+                    setupTrackerForStackPanel(trackerControl);
+
+                    SharedCanvas.Children.Remove(trackerControl);
+                    kinectWrapPanel.Children.Add(trackerControl);
+                }
             }
             
             
@@ -313,49 +372,20 @@ namespace RoomVisualizer
 
         private void KinectDiscovered(string kinectID)
         {
+            Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
 
-            //Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
-
-            //Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-            //{
-            //    tracker.StopStreaming();
-            //    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-            //    availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-            //}));
-
-            if (kinectManager.Locator.Trackers.Count == 1)
+            this.Dispatcher.Invoke(new Action(delegate()
             {
-                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
+                TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+                //tracker.MinRange = 0.8;
+                //tracker.MaxRange = 4;
+                //tracker.FieldOfView = 57;
+                //canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+                availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-                this.Dispatcher.Invoke(new Action(delegate()
-                {
-                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-                    tracker.MinRange = 0.8;
-                    tracker.MaxRange = 4;
-                    tracker.FieldOfView = 57;
-                    canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-
-                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-                    tracker.Orientation = 270;
-                }));
-            }
-            else if (kinectManager.Locator.Trackers.Count == 2)
-            {
-                Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
-
-                this.Dispatcher.Invoke(new Action(delegate()
-                {
-                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-                    tracker.MinRange = 0.8;
-                    tracker.MaxRange = 4;
-                    tracker.FieldOfView = 57;
-                    canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-
-                    tracker.Location = new Point(DrawingResources.ROOM_WIDTH, DrawingResources.ROOM_HEIGHT /2);
-                    tracker.Orientation = 180;
-                }));
-            }
-
+                //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
+                tracker.Orientation = 270;
+            }));
         }
 
         private void KinectRemoved(string KinectID)
@@ -364,6 +394,7 @@ namespace RoomVisualizer
            this.Dispatcher.Invoke(new Action(delegate()
             {
                 canvas.Children.Remove(TrackerControlDictionary[KinectID]);
+                kinectWrapPanel.Children.Remove(TrackerControlDictionary[KinectID]);
                 TrackerControlDictionary.Remove(KinectID);
            }));
         }

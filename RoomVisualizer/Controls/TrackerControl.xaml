@@ -4,15 +4,17 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Canvas Name="canvas">
-        <Polygon Points="0,0 50,50 -50,50" Name="NearTriangle" Fill="#FFCB0000" Opacity="0.75" MouseEnter="Shape_MouseEnter" MouseLeave="Shape_MouseLeave"></Polygon>
-        <Line Name="FarLine" X1="100" Y1="100" X2="-100" Y2="100" Stroke="#FFCB0000" StrokeThickness="4" Opacity="0.75"></Line>
+             d:DesignHeight="150" d:DesignWidth="150" Height="100" Width="100">
+    <Canvas Name="canvas" Height="100" Width="100">
+        <Polygon Points="50,15 75,40 25,40" Name="NearTriangle" Fill="#FFCB0000" Opacity="0.75" MouseEnter="Shape_MouseEnter" MouseLeave="Shape_MouseLeave"></Polygon>
+        <Line Name="FarLine" X1="100" Y1="65" X2="0" Y2="65" Stroke="#FFCB0000" StrokeThickness="4" Opacity="0.75"></Line>
         
-        <Line Name="LeftLine" X1="0" Y1="0" X2="100" Y2="100" Stroke="Black" StrokeThickness="2"></Line>
-        <Line Name="RightLine" X1="0" Y1="0" X2="-100" Y2="100" Stroke="Black" StrokeThickness="2"></Line>
-        
-        <Ellipse Height="50" HorizontalAlignment="Left" Name="TrackerEllipse" Stroke="#FF52318F" VerticalAlignment="Top" Width="50" StrokeThickness="3" Fill="#FF00BCF2" Canvas.Left="-25" Canvas.Top="-25" Visibility="Visible" MouseEnter="Shape_MouseEnter" MouseLeave="Shape_MouseLeave" />
+        <Line Name="LeftLine" X1="50" Y1="15" X2="100" Y2="65" Stroke="Black" StrokeThickness="2"></Line>
+        <Line Name="RightLine" X1="50" Y1="15" X2="0" Y2="65" Stroke="Black" StrokeThickness="2"></Line>
+
+        <Ellipse Height="25" HorizontalAlignment="Center" Name="TrackerEllipse" Stroke="#FF52318F" VerticalAlignment="Top" Width="25" StrokeThickness="3" Fill="#FF00BCF2" Visibility="Visible" MouseEnter="Shape_MouseEnter" MouseLeave="Shape_MouseLeave" Canvas.Left="37.5" Canvas.Top="2.5"  />
+
+        <TextBlock x:Name="TrackerNameLabel" Text="Tracker Name" Height="30" Width="100" Canvas.Left="0" Canvas.Top="70" TextAlignment="Center" TextTrimming="CharacterEllipsis"></TextBlock>
 
     </Canvas>
 </UserControl>

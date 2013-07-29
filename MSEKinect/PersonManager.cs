@@ -113,14 +113,20 @@ namespace MSEKinect
             //Trackers.Add(newTracker);
             locator.Trackers.Add(newTracker);
             newKinectDiscovered(NewKinectID);
-            newTracker.StartStreaming();
+
+            // TODO should only start streaming ig the tracker is added to the visulaizer canvas
+            //newTracker.StartStreaming();
         }
 
         public void resetPeople()
         {
-            foreach (Person person in locator.Persons.ToList())
+            lock (locator.Persons)
             {
-                locator.Persons.Remove(person);
+                locator.Persons.RemoveAll(x => x.GetType().Equals(x.GetType()));
+                foreach (Person person in locator.Persons.ToList())
+                {
+                    locator.Persons.Remove(person);
+                }
             }
         }
 
@@ -559,10 +565,9 @@ namespace MSEKinect
                         tracker1.State = Tracker.CallibrationState.Calibrated;
                         tracker2.State = Tracker.CallibrationState.Calibrated;
                     }
-                    catch (NullReferenceException)
+                    catch (NullReferenceException nullReferenceException)
                     {
-                        System.Console.WriteLine("Tracker1 is: " + tracker1.ToString());
-                        System.Console.WriteLine("Tracker2 is: " + tracker2.ToString());
+                        System.Console.WriteLine(nullReferenceException.Message);
                     }
                 }
             }

@@ -28,7 +28,7 @@ namespace RoomVisualizer
             InitializeComponent();
 
             slabel.FontSize = 20;
-            slabel.Content = "90°";
+            slabel.Content = "270°";
             this.Opacity = 0;
         }
 

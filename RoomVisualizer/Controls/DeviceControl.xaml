@@ -8,6 +8,7 @@
 
     <Canvas Name="canvas">
         <Rectangle Name="DeviceRectangle" Height="64" Width="64" Fill="#00BE3131" Opacity="7" MouseEnter="DeviceRectangle_MouseEnter" MouseLeave="DeviceRectangle_MouseLeave"></Rectangle>
+        
         <Border x:Name="InnerBorder" Height="64" Width="64" BorderThickness="4" Canvas.Left="0" Canvas.Top="0"></Border>
         <TextBlock x:Name="DeviceNameLabel" Text="Device Name" Height="30" Width="100" Canvas.Left="0" Canvas.Top="70" TextAlignment="Center" TextTrimming="CharacterEllipsis"></TextBlock>
         <Line Name="LeftLine" X1="0" Y1="0" X2="200" Y2="200" Stroke="Black" StrokeThickness="2"></Line>
