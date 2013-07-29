@@ -159,6 +159,25 @@ namespace RoomVisualizer
             }
         }
 
+        private void cleanUpKinectPersons(string kinectID)
+        {
+            lock (PersonControlDictionary)
+            {
+                foreach (KeyValuePair<PairablePerson, PersonControl> entry in PersonControlDictionary.ToList())
+                {
+                    if (entry.Key.TrackerIDwithSkeletonID.Keys.Contains(kinectID))
+                    {
+                        this.Dispatcher.Invoke(new Action(delegate()
+                        {
+                            canvas.Children.Remove(PersonControlDictionary[entry.Key]);
+                            PersonControlDictionary.Remove(entry.Key);
+                            kinectManager.Locator.Persons.Remove(entry.Key as Person);
+                        }));
+                    }
+                }
+            }
+        }
+
         private void setupTrackerForStackPanel(TrackerControl trackerControl)
         {
             trackerControl.NearTriangle.Points.Clear();
@@ -225,7 +244,7 @@ namespace RoomVisualizer
                 else if (!(mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y))
                 {
                     trackerControl.Tracker.StopStreaming();
-
+                    cleanUpKinectPersons(trackerControl.Tracker.Identifier);
                     setupTrackerForStackPanel(trackerControl);
 
                     SharedCanvas.Children.Remove(trackerControl);

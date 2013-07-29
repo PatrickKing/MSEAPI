@@ -100,6 +100,23 @@ namespace MSEKinect
 
         void kinectserver_kinectRemoved(string KinectID)
         {
+            lock (locator.Persons)
+            {
+                List<Person> vanishedPersons = new List<Person>();
+                foreach (Person person in locator.Persons)
+                {
+                    if (person.TrackerIDwithSkeletonID.Keys.Contains(KinectID))
+                    {
+                        vanishedPersons.Add(person);
+                    }
+                }
+                foreach (Person person in vanishedPersons)
+                {
+                    locator.Persons.Remove(person);
+                    if (PersonRemoved != null)
+                        PersonRemoved(this, person as PairablePerson);
+                }
+            }
             if (locator.Trackers.Count != 0)
             {
                 locator.Trackers.Remove( locator.Trackers.Find(x => x.Identifier.Equals(KinectID)));
