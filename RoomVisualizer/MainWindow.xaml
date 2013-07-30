@@ -34,6 +34,12 @@
             </Border>
 
             <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5" Background="White">
+                <Expander Header="Available Kinects" Name="expander5" IsExpanded="True" Margin="5,0,0,0">
+                    <WrapPanel Name="availableKinectsStackPanel" Margin="0,5,0,0"></WrapPanel>
+                </Expander>
+            </Border>
+
+            <Border BorderThickness="1" BorderBrush="Black" CornerRadius="5" Padding="0,5" Margin="0,0,0,5" Background="White">
                 <Expander Header="Unpaired Devices" Name="expander2" IsExpanded="True" Margin="5,0,0,0">
                     <WrapPanel Name="unpairedDeviceStackPanel" Margin="0,5,0,0"></WrapPanel>
                 </Expander>
@@ -61,6 +67,8 @@
             </Border>
             <TextBlock Text="MultiSurface Visualizer" FontFamily="Segoe UI" FontSize="30" FontStretch="UltraExpanded" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <Image Source="Images/Icon-144.png" Height="300" Width="300" Stretch="Fill" HorizontalAlignment="Center" />
+            <Button Content="Reset People" Height="42" Name="button1" Width="140" Click="resetButton_Click" />
+            <Button Content="Calibrate" Height="44" Name="button2" Width="142" Click="calibrateButton_Click" />
         </StackPanel>
     </Grid>
 </Window>

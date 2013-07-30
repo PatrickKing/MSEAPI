@@ -23,11 +23,62 @@ namespace RoomVisualizer
     public partial class TrackerControl : UserControl
     {
 
+        DeviceRotationControl deviceRotationControl;
+
+        private enum DisplayState
+        {
+            OnStackPanel,
+            OnCanvas           
+        }
+        private DisplayState myDisplayState;
+        private DisplayState MyDisplayState
+        {
+            get
+            {
+                return myDisplayState;
+            }
+            set
+            {
+                if (value == DisplayState.OnCanvas && myDisplayState == DisplayState.OnStackPanel)
+                {
+                    //Handle transition to display on Canvas
+                    MainWindow.SharedDeviceStackPanel.Children.Remove(this);
+                    MainWindow.KinectWrapPanel.Children.Remove(this);
+                    //formatForCanvas();
+                    MainWindow.SharedCanvas.Children.Add(this);
+                }
+                else if (value == DisplayState.OnStackPanel && myDisplayState == DisplayState.OnCanvas)
+                {
+                    //Handle transition to display on StackPanel
+                    MainWindow.SharedCanvas.Children.Remove(this);
+                    formatForStackPanel();
+                    MainWindow.KinectWrapPanel.Children.Add(this);
+                }
+            }
+        }
+
+        private Tracker _Tracker;
+        public Tracker Tracker
+        {
+            set { }
+            get { return _Tracker; }
+
+        }
+
         public TrackerControl(Tracker tracker)
         {
+            this._Tracker = tracker;
+
             InitializeComponent();
 
+            deviceRotationControl = new DeviceRotationControl();
+            deviceRotationControl.onSliderValueChanged += new EventHandler<RotationSliderEventArgs>(onOrientationSliderChanged);
+            canvas.Children.Add(deviceRotationControl);
+            Canvas.SetLeft(deviceRotationControl, -150);
+            Canvas.SetTop(deviceRotationControl, -10);
+            deviceRotationControl.Opacity = 0;
 
+            TrackerNameLabel.Text = tracker.Identifier;
             LeftLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
             RightLine.StrokeThickness = DrawingResources.TRACKER_FOV_WIDTH;
 
@@ -35,14 +86,99 @@ namespace RoomVisualizer
             tracker.OrientationChanged += onOrientationChanged;
             tracker.FOVChanged += onFOVChanged;
             tracker.RangeChanged += onRangeChanged;
+
+            //formatForStackPanel();
         }
+
+        private void formatForStackPanel()
+        {
+            NearTriangle.Visibility = System.Windows.Visibility.Hidden;
+            LeftLine.Visibility = System.Windows.Visibility.Hidden;
+            RightLine.Visibility = System.Windows.Visibility.Hidden;
+            deviceRotationControl.Visibility = System.Windows.Visibility.Hidden;
+            FarLine.Visibility = System.Windows.Visibility.Hidden;
+            TrackerEllipse.Margin = new Thickness(50, 50, 0, 0);
+        }
+
+
+        void onOrientationSliderChanged(object sender, RotationSliderEventArgs e)
+        {
+            this.Tracker.Orientation = e.Time;
+        }
+
+        private void Shape_MouseEnter(object sender, MouseEventArgs e)
+        {
+            deviceRotationControl.Opacity = 1;
+        }
+
+        private void Shape_MouseLeave(object sender, MouseEventArgs e)
+        {
+            deviceRotationControl.Opacity = 0;
+        }
+
+        #region Drag and Drop
+
+        protected override void OnTouchDown(TouchEventArgs e)
+        {
+            base.OnTouchDown(e);
+
+            startDragging();
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            //if (e.OriginalSource == DeviceRectangle)
+            {
+                base.OnMouseDown(e);
+
+                // We consider it a drag only if the Device is a stationary Device, and the mouse button is pushed
+                if (e.LeftButton == MouseButtonState.Pressed)
+                {
+                    startDragging();
+                }
+            }
+        }
+
+
+        protected override void OnGiveFeedback(GiveFeedbackEventArgs e)
+        {
+            base.OnGiveFeedback(e);
+
+            if (e.Effects.HasFlag(DragDropEffects.Move))
+            {
+                Mouse.SetCursor(Cursors.Pen);
+
+            }
+            else
+            {
+                Mouse.SetCursor(Cursors.No);
+            }
+
+            e.Handled = true;
+        }
+
+        private void startDragging()
+        {
+            // Drag event started on a device supporting setting location
+            DataObject data = new DataObject();
+            data.SetData("trackerControl", this);
+
+            // Start Dragging
+            DragDrop.DoDragDrop(this, data, DragDropEffects.Move);
+
+        }
+        #endregion
 
 
         public void onOrientationChanged(Device device)
         {
-            // We are using RotateTransform now to make things easier. Everything should be drawn pointing downwards (270 degrees)
-            this.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270);
-        }
+            // We are using RotateTransform now to make things easier. Everything should be drawn pointing downwards (270 degrees);
+            LeftLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+            RightLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+            NearTriangle.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+            FarLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+
+        } 
 
         public void onLocationChanged(Device device)
         {
@@ -73,21 +209,28 @@ namespace RoomVisualizer
         public void updateFOV(Tracker tracker)
         {
             double FOVAngle = tracker.FieldOfView.Value / 2;
+            double leftX = (tracker.MaxRange.Value * Math.Sin(Util.DEGREES_TO_RADIANS * FOVAngle)) / (Util.DEGREES_TO_RADIANS * (180.0 - FOVAngle - 90));
+            double leftXPixels = DrawingResources.ConvertFromMetersToPixelsX(leftX, MainWindow.SharedCanvas);
+            double YPixels = DrawingResources.ConvertFromMetersToPixelsY(tracker.MaxRange.Value, MainWindow.SharedCanvas);
 
-            // Draw two lines to serve as field of view indicators
-            double topAngle = Util.NormalizeAngle(270 + FOVAngle);
-            double topX = Math.Cos(topAngle * Math.PI / 180);
-            double topY = Math.Sin(topAngle * Math.PI / 180);
-            Point newLeft = DrawingResources.ConvertPointToProperLength(new Point(topX, topY), DrawingResources.TRACKER_FOV_LENGTH);
-            LeftLine.X2 = newLeft.X;
-            LeftLine.Y2 = -newLeft.Y;
+            RightLine.X2 = 50 + leftXPixels;
+            RightLine.Y2 = YPixels;
+            LeftLine.X2 = 50-leftXPixels;
+            LeftLine.Y2 = YPixels;
 
-            double bottomAngle = Util.NormalizeAngle(270 - FOVAngle);
-            double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
-            double bottomY = Math.Sin(bottomAngle * Math.PI / 180);
-            Point newRight = DrawingResources.ConvertPointToProperLength(new Point(bottomX, bottomY), DrawingResources.TRACKER_FOV_LENGTH);
-            RightLine.X2 = newRight.X;
-            RightLine.Y2 = -newRight.Y;
+            //double topAngle = Util.NormalizeAngle(270 + FOVAngle);
+            //double topX = Math.Cos(topAngle * Math.PI / 180);
+            //double topY = Math.Sin(topAngle * Math.PI / 180);            
+            //Point newLeft = DrawingResources.ConvertPointToProperLength(new Point(topX, topY), DrawingResources.TRACKER_FOV_LENGTH);
+            //LeftLine.X2 = newLeft.X;
+            //LeftLine.Y2 = -newLeft.Y;
+
+            //double bottomAngle = Util.NormalizeAngle(270 - FOVAngle);
+            //double bottomX = Math.Cos(bottomAngle * Math.PI / 180);
+            //double bottomY = Math.Sin(bottomAngle * Math.PI / 180);            
+            //Point newRight = DrawingResources.ConvertPointToProperLength(new Point(bottomX, bottomY), DrawingResources.TRACKER_FOV_LENGTH);
+            //RightLine.X2 = newRight.X;
+            //RightLine.Y2 = -newRight.Y;            
         }
 
 
@@ -107,9 +250,10 @@ namespace RoomVisualizer
                 double YPixels = DrawingResources.ConvertFromMetersToPixelsY(tracker.MinRange.Value, MainWindow.SharedCanvas);
 
                 NearTriangle.Points.Clear();
-                NearTriangle.Points.Add(new Point(0, 0));
-                NearTriangle.Points.Add(new Point(leftXPixels, YPixels));
-                NearTriangle.Points.Add(new Point(-leftXPixels, YPixels));
+
+                NearTriangle.Points.Add(new Point(50, 15));
+                NearTriangle.Points.Add(new Point(50 + leftXPixels, 15+YPixels));
+                NearTriangle.Points.Add(new Point(50 - leftXPixels, 15+YPixels));
             }
 
             // Adjusting the FarLine
@@ -119,9 +263,9 @@ namespace RoomVisualizer
                 double leftXPixels = DrawingResources.ConvertFromMetersToPixelsX(leftX, MainWindow.SharedCanvas);
                 double YPixels = DrawingResources.ConvertFromMetersToPixelsY(tracker.MaxRange.Value, MainWindow.SharedCanvas);
 
-                FarLine.X1 = leftXPixels;
+                FarLine.X1 = 50+ leftXPixels;
                 FarLine.Y1 = YPixels;
-                FarLine.X2 = -leftXPixels;
+                FarLine.X2 = 50-leftXPixels;
                 FarLine.Y2 = YPixels;
             }
         }

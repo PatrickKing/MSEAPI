@@ -130,6 +130,10 @@
       <Project>{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}</Project>
       <Name>IntAirAct</Name>
     </ProjectReference>
+    <ProjectReference Include="..\KinectServer\KinectServer\KinectServer.csproj">
+      <Project>{07BE2682-45AA-470E-81F2-DBBC9B928B3A}</Project>
+      <Name>KinectServer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MSEAPI-CS-SharedNetworking\MSEAPI-SharedNetworking\MSEAPI-SharedNetworking.csproj">
       <Project>{09505CBD-76EE-43EE-9390-BB90EFF36E45}</Project>
       <Name>MSEAPI-SharedNetworking</Name>

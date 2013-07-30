@@ -5,6 +5,7 @@ using System.Text;
 
 using System.Windows;
 using System.Windows.Media;
+using KinectServer;
 //using Microsoft.Kinect;
 
 namespace MSELocator
@@ -19,7 +20,30 @@ namespace MSELocator
         public delegate void TrackerEventSignature(Tracker sender);
         public event TrackerEventSignature RangeChanged;
 
+        private MSEKinectServer _kinectServer;
+            
         private double? _MinRange;
+
+        public Tracker(string KinectID, MSEKinectServer ks)
+        {
+            this.Identifier = KinectID;
+            this._kinectServer = ks;
+            this.State = CallibrationState.NotCalibrated;
+        }
+
+        public enum CallibrationState { Calibrated, NotCalibrated };
+        private CallibrationState? _state;
+        public CallibrationState? State
+        {
+            get { return _state; }
+            set
+            {
+                _state = value;
+            }
+        }
+
+        public Tracker()
+        { }
 
         /// <summary>
         /// A distance in meters where the tracker cannot accurately track closer to that point. The distance of 0 - MinRange is a dead zone for tracking
@@ -53,9 +77,21 @@ namespace MSELocator
             }
         }
 
+        /// <summary>
+        /// Calling this function will send a message to the kinect client of this tracker telling it to start sending skeleton data.
+        /// </summary>
+        public void StartStreaming()
+        {
+            this._kinectServer.startKinectStream(this.Identifier);
+        }
 
-
-
+        /// <summary>
+        /// Calling this function will send a message to the kinect client of this tracker telling it stop sending skeleton data.
+        /// </summary>
+        public void StopStreaming()
+        {
+            this._kinectServer.stopKinectStream(this.Identifier);
+        }
 
 
 

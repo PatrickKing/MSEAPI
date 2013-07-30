@@ -45,7 +45,7 @@ namespace MSEKinect
         }
 
 
-        public MSEKinectManager(bool RequireKinect = true)
+        public MSEKinectManager(bool RequireKinect = false)
         {
             if (RequireKinect)
                 TestKinectAvailability();
@@ -80,6 +80,14 @@ namespace MSEKinect
             intAirAct.Stop();
 
             communicationManager = null;
+        }
+
+        public void resetPeople()
+        {
+            foreach (Person person in locator.Persons.ToList())
+            {
+                locator.Persons.Remove(person);
+            }
         }
 
 

@@ -67,6 +67,10 @@ namespace RoomVisualizer
 
         public void OnLocationChanged(Person person)
         {
+            this.Dispatcher.Invoke(new Action(delegate()
+            {
+                
+            
             if(person.Location.HasValue)
             {
                 Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(person.Location.Value, MainWindow.SharedCanvas);
@@ -77,6 +81,7 @@ namespace RoomVisualizer
     
                 CoordinatesLabel.Content = string.Format("Location: ({0:0.0},{1:0.0})", person.Location.Value.X, person.Location.Value.Y);
             }
+            }));
         }
 
 
