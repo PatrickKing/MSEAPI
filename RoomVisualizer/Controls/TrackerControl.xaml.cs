@@ -74,7 +74,7 @@ namespace RoomVisualizer
             deviceRotationControl = new DeviceRotationControl();
             deviceRotationControl.onSliderValueChanged += new EventHandler<RotationSliderEventArgs>(onOrientationSliderChanged);
             canvas.Children.Add(deviceRotationControl);
-            Canvas.SetLeft(deviceRotationControl, -45);
+            Canvas.SetLeft(deviceRotationControl, -150);
             Canvas.SetTop(deviceRotationControl, -10);
             deviceRotationControl.Opacity = 0;
 
