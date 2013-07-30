@@ -151,7 +151,7 @@ namespace MSEKinect
         void kinectserver_SkeletonsRecieved(string KinectID, List<Skeleton> SkeletonList)
         {
             UpdatePersonsAndDevices(SkeletonList, KinectID);
-            //gestureController.UpdateAllGestureGroups(GetAllSkeletonData(e));
+            gestureController.UpdateAllGestureGroups(SkeletonList.ToArray());
         }
 
         public void StartPersonManager()
