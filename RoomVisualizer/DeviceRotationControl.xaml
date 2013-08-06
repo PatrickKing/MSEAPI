@@ -43,6 +43,6 @@
                 <PerspectiveCamera Position="0 0 4"/>
             </Viewport3D.Camera>
         </Viewport3D>
-        <Label Name="slabel" Content="hello" Margin="30,88,320,32"></Label>
+        <Label Name="slabel" Content="hello" Margin="180,120,170,0"></Label>
     </Grid>
 </UserControl>

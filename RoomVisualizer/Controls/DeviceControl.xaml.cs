@@ -187,8 +187,8 @@ namespace RoomVisualizer
             deviceRotationControl = new DeviceRotationControl();
             deviceRotationControl.onSliderValueChanged += new EventHandler<RotationSliderEventArgs>(onOrientationSliderChanged);
             canvas.Children.Add(deviceRotationControl);
-            Canvas.SetLeft(deviceRotationControl, 0);
-            Canvas.SetTop(deviceRotationControl, 0);
+            Canvas.SetLeft(deviceRotationControl, -170);
+            Canvas.SetTop(deviceRotationControl, -40);
 
             //Setup Events
             pairableDevice.LocationChanged += onLocationChanged;

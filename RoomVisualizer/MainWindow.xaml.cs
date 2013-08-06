@@ -178,29 +178,6 @@ namespace RoomVisualizer
             }
         }
 
-        private void setupTrackerForStackPanel(TrackerControl trackerControl)
-        {
-            trackerControl.NearTriangle.Points.Clear();
-            trackerControl.NearTriangle.Points.Add(new Point(50, 15));
-            trackerControl.NearTriangle.Points.Add(new Point(75, 40));
-            trackerControl.NearTriangle.Points.Add(new Point(25, 40));
-
-            trackerControl.FarLine.X1 = 100;
-            trackerControl.FarLine.Y1 = 65;
-            trackerControl.FarLine.X2 = 0;
-            trackerControl.FarLine.Y2 = 65;
-
-            trackerControl.LeftLine.X1 = 50;
-            trackerControl.LeftLine.Y1 = 15;
-            trackerControl.LeftLine.X2 = 100;
-            trackerControl.LeftLine.Y2 = 65;
-
-            trackerControl.RightLine.X1 = 50;
-            trackerControl.RightLine.Y1 = 15;
-            trackerControl.RightLine.X2 = 0;
-            trackerControl.RightLine.Y2 = 65;
-        }
-
         protected override void OnDrop(DragEventArgs e)
         {
             string DataType = e.Data.GetFormats(true)[0];
@@ -228,9 +205,7 @@ namespace RoomVisualizer
 
                 if (!trackerControl.IsDescendantOf(SharedCanvas))
                 {
-                    trackerControl.Tracker.MinRange = 0.8;
-                    trackerControl.Tracker.MaxRange = 4;
-                    trackerControl.Tracker.FieldOfView = 60;
+                    trackerControl.formatForCanvas();
 
                     kinectWrapPanel.Children.Remove(trackerControl);
                     SharedCanvas.Children.Add(trackerControl);
@@ -245,7 +220,7 @@ namespace RoomVisualizer
                 {
                     trackerControl.Tracker.StopStreaming();
                     cleanUpKinectPersons(trackerControl.Tracker.Identifier);
-                    setupTrackerForStackPanel(trackerControl);
+                    trackerControl.formatForStackPanel();
 
                     SharedCanvas.Children.Remove(trackerControl);
                     kinectWrapPanel.Children.Add(trackerControl);
@@ -400,6 +375,7 @@ namespace RoomVisualizer
                 //tracker.MaxRange = 4;
                 //tracker.FieldOfView = 57;
                 //canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+                TrackerControlDictionary[tracker.Identifier].formatForStackPanel();
                 availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
                 //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);

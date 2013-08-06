@@ -90,14 +90,39 @@ namespace RoomVisualizer
             //formatForStackPanel();
         }
 
-        private void formatForStackPanel()
+        public void formatForStackPanel()
         {
-            NearTriangle.Visibility = System.Windows.Visibility.Hidden;
-            LeftLine.Visibility = System.Windows.Visibility.Hidden;
-            RightLine.Visibility = System.Windows.Visibility.Hidden;
             deviceRotationControl.Visibility = System.Windows.Visibility.Hidden;
-            FarLine.Visibility = System.Windows.Visibility.Hidden;
-            TrackerEllipse.Margin = new Thickness(50, 50, 0, 0);
+            Tracker.Orientation = 270;
+            
+            NearTriangle.Points.Clear();
+            NearTriangle.Points.Add(new Point(50, 15));
+            NearTriangle.Points.Add(new Point(75, 40));
+            NearTriangle.Points.Add(new Point(25, 40));
+
+            FarLine.X1 = 100;
+            FarLine.Y1 = 65;
+            FarLine.X2 = 0;
+            FarLine.Y2 = 65;
+
+            LeftLine.X1 = 50;
+            LeftLine.Y1 = 15;
+            LeftLine.X2 = 100;
+            LeftLine.Y2 = 65;
+
+            RightLine.X1 = 50;
+            RightLine.Y1 = 15;
+            RightLine.X2 = 0;
+            RightLine.Y2 = 65;
+
+        }
+
+        public void formatForCanvas()
+        {
+            deviceRotationControl.Visibility = System.Windows.Visibility.Visible;
+            Tracker.MinRange = 0.8;
+            Tracker.MaxRange = 4;
+            Tracker.FieldOfView = 60;
         }
 
 
