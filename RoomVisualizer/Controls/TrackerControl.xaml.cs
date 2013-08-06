@@ -115,6 +115,8 @@ namespace RoomVisualizer
             RightLine.X2 = 0;
             RightLine.Y2 = 65;
 
+            Tracker.StopStreaming();
+
         }
 
         public void formatForCanvas()
@@ -123,6 +125,7 @@ namespace RoomVisualizer
             Tracker.MinRange = 0.8;
             Tracker.MaxRange = 4;
             Tracker.FieldOfView = 60;
+            Tracker.StartStreaming();
         }
 
 

@@ -209,9 +209,6 @@ namespace RoomVisualizer
 
                     kinectWrapPanel.Children.Remove(trackerControl);
                     SharedCanvas.Children.Add(trackerControl);
-
-                    // Start the kinect stream here
-                    trackerControl.Tracker.StartStreaming();
                     
                 }
 
@@ -529,6 +526,8 @@ namespace RoomVisualizer
         {
             if (e.Key == Key.Escape)
             {
+                kinectManager.Stop();
+
                 Environment.Exit(0);
             }
         }
