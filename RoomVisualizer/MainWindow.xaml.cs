@@ -198,6 +198,7 @@ namespace RoomVisualizer
                 trackerControl.Opacity = 1;
 
                 trackerControl.Tracker.Location = DrawingResources.ConvertFromDisplayCoordinatesToMeters(mouseLocation, sharedCanvas);
+                
 
                 // Check if the TrackerControl is already a child of Shared Canvas
 
@@ -361,22 +362,27 @@ namespace RoomVisualizer
             }));
         }
 
-        private void KinectDiscovered(string kinectID)
+        private void KinectDiscovered(string kinectID, bool hasLocation)
         {
             Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
 
             this.Dispatcher.Invoke(new Action(delegate()
             {
-                TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-                //tracker.MinRange = 0.8;
-                //tracker.MaxRange = 4;
-                //tracker.FieldOfView = 57;
-                //canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-                TrackerControlDictionary[tracker.Identifier].formatForStackPanel();
-                availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+                if (!hasLocation)
+                {
+                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+                    TrackerControlDictionary[tracker.Identifier].formatForStackPanel();
+                    availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
 
-                //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-                tracker.Orientation = 270;
+                    //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
+                    tracker.Orientation = 270;
+                }
+                else
+                {
+                    TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
+                    TrackerControlDictionary[tracker.Identifier].formatForCanvas();
+                    canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+                }
             }));
         }
 

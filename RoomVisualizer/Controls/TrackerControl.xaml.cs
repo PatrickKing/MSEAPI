@@ -200,11 +200,19 @@ namespace RoomVisualizer
 
         public void onOrientationChanged(Device device)
         {
-            // We are using RotateTransform now to make things easier. Everything should be drawn pointing downwards (270 degrees);
-            LeftLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
-            RightLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
-            NearTriangle.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
-            FarLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+            if (device.Orientation != null)
+            {
+
+                this.Dispatcher.Invoke(new Action(delegate()
+                {
+                    // We are using RotateTransform now to make things easier. Everything should be drawn pointing downwards (270 degrees);
+                    LeftLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+                    RightLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+                    NearTriangle.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+                    FarLine.RenderTransform = new RotateTransform((device.Orientation.Value * -1) + 270, 50, 15);
+                }));
+
+            }
 
         } 
 
@@ -212,10 +220,15 @@ namespace RoomVisualizer
         {
             if (device.Location.HasValue)
             {
-                Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(device.Location.Value, MainWindow.SharedCanvas);
-                Canvas.SetLeft(this, newPoint.X);
-                Canvas.SetTop(this, newPoint.Y);
+
+                this.Dispatcher.Invoke(new Action(delegate()
+                {
+                    Point newPoint = DrawingResources.ConvertFromMetersToDisplayCoordinates(device.Location.Value, MainWindow.SharedCanvas);
+                    Canvas.SetLeft(this, newPoint.X);
+                    Canvas.SetTop(this, newPoint.Y);
+                }));
             }
+
         }
 
         public void onRangeChanged(Tracker tracker)

@@ -17,6 +17,28 @@ namespace MSELocator
     public class Tracker : Device
     {
 
+        public double? Orientation
+        {
+            get { return base.Orientation; }
+            set
+            {
+                base.Orientation = value;
+                if(base.Orientation != null)
+                    _kinectServer.updateKinectOrientation(this.Identifier, (double)base.Orientation);
+            }
+        }
+
+        public Point? Location
+        {
+            get { return base.Location; }
+            set
+            {
+                base.Location = value;
+                if (base.Location != null)
+                    _kinectServer.updateKinectLocation(this.Identifier,(Point) base.Location);
+            }
+        }
+
         public delegate void TrackerEventSignature(Tracker sender);
         public event TrackerEventSignature RangeChanged;
 
