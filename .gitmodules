@@ -4,9 +4,6 @@
 [submodule "MSEAPI-CS-SharedNetworking"]
 	path = MSEAPI-CS-SharedNetworking
 	url = https://github.com/ase-lab/MSEAPI-CS-SharedNetworking.git
-[submodule "MSEAPI-CS"]
-	path = MSEAPI-CS
-	url = https://github.com/ase-lab/MSEAPI-CS.git
 [submodule "KinectServer"]
 	path = KinectServer
 	url = https://github.com/ase-lab/KinectServer.git
