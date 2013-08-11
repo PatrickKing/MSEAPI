@@ -31,8 +31,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSEAPI-SharedNetworking", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinectServer", "KinectServer\KinectServer\KinectServer.csproj", "{07BE2682-45AA-470E-81F2-DBBC9B928B3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroupLab.iNetwork", "KinectServer\GroupLab.iNetwork\GroupLab.iNetwork.csproj", "{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}"
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = MSEAPI.vsmdi
@@ -166,16 +164,6 @@ Global
 		{07BE2682-45AA-470E-81F2-DBBC9B928B3A}.Release|Mixed Platforms.Build.0 = Release|x86
 		{07BE2682-45AA-470E-81F2-DBBC9B928B3A}.Release|x86.ActiveCfg = Release|x86
 		{07BE2682-45AA-470E-81F2-DBBC9B928B3A}.Release|x86.Build.0 = Release|x86
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{4A3D0309-0201-4521-987F-7BF3FCE2FBCF}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
