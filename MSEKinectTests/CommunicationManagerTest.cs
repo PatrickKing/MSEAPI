@@ -173,8 +173,8 @@ namespace MSEKinectTests
             // Notify the server that the client wants to be paired
             IARequest pairingRequest = new IARequest(Routes.RequestPairingRoute);
             pairingRequest.Origin = Client.OwnDevice;
-            pairingRequest.Parameters["identifier"] = Client.OwnDevice.Get().Name; 
-            Client.SendRequest(pairingRequest, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception exception)
+            pairingRequest.Parameters["identifier"] = Client.OwnDevice.Name; 
+            Client.SendRequest(pairingRequest, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
             {
                 if (exception != null)
                 {
@@ -189,7 +189,7 @@ namespace MSEKinectTests
                 Assert.AreEqual(PairingState.Paired, person.PairingState);
 
                 // Find the Client's IADevice on the server, test its pariing state
-                PairableDevice device = (PairableDevice)Server.Locator.Devices.Find(x => x.Identifier.Equals(Client.OwnDevice.Get().Name));
+                PairableDevice device = (PairableDevice)Server.Locator.Devices.Find(x => x.Identifier.Equals(Client.OwnDevice.Name));
                 Assert.AreEqual(PairingState.Paired, device.PairingState);
 
                 // Test that the two were paired with each other
@@ -242,7 +242,7 @@ namespace MSEKinectTests
             IARequest request = new IARequest(Routes.GetOffsetAngleRoute);
             request.Parameters["identifier"] = "myPad";
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception exception)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
             {
                 double offsetOrientation = double.Parse(response.BodyAsString());
                 // The angle between the device and the tracker should be 135 degrees
@@ -277,7 +277,7 @@ namespace MSEKinectTests
             request.SetBodyWithString(newOrientation.ToString());
 
             // Send the request, and test
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception exception)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
             {
                 Assert.AreEqual(240.0, device.Orientation.Value, 0.01);
             });
@@ -313,7 +313,7 @@ namespace MSEKinectTests
             request.SetBodyWith(new IntermediatePoint(newLocation));
 
             // Send the request, and test
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception exception)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception exception)
             {
                 Assert.AreEqual(newLocation, device.Location.Value);
             });
@@ -356,7 +356,7 @@ namespace MSEKinectTests
             IARequest request = new IARequest(Routes.GetDeviceInfoRoute);
             request.Parameters["identifier"] = deviceOne.Identifier;
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception e)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
             {
                 IntermediateDevice id = response.BodyAs<IntermediateDevice>();
 
@@ -375,7 +375,7 @@ namespace MSEKinectTests
             request = new IARequest(Routes.GetDeviceInfoRoute);
             request.Parameters["identifier"] = deviceTwo.Identifier;
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception e)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
             {
                 Assert.AreEqual(404, response.StatusCode);
                 doneWaitingForResponse = true;
@@ -415,7 +415,7 @@ namespace MSEKinectTests
 
             IARequest request = new IARequest(Routes.GetAllDeviceInfoRoute);
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception e)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
             {
                 List<IntermediateDevice> ids = response.BodyAs<IntermediateDevice>();
 
@@ -474,7 +474,7 @@ namespace MSEKinectTests
             IARequest request = new IARequest(Routes.GetNearestDeviceInViewRoute);
             request.Parameters["identifier"] = observer.Identifier;
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception e)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
             {
                 IntermediateDevice intDevice = response.BodyAs<IntermediateDevice>();
                 Assert.AreEqual(nearest.Identifier, intDevice.identifier);
@@ -525,7 +525,7 @@ namespace MSEKinectTests
             IARequest request = new IARequest(Routes.GetAllDevicesInViewRoute);
             request.Parameters["identifier"] = observer.Identifier;
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception e)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
             {
                 List<IntermediateDevice> intDevices = response.BodyAs<IntermediateDevice>();
 
@@ -583,7 +583,7 @@ namespace MSEKinectTests
             request.Parameters["identifier"] = observer.Identifier;
             request.Parameters["range"] = "100.0";
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception e)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
             {
                 IntermediateDevice intDevice = response.BodyAs<IntermediateDevice>();
                 Assert.AreEqual(nearest.Identifier, intDevice.identifier);
@@ -645,7 +645,7 @@ namespace MSEKinectTests
             request.Parameters["range"] = "50.0";
 
 
-            Client.SendRequest(request, Server.IntAirAct.OwnDevice.Get(), delegate(IAResponse response, Exception e)
+            Client.SendRequest(request, Server.IntAirAct.OwnDevice, delegate(IAResponse response, Exception e)
             {
                 List<IntermediateDevice> intDevices = response.BodyAs<IntermediateDevice>();
 

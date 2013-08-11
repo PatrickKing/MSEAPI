@@ -85,10 +85,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IntAirActCS\csharp-monads\Monads\Monads.csproj">
-      <Project>{10D4DA24-86C8-4A79-9205-7DD4FCCB3B73}</Project>
-      <Name>Monads</Name>
-    </ProjectReference>
     <ProjectReference Include="..\IntAirActCS\IntAirAct\IntAirAct.csproj">
       <Project>{8A1CECE0-6F76-40A8-AEDC-B3D241D8A962}</Project>
       <Name>IntAirAct</Name>
