@@ -78,7 +78,7 @@ namespace RoomVisualizer
             return new Point(point.X * t, point.Y * t);
 
             // Find slope
-            double m = (point.Y - 15) / (point.X - 50);
+            // double m = (point.Y - 15) / (point.X - 50);
             
         }
 
