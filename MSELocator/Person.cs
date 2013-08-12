@@ -76,6 +76,15 @@ namespace MSELocator
         public event PersonEventSignature LocationChanged;
         public event PersonEventSignature OrientationChanged;
 
+        /// <summary>
+        /// This method overrrides the GetHashCode to resolve the warning raised when Equals
+        /// is ovverrieden but GetHashCode isn't.
+        /// </summary>
+        /// <returns>Hash code of the object</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
         /// <summary>
         /// This method overrrides the equals, to allow comparison of Persons, based on their identifier.

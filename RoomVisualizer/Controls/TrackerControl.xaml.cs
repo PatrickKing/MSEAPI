@@ -30,32 +30,6 @@ namespace RoomVisualizer
             OnStackPanel,
             OnCanvas           
         }
-        private DisplayState myDisplayState;
-        private DisplayState MyDisplayState
-        {
-            get
-            {
-                return myDisplayState;
-            }
-            set
-            {
-                if (value == DisplayState.OnCanvas && myDisplayState == DisplayState.OnStackPanel)
-                {
-                    //Handle transition to display on Canvas
-                    MainWindow.SharedDeviceStackPanel.Children.Remove(this);
-                    MainWindow.KinectWrapPanel.Children.Remove(this);
-                    //formatForCanvas();
-                    MainWindow.SharedCanvas.Children.Add(this);
-                }
-                else if (value == DisplayState.OnStackPanel && myDisplayState == DisplayState.OnCanvas)
-                {
-                    //Handle transition to display on StackPanel
-                    MainWindow.SharedCanvas.Children.Remove(this);
-                    formatForStackPanel();
-                    MainWindow.KinectWrapPanel.Children.Add(this);
-                }
-            }
-        }
 
         private Tracker _Tracker;
         public Tracker Tracker

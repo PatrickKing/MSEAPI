@@ -35,7 +35,6 @@ namespace MSEKinect
         #region Instance Variables
 
         private static TraceSource logger = new TraceSource("MSEKinect");
-        KinectSensor ks;
         GestureController gestureController;
         LocatorInterface locator;
         IAIntAirAct intAirAct;
@@ -67,9 +66,6 @@ namespace MSEKinect
         public delegate void PersonChangedEventSignature(PersonManager sender, PairablePerson person);
         public event PersonChangedEventSignature PersonAdded;
         public event PersonChangedEventSignature PersonRemoved;
-
-        public delegate void TrackerChangedEventSignature(PersonManager sender, Tracker tracker);
-        public event TrackerChangedEventSignature TrackerSet;
 
         public delegate void NewKinectDiscovered(string NewKinectID, bool hasLocation);
         public event NewKinectDiscovered newKinectDiscovered;
@@ -195,10 +191,6 @@ namespace MSEKinect
 
         public void StopPersonManager()
         {
-            if (ks != null)
-            {
-                ks.Stop();
-            }
             kinectserver.Stop();
         }
 

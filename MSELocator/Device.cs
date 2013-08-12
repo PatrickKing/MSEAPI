@@ -113,6 +113,15 @@ namespace MSELocator
         public event DeviceEventSignature OrientationChanged;
         public event DeviceEventSignature FOVChanged;
 
+        /// <summary>
+        /// This method overrrides the GetHashCode to resolve the warning raised when Equals
+        /// is ovverrieden but GetHashCode isn't.
+        /// </summary>
+        /// <returns>Hash code of the object</returns>
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
 
         public override bool Equals(System.Object obj)
         {
