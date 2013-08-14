@@ -207,10 +207,11 @@ namespace RoomVisualizer
                 if (!trackerControl.IsDescendantOf(SharedCanvas))
                 {
                     trackerControl.formatForCanvas();
-
                     kinectWrapPanel.Children.Remove(trackerControl);
                     SharedCanvas.Children.Add(trackerControl);
-                    
+
+                    if (trackerControl.Tracker.Orientation == null)
+                        trackerControl.Tracker.Orientation = 270;
                 }
 
                 // If the Cursor is within the Canvas
@@ -219,7 +220,6 @@ namespace RoomVisualizer
                     trackerControl.Tracker.StopStreaming();
                     cleanUpKinectPersons(trackerControl.Tracker.Identifier);
                     trackerControl.formatForStackPanel();
-
                     SharedCanvas.Children.Remove(trackerControl);
                     kinectWrapPanel.Children.Add(trackerControl);
                 }
@@ -362,26 +362,28 @@ namespace RoomVisualizer
             }));
         }
 
-        private void KinectDiscovered(string kinectID, bool hasLocation)
+        private void KinectDiscovered(string kinectID, Point? KinectLocation, Double? KinectOrientation)
         {
             Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
 
             this.Dispatcher.Invoke(new Action(delegate()
             {
-                if (!hasLocation)
+                if (KinectLocation == null)
                 {
                     TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
                     TrackerControlDictionary[tracker.Identifier].formatForStackPanel();
                     availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-
-                    //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-                    tracker.Orientation = 270;
                 }
                 else
                 {
                     TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
                     TrackerControlDictionary[tracker.Identifier].formatForCanvas();
                     canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+
+                    tracker.Location = KinectLocation;
+
+                    if (KinectOrientation != null)
+                        tracker.Orientation = KinectOrientation;
                 }
             }));
         }

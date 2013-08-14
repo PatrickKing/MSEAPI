@@ -67,7 +67,7 @@ namespace MSEKinect
         public event PersonChangedEventSignature PersonAdded;
         public event PersonChangedEventSignature PersonRemoved;
 
-        public delegate void NewKinectDiscovered(string NewKinectID, bool hasLocation);
+        public delegate void NewKinectDiscovered(string NewKinectID, Point? KinectLocation, Double? KinectOrientation);
         public event NewKinectDiscovered newKinectDiscovered;
 
         public delegate void KinectRemoved(string NewKinectID);
@@ -127,14 +127,11 @@ namespace MSEKinect
             //Trackers.Add(newTracker);
             locator.Trackers.Add(newTracker);
 
-            if (KinectLocation != null)
-                newKinectDiscovered(NewKinectID, true);
-            else
-                newKinectDiscovered(NewKinectID, false);
+            newKinectDiscovered(NewKinectID, KinectLocation, KinectOrientation);
 
             //update location and orientation of tracker
-            newTracker.Location = KinectLocation;
-            newTracker.Orientation = KinectOrientation;
+            //newTracker.Location = KinectLocation;
+            //newTracker.Orientation = KinectOrientation;
 
             // TODO should only start streaming ig the tracker is added to the visulaizer canvas
             //newTracker.StartStreaming();
