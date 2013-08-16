@@ -417,10 +417,6 @@ namespace MSELocator
             return FindNearestDevice(observer, devicesInView);
         }
 
-
-        #endregion
-
-
         private static Device FindNearestDevice(Device observer, List<Device> deviceList)
         {
             if (deviceList.Count == 0)
@@ -453,6 +449,8 @@ namespace MSELocator
 
             }
         }
+
+        #endregion
 
     }
 }

@@ -182,6 +182,7 @@ namespace RoomVisualizer
         {
             string DataType = e.Data.GetFormats(true)[0];
 
+            //if the object dropped is a tracker
             if (DataType == "trackerControl")
             {
                 base.OnDrop(e);
@@ -201,7 +202,6 @@ namespace RoomVisualizer
                 
 
                 // Check if the TrackerControl is already a child of Shared Canvas
-
                 Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));   
 
                 if (!trackerControl.IsDescendantOf(SharedCanvas))
@@ -214,7 +214,7 @@ namespace RoomVisualizer
                         trackerControl.Tracker.Orientation = 270;
                 }
 
-                // If the Cursor is within the Canvas
+                // if the cursor is outside the canvas, put the tracker back in stackpanel.
                 else if (!(mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y))
                 {
                     trackerControl.Tracker.StopStreaming();
@@ -225,7 +225,7 @@ namespace RoomVisualizer
                 }
             }
             
-            
+            //if the objet dropped is a device.
             else if (DataType == "deviceControl")
             {
                 base.OnDrop(e);
@@ -341,23 +341,12 @@ namespace RoomVisualizer
             //Seperate components for displaying the visible skeletons
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
 
-
-            //Hardcode tracker position and orientation
-            //Tracker tracker = kinectManager.Locator.Trackers[0];
-
-            ////TODO - Set up event handling for new Trackers and put this code in there.
-            //TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-            //canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-
             //// Values retrieved from:
             //// http://blogs.msdn.com/b/kinectforwindows/archive/2012/01/20/near-mode-what-it-is-and-isn-t.aspx
             //// http://msdn.microsoft.com/en-us/library/jj131033.aspx
             //tracker.MinRange = 0.8;
             //tracker.MaxRange = 4;
             //tracker.FieldOfView = 57;
-
-            //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-            //tracker.Orientation = 275;
 
             }));
         }
@@ -368,6 +357,7 @@ namespace RoomVisualizer
 
             this.Dispatcher.Invoke(new Action(delegate()
             {
+                //if the discovered kinect doesn't have a location, put the kinect in stack panel
                 if (KinectLocation == null)
                 {
                     TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);

@@ -63,7 +63,7 @@
       <DependentUpon>PersonControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\DrawingResources.cs" />
-    <Compile Include="DeviceRotationControl.xaml.cs">
+    <Compile Include="Controls\DeviceRotationControl.xaml.cs">
       <DependentUpon>DeviceRotationControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="DeviceRotationControlEventArgs.cs" />
@@ -79,7 +79,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="DeviceRotationControl.xaml">
+    <Page Include="Controls\DeviceRotationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
