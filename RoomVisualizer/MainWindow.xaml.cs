@@ -161,7 +161,7 @@ namespace RoomVisualizer
 
         private void cleanUpKinectPersons(string kinectID)
         {
-            lock (PersonControlDictionary)
+            lock (kinectManager.Locator.threadLock)
             {
                 foreach (KeyValuePair<PairablePerson, PersonControl> entry in PersonControlDictionary.ToList())
                 {
@@ -440,8 +440,11 @@ namespace RoomVisualizer
         {
             this.Dispatcher.Invoke(new Action(delegate()
             {
-                PersonControlDictionary[pairablePerson] = new PersonControl(pairablePerson);
-                canvas.Children.Add(PersonControlDictionary[pairablePerson]);
+                if (!PersonControlDictionary.ContainsKey(pairablePerson))
+                {
+                    PersonControlDictionary[pairablePerson] = new PersonControl(pairablePerson);
+                    canvas.Children.Add(PersonControlDictionary[pairablePerson]);
+                }
             }));
         }
 
@@ -464,7 +467,11 @@ namespace RoomVisualizer
             {
                 //drawnTracker = new DrawnTracker(tracker);
             }
+        }
 
+        void Clean()
+        {
+            
         }
 
         #endregion

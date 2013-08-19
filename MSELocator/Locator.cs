@@ -26,6 +26,13 @@ namespace MSELocator
             set { _devices = value; }
         }
 
+        private Object _threadLock;
+        public Object threadLock
+        {
+            get { return _threadLock; }
+            set { _threadLock = value; }
+        }
+
         // Tracker does not actually need to be a part of the locator to work, though it makes sense to keep tabs on trackers in a central place.
         private List<Tracker> _trackers;
         public List<Tracker> Trackers

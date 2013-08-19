@@ -8,6 +8,12 @@ namespace MSELocator
 {
     public interface LocatorInterface
     {
+        Object threadLock
+        {
+            get;
+            set;
+        }
+
         List<Person> Persons
         {
             get;

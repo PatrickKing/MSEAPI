@@ -60,6 +60,7 @@ namespace MSEKinect
         {
             this.gestureController = gc;
             this.locator = locator;
+            locator.threadLock = new object();
             this.intAirAct = intAirAct;
 
             kinectserver = new MSEKinectServer();
@@ -110,7 +111,7 @@ namespace MSEKinect
         void kinectserver_kinectRemoved(string KinectID)
         {
             // if a kinect is removed, we want to get rid of all people that it was tracking.
-            lock (locator.Persons)
+            lock (locator.threadLock)
             {
                 List<Person> vanishedPersons = new List<Person>();
                 foreach (Person person in locator.Persons)
@@ -149,25 +150,28 @@ namespace MSEKinect
         /// <param name="skeletons"></param>
         private void UpdatePersonsAndDevices(List<Skeleton> skeletons, string kinectID)
         {
-            //Kinect occasionally returns null for a skeleton frame which leads to a null list<Skeleton>: skip this frame so that we don't drop any People
-            if (skeletons == null)
+            lock (locator.threadLock)
             {
-                return;
+                //Kinect occasionally returns null for a skeleton frame which leads to a null list<Skeleton>: skip this frame so that we don't drop any People
+                if (skeletons == null)
+                {
+                    return;
+                }
+                //Convert Locator List Types into PairablePerson & PairableDevice
+                List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+                List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
+
+                // During shut down, the kinect will return some empty skeleton frames, and null skeleton lists
+                if (skeletons == null)
+                    skeletons = new List<Skeleton>();
+
+                AddNewPeople(skeletons, pairablePersons, kinectID);
+                RemoveOldPeople(skeletons, pairablePersons, pairableDevices, kinectID);
+                UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices, kinectID);
+
+                //Sync up the Locator's Person collection
+                locator.Persons = new List<Person>(pairablePersons);
             }
-            //Convert Locator List Types into PairablePerson & PairableDevice
-            List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
-            List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
-
-            // During shut down, the kinect will return some empty skeleton frames, and null skeleton lists
-            if (skeletons == null)
-                skeletons = new List<Skeleton>();
-
-            AddNewPeople(skeletons, pairablePersons, kinectID);
-            RemoveOldPeople(skeletons, pairablePersons, pairableDevices, kinectID);
-            UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices, kinectID);
-
-            //Sync up the Locator's Person collection
-            locator.Persons = new List<Person>(pairablePersons);
         }
 
         private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices, String kinectID)
@@ -468,42 +472,44 @@ namespace MSEKinect
 
         public void calibrate()
         {
-            //if((locator.Trackers.FindAll(x => x.State == Tracker.CallibrationState.NotCalibrated)).Count == 2 && locator.Persons.Count == 2)
-            if (locator.Trackers.Count == locator.Persons.Count)
+            lock (locator.threadLock)
             {
-                Person person1 = locator.Persons[0];
-                Tracker tracker1 = locator.Trackers.Find(x => x.Identifier.Equals(person1.TrackerIDwithSkeletonID.Keys.ToList()[0])
-                                                               && x.State == Tracker.CallibrationState.NotCalibrated);
-
-                for (int i = 1; i < locator.Trackers.Count; i++)
+                //if((locator.Trackers.FindAll(x => x.State == Tracker.CallibrationState.NotCalibrated)).Count == 2 && locator.Persons.Count == 2)
+                if (locator.Trackers.Count == locator.Persons.Count)
                 {
-                    Person person2 = locator.Persons[i];
-                    Tracker tracker2 = locator.Trackers.Find(x => x.Identifier.Equals(person2.TrackerIDwithSkeletonID.Keys.ToList()[0])
-                                                                    && x.State == Tracker.CallibrationState.NotCalibrated);
+                    Person person1 = locator.Persons[0];
+                    Tracker tracker1 = locator.Trackers.Find(x => x.Identifier.Equals(person1.TrackerIDwithSkeletonID.Keys.ToList()[0])
+                                                                   && x.State == Tracker.CallibrationState.NotCalibrated);
 
-                    double xValue = person1.Location.Value.X - person2.Location.Value.X;
-                    double yValue = person1.Location.Value.Y - person2.Location.Value.Y;
-
-                    try
+                    for (int i = 1; i < locator.Trackers.Count; i++)
                     {
-                        Point newPosition = new Point(tracker2.Location.Value.X + xValue, tracker2.Location.Value.Y + yValue);
-                        tracker2.Location = newPosition;
+                        Person person2 = locator.Persons[i];
+                        Tracker tracker2 = locator.Trackers.Find(x => x.Identifier.Equals(person2.TrackerIDwithSkeletonID.Keys.ToList()[0])
+                                                                        && x.State == Tracker.CallibrationState.NotCalibrated);
 
-                        tracker1.State = Tracker.CallibrationState.Calibrated;
-                        tracker2.State = Tracker.CallibrationState.Calibrated;
-                    }
-                    catch (NullReferenceException nullReferenceException)
-                    {
-                        System.Console.WriteLine(nullReferenceException.Message);
+                        double xValue = person1.Location.Value.X - person2.Location.Value.X;
+                        double yValue = person1.Location.Value.Y - person2.Location.Value.Y;
+
+                        try
+                        {
+                            Point newPosition = new Point(tracker2.Location.Value.X + xValue, tracker2.Location.Value.Y + yValue);
+                            tracker2.Location = newPosition;
+
+                            tracker1.State = Tracker.CallibrationState.Calibrated;
+                            tracker2.State = Tracker.CallibrationState.Calibrated;
+                        }
+                        catch (NullReferenceException nullReferenceException)
+                        {
+                            System.Console.WriteLine(nullReferenceException.Message);
+                        }
                     }
                 }
             }
-
         }
 
         public void resetPeople()
         {
-            lock (locator.Persons)
+            lock (locator.threadLock)
             {
                 locator.Persons.RemoveAll(x => x.GetType().Equals(x.GetType()));
                 foreach (Person person in locator.Persons.ToList())
