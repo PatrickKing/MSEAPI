@@ -52,7 +52,7 @@ namespace MSELocator
 
         Device GetNearestDeviceWithinRange(Device observer, double distance);
 
-        Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints(Device observer);
+        List<Device> GetDevicesInViewWithIntersectionPoints(Device observer);
 
         #endregion
 

@@ -106,6 +106,11 @@ namespace MSELocator
             }
         }
 
+        public Dictionary<string, double> intersectionPoint
+        {
+            get;
+            set;
+        }
 
 
         public delegate void DeviceEventSignature(Device sender);
@@ -158,6 +163,9 @@ namespace MSELocator
         public Device()
         {
             this.FieldOfView = Util.DEFAULT_FIELD_OF_VIEW;
+            this.intersectionPoint = new Dictionary<string, double>();
+            intersectionPoint.Add("x", 0);
+            intersectionPoint.Add("y", 0);
         }
 
 

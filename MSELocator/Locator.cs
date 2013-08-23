@@ -77,9 +77,9 @@ namespace MSELocator
         /// </summary>
         /// <param name="observer"></param>
         /// <returns>Devices in the field of view of the observer and their intersection points.</returns>
-        public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints(Device observer)
+        public List<Device> GetDevicesInViewWithIntersectionPoints(Device observer)
         {
-            Dictionary<Device, Point> returnDevices = new Dictionary<Device, Point>();
+            List<Device> returnDevices = new List<Device>();
 
             Line obseverLineOfSight = new Line(observer.Location, observer.Orientation);
 
@@ -117,7 +117,11 @@ namespace MSELocator
                 }
 
                 Point ratioOnScreen = GetRatioPositionOnScreen(target, (Point)nearestPoint);
-                returnDevices.Add(target, ratioOnScreen);
+
+
+                target.intersectionPoint["x"] = ratioOnScreen.X;
+                target.intersectionPoint["y"] = ratioOnScreen.Y;
+                returnDevices.Add(target);                
             }
 
             return returnDevices;

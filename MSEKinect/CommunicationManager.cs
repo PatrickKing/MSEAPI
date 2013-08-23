@@ -339,16 +339,16 @@ namespace MSEKinect
             response.SetBodyWith(deviceAndIntersections);
         }
 
-        private List<IntermediateDevice> ConvertToUsePairableDevices(Dictionary<Device, Point> inputDictionary)
+        private List<IntermediateDevice> ConvertToUsePairableDevices(List<Device> devices)
         {
             List<IntermediateDevice> convertedList = new List<IntermediateDevice>();
 
-            foreach (KeyValuePair<Device,Point> entry in inputDictionary)
+            foreach (Device device in devices)
             {
                 //Convert from Device to IntermediateDevice
                 //TODO - Fix this atrocity
-                IntermediateDevice intermediateDevice = PairableDevice.GetCompleteIntermediateDevice(entry.Key);
-                intermediateDevice.intersectionPoint = entry.Value;
+                IntermediateDevice intermediateDevice = PairableDevice.GetCompleteIntermediateDevice(device);
+                intermediateDevice.intersectionPoint = new Point(device.intersectionPoint["x"], device.intersectionPoint["y"]);
                 convertedList.Add(intermediateDevice); 
             }
 
