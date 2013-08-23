@@ -17,8 +17,8 @@ namespace MSEKinect
 
 
         public delegate void PairablePersonEventSignature(PairablePerson sender);
+
         public event PairablePersonEventSignature PairingStateChanged;
-        public event PairablePersonEventSignature CalibrationStateChanged;
 
 
         private PairingState _pairingState;
@@ -55,21 +55,6 @@ namespace MSEKinect
             }
         }
 
-        public enum CallibrationState { UsedForCalibration, NotUsedCalibration };
-        private CallibrationState _calibrationState;
-        public CallibrationState CalibrationState
-        {
-            get { return _calibrationState; }
-            set
-            {
-                _calibrationState = value;
-
-                if (CalibrationStateChanged != null)
-                {
-                    CalibrationStateChanged(this);
-                }
-            }
-        }
 
         private Timer pairingTimeoutTimer;
         private Timer occludedTimeoutTimer;
