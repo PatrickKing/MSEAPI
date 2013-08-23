@@ -9,7 +9,7 @@
     <Canvas>
         <Label Name="IdentifierLabel" Content="###" FontSize="22"></Label>
         <Label Name="CoordinatesLabel" Content="(##,##)" Canvas.Top="20" FontSize="22"></Label>
-        <Ellipse Name="PersonEllipse">
+        <Ellipse Name="PersonEllipse" MouseUp="PersonEllipse_MouseUp">
             <Ellipse.Fill>
                 <ImageBrush ImageSource="http://c.dryicons.com/images/icon_sets/luna_blue_icons/png/128x128/user.png" />
             </Ellipse.Fill>

@@ -98,6 +98,16 @@ namespace RoomVisualizer
             }
         }
 
+        public static Brush GetBrushFromCalibrationState(PairablePerson.CallibrationState state)
+        {
+            switch (state)
+            {
+                case (PairablePerson.CallibrationState.UsedForCalibration): return Brushes.Blue;
+                case(PairablePerson.CallibrationState.NotUsedCalibration): return Brushes.DarkRed;
+                default: return Brushes.White;
+            }
+        }
+
         // Adds Gridlines based on the width and height of the canvas onto the Grid gridLines
         public static void GenerateGridLines(Canvas canvas, Grid gridLines, double scale)
         {
