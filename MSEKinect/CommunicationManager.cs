@@ -49,7 +49,10 @@ namespace MSEKinect
             intAirAct.Route(Routes.GetAllDevicesInViewRoute, new Action<IARequest, IAResponse>(GetDevicesInView));
             intAirAct.Route(Routes.GetNearestDeviceInRangeRoute, new Action<IARequest, IAResponse>(GetNearestDeviceInRange));
             intAirAct.Route(Routes.GetAllDevicesInRangeRoute, new Action<IARequest, IAResponse>(GetDevicesInRange));
+            
+            /* Depricated!!!
             intAirAct.Route(Routes.GetAllDevicesWithIntersectionPointsRoute, new Action<IARequest, IAResponse>(GetDevicesWithIntersectionPoint));
+             */
 
 
 
@@ -101,13 +104,12 @@ namespace MSEKinect
         
         }
 
-
         /// <summary>
         /// Handle a request with updated information for a device.
         /// Presently, only used to update device location
         /// </summary>
-        /// <param name="request"></param>
-        /// <param name="response"></param>
+        /// <param name="request">IntAirAct Request</param>
+        /// <param name="response">IntAirAct Response</param>
         void UpdateDeviceOrientation(IARequest request, IAResponse response)
         {
             string result = request.BodyAsString();
@@ -128,6 +130,11 @@ namespace MSEKinect
             }
         }
 
+        /// <summary>
+        /// Handle a request with updated location for a device.
+        /// </summary>
+        /// <param name="request">IntAirAct Request</param>
+        /// <param name="response">IntAirAct Response</param>
         public void UpdateDeviceLocation(IARequest request, IAResponse response)
         {
             IntermediatePoint intermediatePoint = request.BodyAs<IntermediatePoint>();
@@ -147,7 +154,6 @@ namespace MSEKinect
             }
 
         }
-
 
         #endregion
 
@@ -316,6 +322,7 @@ namespace MSEKinect
 
         }
 
+        /* Depricated!!!
         void GetDevicesWithIntersectionPoint(IARequest request, IAResponse response)
         {
             String deviceIdentifier = request.Parameters["identifier"];
@@ -328,7 +335,7 @@ namespace MSEKinect
                 return;
             }
 
-            List<IntermediateDevice> deviceAndIntersections = ConvertToUsePairableDevices(locator.GetDevicesInViewWithIntersectionPoints(observer));
+            List<IntermediateDevice> deviceAndIntersections = ConvertToUsePairableDevices(locator.GetDevicesInView(observer));
 
             if (deviceAndIntersections.Count == 0)
             {
@@ -338,6 +345,7 @@ namespace MSEKinect
 
             response.SetBodyWith(deviceAndIntersections);
         }
+          
 
         private List<IntermediateDevice> ConvertToUsePairableDevices(List<Device> devices)
         {
@@ -355,9 +363,7 @@ namespace MSEKinect
             return convertedList;
 
         }
-
-
-
+        */
 
         #endregion
 

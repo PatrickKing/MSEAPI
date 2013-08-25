@@ -51,7 +51,7 @@ namespace MSELocatorTests
 
             Point p = new Point(0.48,1);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -69,7 +69,7 @@ namespace MSELocatorTests
             locator.Devices.Add(iPad);
             locator.Devices.Add(table);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.IsTrue(devices.Count == 0);
         }
@@ -88,7 +88,7 @@ namespace MSELocatorTests
 
             Point p = new Point(0, 1);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -108,7 +108,7 @@ namespace MSELocatorTests
 
             Point p = new Point(0, 0);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -128,7 +128,7 @@ namespace MSELocatorTests
 
             Point p = new Point(1, 1);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -148,7 +148,7 @@ namespace MSELocatorTests
 
             Point p = new Point(1, 0);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -168,7 +168,7 @@ namespace MSELocatorTests
 
             Point p = new Point(0.5, 1);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -188,7 +188,7 @@ namespace MSELocatorTests
 
             Point p = new Point(0.5, 0);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -208,7 +208,7 @@ namespace MSELocatorTests
 
             Point p = new Point(1, 0.5);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -228,7 +228,7 @@ namespace MSELocatorTests
 
             Point p = new Point(0, 0.5);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -248,7 +248,7 @@ namespace MSELocatorTests
 
             Point p = new Point(0.26, 1);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["x"], p.X, 0.01);
             Assert.AreEqual(devices.Find(x => x.Identifier.Equals("table")).intersectionPoint["y"], p.Y, 0.01);
@@ -268,7 +268,7 @@ namespace MSELocatorTests
 
             Point p = new Point(1, 0);
 
-            List<Device> devices = locator.GetDevicesInViewWithIntersectionPoints(iPad);
+            List<Device> devices = locator.GetDevicesInView(iPad);
 
             Assert.AreEqual(devices.Count, 0);
             //Assert.AreEqual(dic[table].X, p.X, 0.01);

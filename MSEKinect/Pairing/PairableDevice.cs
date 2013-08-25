@@ -6,6 +6,7 @@ using MSELocator;
 using System.Runtime.CompilerServices;
 using System.Timers;
 using MSEAPI_SharedNetworking;
+using System.Windows;
 
 [assembly: InternalsVisibleTo("MSEKinectTests")]
 
@@ -97,7 +98,8 @@ namespace MSEKinect
                 {
                     orientation = device.Orientation,
                     identifier = device.Identifier,
-                    location = device.Location
+                    location = device.Location,
+                    intersectionPoint = new Point(device.intersectionPoint["x"], device.intersectionPoint["y"])
                 };
 
                 if (intermediateDevice.isComplete)

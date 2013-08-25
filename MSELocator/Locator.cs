@@ -77,7 +77,7 @@ namespace MSELocator
         /// </summary>
         /// <param name="observer"></param>
         /// <returns>Devices in the field of view of the observer and their intersection points.</returns>
-        public List<Device> GetDevicesInViewWithIntersectionPoints(Device observer)
+        public List<Device> GetDevicesInView(Device observer)
         {
             List<Device> returnDevices = new List<Device>();
 
@@ -260,7 +260,7 @@ namespace MSELocator
             return new Point(-1, -1);
         }
 
-
+        /* Depricated!!!
         /// <summary>
         /// Computes the devices within the field of view of the observer. Returns an empty list if FieldOfView or Location are null on the observer.
         /// </summary>
@@ -312,6 +312,7 @@ namespace MSELocator
             return returnDevices;
 
         }
+         * */
 
         /// <summary>
         /// Computes the devices that are in front of the observer device. Returns an empty list if FieldOfView or Location are null on the observer.
