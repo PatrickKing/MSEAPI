@@ -363,6 +363,7 @@ namespace MSEKinect
                         Orientation = 0.0,
                         Identifier = skeleton.TrackingId.ToString(),
                         PairingState = PairingState.NotPaired,
+                        CalibrationState = PairablePerson.CallibrationState.NotUsedCalibration,
                         TrackerIDwithSkeletonID = new Dictionary<string, string>(),
                         TrackedByIdentifier = kinectID
                     };
@@ -472,39 +473,71 @@ namespace MSEKinect
 
         public void calibrate()
         {
-            lock (locator.threadLock)
-            {
-                //if((locator.Trackers.FindAll(x => x.State == Tracker.CallibrationState.NotCalibrated)).Count == 2 && locator.Persons.Count == 2)
-                if (locator.Trackers.Count == locator.Persons.Count)
+
+                List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+                List<PairablePerson> personsUsedForCalibration = pairablePersons.FindAll(x => x.CalibrationState == PairablePerson.CallibrationState.UsedForCalibration);
+
+                if (personsUsedForCalibration.Count > 1)
                 {
-                    Person person1 = locator.Persons[0];
-                    Tracker tracker1 = locator.Trackers.Find(x => x.Identifier.Equals(person1.TrackerIDwithSkeletonID.Keys.ToList()[0])
-                                                                   && x.State == Tracker.CallibrationState.NotCalibrated);
+                    Dictionary<PairablePerson, Tracker> personsAndTheirTrackers = new Dictionary<PairablePerson, Tracker>();
 
-                    for (int i = 1; i < locator.Trackers.Count; i++)
+                    foreach (PairablePerson person in personsUsedForCalibration)
                     {
-                        Person person2 = locator.Persons[i];
-                        Tracker tracker2 = locator.Trackers.Find(x => x.Identifier.Equals(person2.TrackerIDwithSkeletonID.Keys.ToList()[0])
-                                                                        && x.State == Tracker.CallibrationState.NotCalibrated);
+                        Tracker tracker = locator.Trackers.Find(x => x.Identifier.Equals(person.TrackerIDwithSkeletonID.Keys.ToList()[0]));
+                        personsAndTheirTrackers.Add(person, tracker);
+                    }
 
-                        double xValue = person1.Location.Value.X - person2.Location.Value.X;
-                        double yValue = person1.Location.Value.Y - person2.Location.Value.Y;
+                    Tracker mainTracker = null;
+                    PairablePerson mainPerson = null;
+
+                    foreach (KeyValuePair<PairablePerson, Tracker> entry in personsAndTheirTrackers)
+                    {
+                        if (entry.Value.State == Tracker.CallibrationState.Calibrated)
+                        {
+                            mainTracker = entry.Value;
+                            mainPerson = entry.Key;
+                            break;
+                        }
+                    }
+
+                    if (mainTracker == null)
+                    {
+                        mainTracker = personsAndTheirTrackers.Values.ToList()[0];
+                        mainPerson = personsAndTheirTrackers.Keys.ToList()[0];
+                    }
+
+                    mainTracker.State = Tracker.CallibrationState.Calibrated;
+
+                    foreach (KeyValuePair<PairablePerson, Tracker> entry in personsAndTheirTrackers)
+                    {
+                        PairablePerson person = entry.Key;
+                        Tracker tracker = entry.Value;
+
+                        if (tracker.State == Tracker.CallibrationState.Calibrated)
+                            continue;
+
+                        double xValue = mainPerson.Location.Value.X - person.Location.Value.X;
+                        double yValue = mainPerson.Location.Value.Y - person.Location.Value.Y;
 
                         try
                         {
-                            Point newPosition = new Point(tracker2.Location.Value.X + xValue, tracker2.Location.Value.Y + yValue);
-                            tracker2.Location = newPosition;
+                            Point newPosition = new Point(tracker.Location.Value.X + xValue, tracker.Location.Value.Y + yValue);
+                            tracker.Location = newPosition;
 
-                            tracker1.State = Tracker.CallibrationState.Calibrated;
-                            tracker2.State = Tracker.CallibrationState.Calibrated;
+                            tracker.State = Tracker.CallibrationState.Calibrated;
                         }
                         catch (NullReferenceException nullReferenceException)
                         {
-                            System.Console.WriteLine(nullReferenceException.Message);
+                            System.Console.WriteLine(nullReferenceException);
                         }
                     }
+
+                    foreach (PairablePerson person in personsAndTheirTrackers.Keys.ToList())
+                    {
+                        person.CalibrationState = PairablePerson.CallibrationState.NotUsedCalibration;
+                    }
+
                 }
-            }
         }
 
         public void resetPeople()
