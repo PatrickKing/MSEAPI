@@ -54,3 +54,18 @@ There are essentially two ways to set up Kinects in a room:
 2. Another way is to have each kinect point at a different area to increase the area of tracking. However, it is really important to have enough overlapping coverage between Kinects so that there is always at least one kinect tracking people who are moving across.
 
 	![ScreenShot](https://raw.github.com/ase-lab/MSEAPI/Warnings/Screenshots/Screenshot7.png)
+	
+# How to pair devices with people
+
+MSE API tracks the location of devices by tracking the people who are holding these devices. To do that, devices need to be "paired" with the person who is holding that device. Here is how to pair a device with a person:
+
+1. Whenever an application that is running any of the MSE API client libraries is turned on, it will show up on the sidebar of the visualizer like below.
+
+	![ScreenShot](https://raw.github.com/ase-lab/MSEAPI/Warnings/Screenshots/Screenshot9.png)
+	
+2. Simply drag and drop that device on a person in the visualiser to pair them.
+
+	![ScreenShot](https://raw.github.com/ase-lab/MSEAPI/Warnings/Screenshots/Screenshot8.png)
+	
+3. If a device is not a hand held device (i.e a tabletop or a display), it can be dragged and dropped anywhere on the visualizer canvas.
+	
