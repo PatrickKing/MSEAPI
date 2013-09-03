@@ -67,8 +67,8 @@
             </Border>
             <TextBlock Text="MultiSurface Visualizer" FontFamily="Segoe UI" FontSize="30" FontStretch="UltraExpanded" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             <Image Source="Images/Icon-144.png" Height="300" Width="300" Stretch="Fill" HorizontalAlignment="Center" />
-            <Button Content="Reset People" Height="42" Name="button1" Width="140" Click="resetButton_Click" />
-            <Button Content="Calibrate" Height="44" Name="button2" Width="142" Click="calibrateButton_Click" />
+            <Button Content="Calibrate" Height="40" Name="button2" Width="140" Click="calibrateButton_Click" FontSize="18" FontWeight="Normal" />
+            <Button Content="Reset People" Height="40" Name="button1" Width="140" Click="resetButton_Click" FontSize="18" FontWeight="Normal" />
         </StackPanel>
     </Grid>
 </Window>

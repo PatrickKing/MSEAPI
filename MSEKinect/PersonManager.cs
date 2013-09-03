@@ -30,35 +30,13 @@ namespace MSEKinect
 
         #endregion
 
-
-
         #region Instance Variables
 
         private static TraceSource logger = new TraceSource("MSEKinect");
-        KinectSensor ks;
         GestureController gestureController;
         LocatorInterface locator;
         IAIntAirAct intAirAct;
         MSEKinectServer kinectserver;
-
-
-        //Tracker tracker;
-        //public Tracker Tracker 
-        //{ 
-        //    get { return tracker; } 
-        //    private set 
-        //    { 
-        //        tracker = value;
-        //        TrackerSet(this, tracker);
-        //    }
-        //}
-
-        //private List<Tracker> _trackers;
-        //public List<Tracker> Trackers
-        //{
-        //    get { return _trackers; }
-        //    set { _trackers = value; }
-        //}
 
         #endregion
 
@@ -68,10 +46,7 @@ namespace MSEKinect
         public event PersonChangedEventSignature PersonAdded;
         public event PersonChangedEventSignature PersonRemoved;
 
-        public delegate void TrackerChangedEventSignature(PersonManager sender, Tracker tracker);
-        public event TrackerChangedEventSignature TrackerSet;
-
-        public delegate void NewKinectDiscovered(string NewKinectID, bool hasLocation);
+        public delegate void NewKinectDiscovered(string NewKinectID, Point? KinectLocation, Double? KinectOrientation);
         public event NewKinectDiscovered newKinectDiscovered;
 
         public delegate void KinectRemoved(string NewKinectID);
@@ -85,6 +60,7 @@ namespace MSEKinect
         {
             this.gestureController = gc;
             this.locator = locator;
+            locator.threadLock = new object();
             this.intAirAct = intAirAct;
 
             kinectserver = new MSEKinectServer();
@@ -92,15 +68,50 @@ namespace MSEKinect
             kinectserver.NewKinectDiscovered += new NewKinectDiscoveredEventSignature(kinectserver_NewKinectDiscovered);
             kinectserver.SkeletonsRecieved += new SkeletonsReceivedEventSignature(kinectserver_SkeletonsRecieved);
             kinectserver.kinectRemoved += new KinectRemovedSignature(kinectserver_kinectRemoved);
+        }
 
-            //Trackers = new List<Tracker>();
-            //tracker = new Tracker() { Location = new Point(0, 0), Orientation = 0, Identifier = "MSEKinect", KinectID = "pewpew" };
-            //locator.Trackers.Add(tracker);
+        public void StartPersonManager()
+        {
+            // Sets the initial elevation angle of the connect to 0 degrees
+            // This seemed to be causing the app to hang, in particular with the Kinect that was dropped
+            //ks.ElevationAngle = 0;
+
+           // Set smoothing parameters for when Kinect is tracking a skeleton
+           TransformSmoothParameters parameters = new TransformSmoothParameters()
+           {
+                Smoothing = 0.7f,
+                Correction = 0.3f,
+                Prediction = 0.4f,
+                JitterRadius = 1.0f,
+                MaxDeviationRadius = 0.5f,
+           };
+
+           //ks.SkeletonStream.Enable(parameters);
+            //ks.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(ks_SkeletonFrameReady);
+        }
+
+        public void StopPersonManager()
+        {
+            kinectserver.Stop();
+        }
+
+        #endregion
+
+        #region Kinect Discovered/Removed and recieving Skeleton Frames
+
+        void kinectserver_NewKinectDiscovered(string NewKinectID, Point? KinectLocation, Double? KinectOrientation)
+        {
+            Tracker newTracker = new Tracker(NewKinectID, this.kinectserver);
+
+            locator.Trackers.Add(newTracker);
+
+            newKinectDiscovered(NewKinectID, KinectLocation, KinectOrientation);
         }
 
         void kinectserver_kinectRemoved(string KinectID)
         {
-            lock (locator.Persons)
+            // if a kinect is removed, we want to get rid of all people that it was tracking.
+            lock (locator.threadLock)
             {
                 List<Person> vanishedPersons = new List<Person>();
                 foreach (Person person in locator.Persons)
@@ -119,43 +130,10 @@ namespace MSEKinect
             }
             if (locator.Trackers.Count != 0)
             {
-                locator.Trackers.Remove( locator.Trackers.Find(x => x.Identifier.Equals(KinectID)));
+                locator.Trackers.Remove(locator.Trackers.Find(x => x.Identifier.Equals(KinectID)));
                 kinectRemoved(KinectID);
             }
         }
-
-        void kinectserver_NewKinectDiscovered(string NewKinectID, Point? KinectLocation, Double? KinectOrientation)
-        {
-            Tracker newTracker = new Tracker(NewKinectID, this.kinectserver);
-
-            //Trackers.Add(newTracker);
-            locator.Trackers.Add(newTracker);
-
-            if (KinectLocation != null)
-                newKinectDiscovered(NewKinectID, true);
-            else
-                newKinectDiscovered(NewKinectID, false);
-
-            //update location and orientation of tracker
-            newTracker.Location = KinectLocation;
-            newTracker.Orientation = KinectOrientation;
-
-            // TODO should only start streaming ig the tracker is added to the visulaizer canvas
-            //newTracker.StartStreaming();
-        }
-
-        public void resetPeople()
-        {
-            lock (locator.Persons)
-            {
-                locator.Persons.RemoveAll(x => x.GetType().Equals(x.GetType()));
-                foreach (Person person in locator.Persons.ToList())
-                {
-                    locator.Persons.Remove(person);
-                }
-            }
-        }
-
 
         void kinectserver_SkeletonsRecieved(string KinectID, List<Skeleton> SkeletonList)
         {
@@ -163,92 +141,37 @@ namespace MSEKinect
             gestureController.UpdateAllGestureGroups(SkeletonList.ToArray());
         }
 
-        public void StartPersonManager()
-        {
-            // If there is a Kinect connected, get the Kinect
-
-           // if (KinectSensor.KinectSensors.Count > 0)
-            {
-                //ks = KinectSensor.KinectSensors[0];
-                //ks.Start();
-
-
-
-                // Sets the initial elevation angle of the connect to 0 degrees
-                // This seemed to be causing the app to hang, in particular with the Kinect that was dropped
-                //ks.ElevationAngle = 0;
-
-                // Set smoothing parameters for when Kinect is tracking a skeleton
-                TransformSmoothParameters parameters = new TransformSmoothParameters()
-                {
-                    Smoothing = 0.7f,
-                    Correction = 0.3f,
-                    Prediction = 0.4f,
-                    JitterRadius = 1.0f,
-                    MaxDeviationRadius = 0.5f,
-                };
-
-                //ks.SkeletonStream.Enable(parameters);
-                //ks.SkeletonFrameReady += new EventHandler<SkeletonFrameReadyEventArgs>(ks_SkeletonFrameReady);
-            }
-        }
-
-        public void StopPersonManager()
-        {
-            if (ks != null)
-            {
-                ks.Stop();
-            }
-            kinectserver.Stop();
-        }
-
         #endregion
 
         #region Handling Skeleton Frames from Kinect
-
-        //TODO Add documentation explaining how this works
-        void ks_SkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e, string kinectID)
-        {
-            //Checks if the stream is enabled for cases (though unlikely) when stream isn't enabled
-            if (!((KinectSensor)sender).SkeletonStream.IsEnabled)
-                return;
-
-            //Process the skeleton frame
-            else
-            {
-                UpdatePersonsAndDevices(GetTrackedSkeletonsAndPositions(e), kinectID);
-                gestureController.UpdateAllGestureGroups(GetAllSkeletonData(e));
-            }
-
-
-        }
-
-
         /// <summary>
         /// Single function to update location, and eventually orientation, of persons and devices in response to new Kinect frames.
         /// </summary>
         /// <param name="skeletons"></param>
         private void UpdatePersonsAndDevices(List<Skeleton> skeletons, string kinectID)
         {
-            //Kinect occasionally returns null for a skeleton frame which leads to a null list<Skeleton>: skip this frame so that we don't drop any People
-            if (skeletons == null)
+            lock (locator.threadLock)
             {
-                return;
+                //Kinect occasionally returns null for a skeleton frame which leads to a null list<Skeleton>: skip this frame so that we don't drop any People
+                if (skeletons == null)
+                {
+                    return;
+                }
+                //Convert Locator List Types into PairablePerson & PairableDevice
+                List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+                List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
+
+                // During shut down, the kinect will return some empty skeleton frames, and null skeleton lists
+                if (skeletons == null)
+                    skeletons = new List<Skeleton>();
+
+                AddNewPeople(skeletons, pairablePersons, kinectID);
+                RemoveOldPeople(skeletons, pairablePersons, pairableDevices, kinectID);
+                UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices, kinectID);
+
+                //Sync up the Locator's Person collection
+                locator.Persons = new List<Person>(pairablePersons);
             }
-            //Convert Locator List Types into PairablePerson & PairableDevice
-            List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
-            List<PairableDevice> pairableDevices = locator.Devices.OfType<PairableDevice>().ToList<PairableDevice>();
-
-            // During shut down, the kinect will return some empty skeleton frames, and null skeleton lists
-            if (skeletons == null)
-                skeletons = new List<Skeleton>();
-
-            AddNewPeople(skeletons, pairablePersons, kinectID);
-            RemoveOldPeople(skeletons, pairablePersons, pairableDevices, kinectID);
-            UpdatePeopleLocations(skeletons, pairablePersons, pairableDevices, kinectID);
-
-            //Sync up the Locator's Person collection
-            locator.Persons = new List<Person>(pairablePersons);
         }
 
         private void UpdatePeopleLocations(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices, String kinectID)
@@ -289,7 +212,7 @@ namespace MSEKinect
 
         private void RemoveOldPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, List<PairableDevice> pairableDevices, String kinectID)
         {
-            // For any Persons that have left the scene, remove their PairablePerson from , and if it was paired, unhook their paired device
+            // If a person has dissappeared, remove the kinect ID from they TrackIDwithSkeletonID dictionary
             List<PairablePerson> vanishedPersons = new List<PairablePerson>();
             foreach (PairablePerson person in pairablePersons)
             {
@@ -314,13 +237,9 @@ namespace MSEKinect
                 }
 
 
-
-                //if (skeletons.Find(x => x.TrackingId.ToString().Equals(person.Identifier)) == null)
+                //If that person is not tracked by anyone then make them an occluded person.
                 if(person.TrackerIDwithSkeletonID.Count == 0)
                 {
-
-                    //if (!person.TrackedByIdentifier.Equals(kinectID))
-                    //    continue;
 
                     //Remove Held-By-Person Identifier
                     PairableDevice device = pairableDevices.Find(x => x.Identifier.Equals(person.HeldDeviceIdentifier));
@@ -376,17 +295,16 @@ namespace MSEKinect
                 PersonRemoved(this, person);
         } 
 
-
         private void AddNewPeople(List<Skeleton> skeletons, List<PairablePerson> pairablePersons, String kinectID)
         {
-
+            //if a skeleton is very close to an existing person, that kinect will be added to the person's list of TrackerIDwithSkeletonID
+            //this is how one person can be tracked by multiple kinects.
             foreach (Skeleton skeleton in skeletons)
             {
                 Point skeletonInRoomSpace = locator.Trackers.Find(x => x.Identifier.Equals(kinectID)).ConvertSkeletonToRoomSpace(new Vector(skeleton.Position.Z, skeleton.Position.X));
 
                 foreach (PairablePerson pairablePerson in pairablePersons)
                 {
-                    //if this skeleton is very close to an existing person, that kinect will be added to the person's list of TrackerIDwithSkeletonID
                     if (skeletonInRoomSpace.X < (pairablePerson.Location.Value.X + PROXIMITYDISTANCE) &&
                         skeletonInRoomSpace.X > (pairablePerson.Location.Value.X - PROXIMITYDISTANCE) &&
                         skeletonInRoomSpace.Y < (pairablePerson.Location.Value.Y + PROXIMITYDISTANCE) &&
@@ -399,14 +317,11 @@ namespace MSEKinect
                         break;
                     }
                 }
-
             }
 
-
-            // First, test each new skeleton to see if it matches an occluded person
+            // Then, test each new skeleton to see if it matches an occluded person
             foreach (Skeleton skeleton in skeletons)
             {
-                //New Skeleton Found
                 //if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
                 if (pairablePersons.Find(x => skeleton.TrackingId.ToString().Equals(x.Identifier)) == null)
                 {
@@ -433,15 +348,13 @@ namespace MSEKinect
                 }
             }
 
-            // For any skeletons that weren't matched to an occluded person, we create a new PairablePerson
+            // For any skeletons that could not be matched to an existing person or if it wasn't matched to an occluded person, we create a new PairablePerson
             foreach (Skeleton skeleton in skeletons)
             {
-
                 if (skeleton.TrackingId == 0)
                     continue;
+
                 //New Skeleton Found
-                //if (pairablePersons.Find(x => x.Identifier.Equals(skeleton.TrackingId.ToString())) == null)
-                //if (pairablePersons.Find(x => skeleton.TrackingId.ToString().Equals(x.Identifier)) == null )
                 if(pairablePersons.Find(x => x.TrackerIDwithSkeletonID.ContainsValue(skeleton.TrackingId.ToString())) == null)
                 {
                     PairablePerson person = new PairablePerson
@@ -450,6 +363,7 @@ namespace MSEKinect
                         Orientation = 0.0,
                         Identifier = skeleton.TrackingId.ToString(),
                         PairingState = PairingState.NotPaired,
+                        CalibrationState = PairablePerson.CallibrationState.NotUsedCalibration,
                         TrackerIDwithSkeletonID = new Dictionary<string, string>(),
                         TrackedByIdentifier = kinectID
                     };
@@ -503,8 +417,6 @@ namespace MSEKinect
             }
         }
 
-        
-
         /// <summary>
         /// Gets all skeletons seen by the Kinect, whether they are fully tracked (with skeleton data) or only positionally tracked (position only, no joint or bones).
         /// </summary>
@@ -535,8 +447,6 @@ namespace MSEKinect
             }
         }
 
-
-
         Skeleton[] GetAllSkeletonData(SkeletonFrameReadyEventArgs e)
         {
             //Allocate a maximum of 6 skeletons, as per the maximum allowed by the Kinect
@@ -557,49 +467,90 @@ namespace MSEKinect
             }
         }
 
-
-
-
         #endregion
 
-
-        #region Calibration
+        #region Calibration and Reseting people
 
         public void calibrate()
         {
-            //if((locator.Trackers.FindAll(x => x.State == Tracker.CallibrationState.NotCalibrated)).Count == 2 && locator.Persons.Count == 2)
-            if (locator.Trackers.Count == locator.Persons.Count)
-            {
-                Person person1 = locator.Persons[0];
-                Tracker tracker1 = locator.Trackers.Find(x => x.Identifier.Equals(person1.TrackerIDwithSkeletonID.Keys.ToList()[0])
-                                                               && x.State == Tracker.CallibrationState.NotCalibrated);
 
-                for (int i = 1; i < locator.Trackers.Count; i++)
+                List<PairablePerson> pairablePersons = locator.Persons.OfType<PairablePerson>().ToList<PairablePerson>();
+                List<PairablePerson> personsUsedForCalibration = pairablePersons.FindAll(x => x.CalibrationState == PairablePerson.CallibrationState.UsedForCalibration);
+
+                if (personsUsedForCalibration.Count > 1)
                 {
-                    Person person2 = locator.Persons[i];
-                    Tracker tracker2 = locator.Trackers.Find(x => x.Identifier.Equals(person2.TrackerIDwithSkeletonID.Keys.ToList()[0])
-                                                                    && x.State == Tracker.CallibrationState.NotCalibrated);
+                    Dictionary<PairablePerson, Tracker> personsAndTheirTrackers = new Dictionary<PairablePerson, Tracker>();
 
-                    double xValue = person1.Location.Value.X - person2.Location.Value.X;
-                    double yValue = person1.Location.Value.Y - person2.Location.Value.Y;
-
-                    try
+                    foreach (PairablePerson person in personsUsedForCalibration)
                     {
-                        Point newPosition = new Point(tracker2.Location.Value.X + xValue, tracker2.Location.Value.Y + yValue);
-                        tracker2.Location = newPosition;
+                        Tracker tracker = locator.Trackers.Find(x => x.Identifier.Equals(person.TrackerIDwithSkeletonID.Keys.ToList()[0]));
+                        personsAndTheirTrackers.Add(person, tracker);
+                    }
 
-                        tracker1.State = Tracker.CallibrationState.Calibrated;
-                        tracker2.State = Tracker.CallibrationState.Calibrated;
-                    }
-                    catch (NullReferenceException nullReferenceException)
+                    Tracker mainTracker = null;
+                    PairablePerson mainPerson = null;
+
+                    foreach (KeyValuePair<PairablePerson, Tracker> entry in personsAndTheirTrackers)
                     {
-                        System.Console.WriteLine(nullReferenceException.Message);
+                        if (entry.Value.State == Tracker.CallibrationState.Calibrated)
+                        {
+                            mainTracker = entry.Value;
+                            mainPerson = entry.Key;
+                            break;
+                        }
                     }
+
+                    if (mainTracker == null)
+                    {
+                        mainTracker = personsAndTheirTrackers.Values.ToList()[0];
+                        mainPerson = personsAndTheirTrackers.Keys.ToList()[0];
+                    }
+
+                    mainTracker.State = Tracker.CallibrationState.Calibrated;
+
+                    foreach (KeyValuePair<PairablePerson, Tracker> entry in personsAndTheirTrackers)
+                    {
+                        PairablePerson person = entry.Key;
+                        Tracker tracker = entry.Value;
+
+                        if (tracker.State == Tracker.CallibrationState.Calibrated)
+                            continue;
+
+                        double xValue = mainPerson.Location.Value.X - person.Location.Value.X;
+                        double yValue = mainPerson.Location.Value.Y - person.Location.Value.Y;
+
+                        try
+                        {
+                            Point newPosition = new Point(tracker.Location.Value.X + xValue, tracker.Location.Value.Y + yValue);
+                            tracker.Location = newPosition;
+
+                            tracker.State = Tracker.CallibrationState.Calibrated;
+                        }
+                        catch (NullReferenceException nullReferenceException)
+                        {
+                            System.Console.WriteLine(nullReferenceException);
+                        }
+                    }
+
+                    foreach (PairablePerson person in personsAndTheirTrackers.Keys.ToList())
+                    {
+                        person.CalibrationState = PairablePerson.CallibrationState.NotUsedCalibration;
+                    }
+
                 }
-            }
-
         }
 
+        public void resetPeople()
+        {
+            lock (locator.threadLock)
+            {
+                locator.Persons.RemoveAll(x => x.GetType().Equals(x.GetType()));
+                foreach (Person person in locator.Persons.ToList())
+                {
+                    locator.Persons.Remove(person);
+                }
+            }
+        }
 
         #endregion
 

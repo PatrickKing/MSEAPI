@@ -26,6 +26,13 @@ namespace MSELocator
             set { _devices = value; }
         }
 
+        private Object _threadLock;
+        public Object threadLock
+        {
+            get { return _threadLock; }
+            set { _threadLock = value; }
+        }
+
         // Tracker does not actually need to be a part of the locator to work, though it makes sense to keep tabs on trackers in a central place.
         private List<Tracker> _trackers;
         public List<Tracker> Trackers
@@ -70,9 +77,9 @@ namespace MSELocator
         /// </summary>
         /// <param name="observer"></param>
         /// <returns>Devices in the field of view of the observer and their intersection points.</returns>
-        public Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints(Device observer)
+        public List<Device> GetDevicesInView(Device observer)
         {
-            Dictionary<Device, Point> returnDevices = new Dictionary<Device, Point>();
+            List<Device> returnDevices = new List<Device>();
 
             Line obseverLineOfSight = new Line(observer.Location, observer.Orientation);
 
@@ -110,7 +117,11 @@ namespace MSELocator
                 }
 
                 Point ratioOnScreen = GetRatioPositionOnScreen(target, (Point)nearestPoint);
-                returnDevices.Add(target, ratioOnScreen);
+
+
+                target.intersectionPoint["x"] = ratioOnScreen.X;
+                target.intersectionPoint["y"] = ratioOnScreen.Y;
+                returnDevices.Add(target);                
             }
 
             return returnDevices;
@@ -249,7 +260,7 @@ namespace MSELocator
             return new Point(-1, -1);
         }
 
-
+        /* Depricated!!!
         /// <summary>
         /// Computes the devices within the field of view of the observer. Returns an empty list if FieldOfView or Location are null on the observer.
         /// </summary>
@@ -301,6 +312,7 @@ namespace MSELocator
             return returnDevices;
 
         }
+         * */
 
         /// <summary>
         /// Computes the devices that are in front of the observer device. Returns an empty list if FieldOfView or Location are null on the observer.
@@ -417,10 +429,6 @@ namespace MSELocator
             return FindNearestDevice(observer, devicesInView);
         }
 
-
-        #endregion
-
-
         private static Device FindNearestDevice(Device observer, List<Device> deviceList)
         {
             if (deviceList.Count == 0)
@@ -453,6 +461,8 @@ namespace MSELocator
 
             }
         }
+
+        #endregion
 
     }
 }

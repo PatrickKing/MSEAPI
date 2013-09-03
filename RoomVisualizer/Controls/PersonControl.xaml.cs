@@ -24,15 +24,19 @@ namespace RoomVisualizer
     public partial class PersonControl : UserControl
     {
 
+        private PairablePerson person;
 
         public PersonControl(PairablePerson pairablePerson)
         {
             InitializeComponent();
 
+            person = pairablePerson;
+
             //Setup Events
             pairablePerson.LocationChanged += OnLocationChanged;
             pairablePerson.OrientationChanged += OnOrientationChanged;
             pairablePerson.PairingStateChanged += OnPairingStateChanged;
+            pairablePerson.CalibrationStateChanged += onCalibrationStateChanged;
 
             //Setup the person's 'dot'
             PersonEllipse.StrokeThickness = DrawingResources.STROKE_WIDTH;
@@ -94,6 +98,29 @@ namespace RoomVisualizer
                 PersonEllipse.Stroke = DrawingResources.GetBrushFromPairingState(pairablePerson.PairingState);
             }));
    
+        }
+        
+        public void onCalibrationStateChanged(PairablePerson pairablePerson)
+        {
+            //Dispatch Brush Change to Main Thread
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                //Set Color of Ellipse to Appropriate Color
+                PersonEllipse.Stroke = DrawingResources.GetBrushFromCalibrationState(pairablePerson.CalibrationState);
+            }));
+        }
+
+        private void PersonEllipse_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (person.CalibrationState == PairablePerson.CallibrationState.NotUsedCalibration)
+            {
+                person.CalibrationState = PairablePerson.CallibrationState.UsedForCalibration;
+            }
+            else
+            {
+                person.CalibrationState = PairablePerson.CallibrationState.NotUsedCalibration;
+            }
+
         }
 
     }

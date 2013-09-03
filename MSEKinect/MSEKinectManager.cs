@@ -44,7 +44,6 @@ namespace MSEKinect
             get { return intAirAct; }
         }
 
-
         public MSEKinectManager(bool RequireKinect = false)
         {
             if (RequireKinect)
@@ -61,7 +60,6 @@ namespace MSEKinect
 
         }
 
-
         public void Start()
         {
             personManager.StartPersonManager();
@@ -70,7 +68,6 @@ namespace MSEKinect
 
             gestureController.GestureRecognized += pairingRecognizer.PersonPairAttempt;
             communicationManager = new CommunicationManager(intAirAct, pairingRecognizer, locator, personManager);
-            
         }
 
         public void Stop()

@@ -161,7 +161,7 @@ namespace RoomVisualizer
 
         private void cleanUpKinectPersons(string kinectID)
         {
-            lock (PersonControlDictionary)
+            lock (kinectManager.Locator.threadLock)
             {
                 foreach (KeyValuePair<PairablePerson, PersonControl> entry in PersonControlDictionary.ToList())
                 {
@@ -182,6 +182,7 @@ namespace RoomVisualizer
         {
             string DataType = e.Data.GetFormats(true)[0];
 
+            //if the object dropped is a tracker
             if (DataType == "trackerControl")
             {
                 base.OnDrop(e);
@@ -201,31 +202,30 @@ namespace RoomVisualizer
                 
 
                 // Check if the TrackerControl is already a child of Shared Canvas
-
                 Point canvasBounds = new Point(DrawingResources.ConvertFromMetersToPixelsX(DrawingResources.ROOM_WIDTH, sharedCanvas), DrawingResources.ConvertFromMetersToPixelsY(DrawingResources.ROOM_HEIGHT, sharedCanvas));   
 
                 if (!trackerControl.IsDescendantOf(SharedCanvas))
                 {
                     trackerControl.formatForCanvas();
-
                     kinectWrapPanel.Children.Remove(trackerControl);
                     SharedCanvas.Children.Add(trackerControl);
-                    
+
+                    if (trackerControl.Tracker.Orientation == null)
+                        trackerControl.Tracker.Orientation = 270;
                 }
 
-                // If the Cursor is within the Canvas
+                // if the cursor is outside the canvas, put the tracker back in stackpanel.
                 else if (!(mouseLocation.X < canvasBounds.X && mouseLocation.Y < canvasBounds.Y))
                 {
                     trackerControl.Tracker.StopStreaming();
                     cleanUpKinectPersons(trackerControl.Tracker.Identifier);
                     trackerControl.formatForStackPanel();
-
                     SharedCanvas.Children.Remove(trackerControl);
                     kinectWrapPanel.Children.Add(trackerControl);
                 }
             }
             
-            
+            //if the objet dropped is a device.
             else if (DataType == "deviceControl")
             {
                 base.OnDrop(e);
@@ -341,14 +341,6 @@ namespace RoomVisualizer
             //Seperate components for displaying the visible skeletons
             skeletonRenderer = new SkeletonRenderer(SkeletonBasicsImage);
 
-
-            //Hardcode tracker position and orientation
-            //Tracker tracker = kinectManager.Locator.Trackers[0];
-
-            ////TODO - Set up event handling for new Trackers and put this code in there.
-            //TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
-            //canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-
             //// Values retrieved from:
             //// http://blogs.msdn.com/b/kinectforwindows/archive/2012/01/20/near-mode-what-it-is-and-isn-t.aspx
             //// http://msdn.microsoft.com/en-us/library/jj131033.aspx
@@ -356,32 +348,32 @@ namespace RoomVisualizer
             //tracker.MaxRange = 4;
             //tracker.FieldOfView = 57;
 
-            //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-            //tracker.Orientation = 275;
-
             }));
         }
 
-        private void KinectDiscovered(string kinectID, bool hasLocation)
+        private void KinectDiscovered(string kinectID, Point? KinectLocation, Double? KinectOrientation)
         {
             Tracker tracker = kinectManager.Locator.Trackers.Find(x => x.Identifier.Equals(kinectID));
 
             this.Dispatcher.Invoke(new Action(delegate()
             {
-                if (!hasLocation)
+                //if the discovered kinect doesn't have a location, put the kinect in stack panel
+                if (KinectLocation == null)
                 {
                     TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
                     TrackerControlDictionary[tracker.Identifier].formatForStackPanel();
                     availableKinectsStackPanel.Children.Add(TrackerControlDictionary[tracker.Identifier]);
-
-                    //tracker.Location = new Point(DrawingResources.ROOM_WIDTH / 2, DrawingResources.ROOM_HEIGHT);
-                    tracker.Orientation = 270;
                 }
                 else
                 {
                     TrackerControlDictionary[tracker.Identifier] = new TrackerControl(tracker);
                     TrackerControlDictionary[tracker.Identifier].formatForCanvas();
                     canvas.Children.Add(TrackerControlDictionary[tracker.Identifier]);
+
+                    tracker.Location = KinectLocation;
+
+                    if (KinectOrientation != null)
+                        tracker.Orientation = KinectOrientation;
                 }
             }));
         }
@@ -448,8 +440,11 @@ namespace RoomVisualizer
         {
             this.Dispatcher.Invoke(new Action(delegate()
             {
-                PersonControlDictionary[pairablePerson] = new PersonControl(pairablePerson);
-                canvas.Children.Add(PersonControlDictionary[pairablePerson]);
+                if (!PersonControlDictionary.ContainsKey(pairablePerson))
+                {
+                    PersonControlDictionary[pairablePerson] = new PersonControl(pairablePerson);
+                    canvas.Children.Add(PersonControlDictionary[pairablePerson]);
+                }
             }));
         }
 
@@ -472,7 +467,11 @@ namespace RoomVisualizer
             {
                 //drawnTracker = new DrawnTracker(tracker);
             }
+        }
 
+        void Clean()
+        {
+            
         }
 
         #endregion

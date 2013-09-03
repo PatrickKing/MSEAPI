@@ -101,6 +101,7 @@ namespace MSELocator
         }
         #endregion
 
+        # region Line Fucntions
         public static Point? getIntersectionPoint(Line line1, Line line2)
         {
             Point? IntersectionPoint = null;
@@ -168,5 +169,7 @@ namespace MSELocator
             if (answer < 0) { return true; }
             return false;
         }
+
+        #endregion
     }
 }

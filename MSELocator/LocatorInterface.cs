@@ -8,6 +8,12 @@ namespace MSELocator
 {
     public interface LocatorInterface
     {
+        Object threadLock
+        {
+            get;
+            set;
+        }
+
         List<Person> Persons
         {
             get;
@@ -45,8 +51,6 @@ namespace MSELocator
         Device GetNearestDeviceWithinRange(String identifier, double distance);
 
         Device GetNearestDeviceWithinRange(Device observer, double distance);
-
-        Dictionary<Device, Point> GetDevicesInViewWithIntersectionPoints(Device observer);
 
         #endregion
 
